@@ -21,5 +21,5 @@ useHead({
   <HomeTestimonialsSection />
   <HomeArticlesSection />
   <HomeFaqSection />
-
+  <HomeContactSection />
 </template>
