@@ -16,5 +16,6 @@ useHead({
   <HomeTrustBar />
   <HomeConcernsSection />
   <HomeServicesSection />
+  <HomeApproachSection />
 
 </template>
