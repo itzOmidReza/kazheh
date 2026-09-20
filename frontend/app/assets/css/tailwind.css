@@ -1,72 +1,123 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ========================================
+   Conscious Calm — Light theme
+   ======================================== */
 
 :root {
-  --background: #ffffff;
-  --foreground: #09090b;
+  color-scheme: light;
+
+  --background: #f8faf8;
+  --foreground: #18393c;
+
+  --surface: #f1f6f3;
 
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #18393c;
 
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
+  --popover: #ffffff;
+  --popover-foreground: #18393c;
 
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
+  --primary: #16484a;
+  --primary-foreground: #ffffff;
 
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  --secondary: #e8f2ed;
+  --secondary-foreground: #16484a;
 
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --muted: #f1f6f3;
+  /* Slightly darker than the original token for readable small text. */
+  --muted-foreground: #596e6e;
 
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
+  /* Interactive highlights: menus, tabs, calendar, etc. */
+  --accent: #d6e9e0;
+  --accent-foreground: #102f35;
 
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #a1a1aa;
+  /* Warm emphasis reserved for the main call to action. */
+  --cta: #dda075;
+  --cta-hover: #f0c3a2;
+  --cta-foreground: #102f35;
+
+  --destructive: #b42332;
+  --destructive-foreground: #ffffff;
+
+  --success: #216447;
+  --success-foreground: #ffffff;
+
+  --border: #d9e5df;
+  --input: #849b90;
+  --ring: #1d625d;
+
+  --radius: 0.875rem;
+
+  --motion-fast: 160ms;
+  --motion-normal: 240ms;
+  --motion-slow: 500ms;
 }
+
+/* ========================================
+   Dark theme — proposed extension
+   ======================================== */
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
+  color-scheme: dark;
 
-  --card: #09090b;
-  --card-foreground: #fafafa;
+  --background: #0d2024;
+  --foreground: #e8f2ed;
 
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
+  --surface: #132c30;
 
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
+  --card: #163035;
+  --card-foreground: #e8f2ed;
 
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
+  --popover: #163035;
+  --popover-foreground: #e8f2ed;
 
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --primary: #bcd8cc;
+  --primary-foreground: #102f35;
 
-  --destructive: #7f1d1d;
-  --destructive-foreground: #fafafa;
+  --secondary: #203e40;
+  --secondary-foreground: #e8f2ed;
 
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #71717a;
+  --muted: #193338;
+  --muted-foreground: #b0c4bc;
+
+  --accent: #294b48;
+  --accent-foreground: #e8f2ed;
+
+  --cta: #dda075;
+  --cta-hover: #f0c3a2;
+  --cta-foreground: #102f35;
+
+  --destructive: #ffabb3;
+  --destructive-foreground: #440c16;
+
+  --success: #a4d9b9;
+  --success-foreground: #102f25;
+
+  --border: #355153;
+  --input: #68867c;
+  --ring: #bcd8cc;
 }
 
-@theme inline {
-  --font-heading: var(--font-sans);
+/* ========================================
+   Tailwind semantic colors
+   ======================================== */
 
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
 
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -80,20 +131,173 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-cta-foreground: var(--cta-foreground);
+
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
 
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 }
 
+/* ========================================
+   Brand palette and design tokens
+   ======================================== */
+
+@theme {
+  --font-sans: 'Vazirmatn', Tahoma, sans-serif;
+  --font-heading: 'Vazirmatn', Tahoma, sans-serif;
+
+  --color-primary-900: #102f35;
+  --color-primary-800: #16484a;
+  --color-primary-700: #1d625d;
+  --color-primary-500: #3d8a7d;
+
+  --color-sage-100: #e8f2ed;
+  --color-sage-200: #d6e9e0;
+  --color-sage-300: #bcd8cc;
+
+  --color-warm-300: #f0c3a2;
+  --color-warm-500: #dda075;
+  --color-warm-700: #b8754e;
+
+  /* Fluid headings: mobile → desktop */
+  --text-display: clamp(2.125rem, 1.5rem + 2.5vw, 3.5rem);
+  --text-display--line-height: 1.45;
+  --text-display--font-weight: 800;
+
+  --text-heading-xl: clamp(1.875rem, 1.375rem + 2vw, 2.75rem);
+  --text-heading-xl--line-height: 1.5;
+  --text-heading-xl--font-weight: 700;
+
+  --text-heading-lg: clamp(1.5rem, 1.125rem + 1.5vw, 2.125rem);
+  --text-heading-lg--line-height: 1.6;
+  --text-heading-lg--font-weight: 700;
+
+  --text-heading-md: 1.5rem;
+  --text-heading-md--line-height: 1.65;
+  --text-heading-md--font-weight: 600;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 2;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 2;
+
+  /* Minimum 14px for supporting text */
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.9;
+
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.8;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.375rem;
+  --radius-xl: 2rem;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 8px 24px rgb(16 47 53 / 7%);
+  --shadow-card: 0 16px 32px rgb(16 47 53 / 11%);
+  --shadow-floating: 0 24px 55px rgb(7 29 37 / 22%);
+
+  --container-site: 75rem;
+
+  --spacing-section: clamp(3rem, 1.5rem + 6vw, 6rem);
+  --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2rem);
+
+  --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ========================================
+   Base styles
+   ======================================== */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  html {
+    font-family: var(--font-sans);
+    scroll-padding-block-start: 6rem;
   }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+    min-block-size: 100svh;
+    font-size: 0.9375rem;
+    line-height: 2;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.5;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  :where(
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    summary,
+    [tabindex]
+  ):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  :where(input, textarea, select) {
+    accent-color: var(--primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ========================================
+   Reusable layout utilities
+   ======================================== */
+
+@utility site-container {
+  width: 100%;
+  max-width: var(--container-site);
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+}
+
+@utility section-space {
+  padding-block: var(--spacing-section);
 }
