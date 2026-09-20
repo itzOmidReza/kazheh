@@ -15,5 +15,6 @@ useHead({
   <HomeHero />
   <HomeTrustBar />
   <HomeConcernsSection />
+  <HomeServicesSection />
 
 </template>
