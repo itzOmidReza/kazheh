@@ -32,10 +32,7 @@ bun-debug.log*
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# Local env files
-.env
-.env.*
-!.env.example
+
 
 # Testing / coverage
 coverage
@@ -49,3 +46,7 @@ coverage
 # Vite / Nitro
 .vite
 .vite-inspect
+
+
+
+# backend
