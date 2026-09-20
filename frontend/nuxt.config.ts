@@ -16,4 +16,13 @@ export default defineNuxtConfig({
     prefix: '',
     componentDir: '@/components/ui',
   },
+
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: 'fa',
+        dir: 'rtl',
+      },
+    },
+  },
 });
