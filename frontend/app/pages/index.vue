@@ -17,5 +17,6 @@ useHead({
   <HomeConcernsSection />
   <HomeServicesSection />
   <HomeApproachSection />
+  <HomeProcessSection />
 
 </template>
