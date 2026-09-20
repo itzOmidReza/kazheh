@@ -18,5 +18,8 @@ useHead({
   <HomeServicesSection />
   <HomeApproachSection />
   <HomeProcessSection />
+  <HomeTestimonialsSection />
+  <HomeArticlesSection />
+  <HomeFaqSection />
 
 </template>
