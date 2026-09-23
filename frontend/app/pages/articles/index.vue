@@ -1,5 +1,16 @@
 <script setup lang="ts">
 import { ArrowLeft, Clock3 } from '@lucide/vue'
+import { siteConfig } from '~/data'
+
+useHead({
+  title: `مجله و مقالات | ${siteConfig.name}`,
+  meta: [
+    {
+      name: 'description',
+      content: 'یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.',
+    },
+  ],
+})
 
 const articles = [
   {
@@ -10,41 +21,42 @@ const articles = [
       'گاهی شناختن آنچه در ذهن و بدن ما می‌گذرد، اولین قدم برای برخورد آرام‌تر با اضطراب است.',
     readingTime: 6,
   },
-{
-  slug: 'healthy-boundaries',
+  {
+    slug: 'healthy-boundaries',
     category: 'روابط',
-      title: 'مرزهای سالم در رابطه چه معنایی دارند؟',
-        excerpt:
-  'مرزبندی به معنی فاصله گرفتن از دیگران نیست؛ راهی برای شناختن نیازها و احترام متقابل است.',
+    title: 'مرزهای سالم در رابطه چه معنایی دارند؟',
+    excerpt:
+      'مرزبندی به معنی فاصله گرفتن از دیگران نیست؛ راهی برای شناختن نیازها و احترام متقابل است.',
     readingTime: 5,
-},
-{
-  slug: 'starting-therapy',
+  },
+  {
+    slug: 'starting-therapy',
     category: 'شروع درمان',
-      title: 'اگر برای شروع مشاوره مردد هستید',
-        excerpt:
-  'مردد بودن پیش از اولین گفت‌وگو طبیعی است. چند نکته می‌تواند تصمیم‌گیری را ساده‌تر کند.',
+    title: 'اگر برای شروع مشاوره مردد هستید',
+    excerpt:
+      'مردد بودن پیش از اولین گفت‌وگو طبیعی است. چند نکته می‌تواند تصمیم‌گیری را ساده‌تر کند.',
     readingTime: 4,
-},
+  },
 ]
+
+const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 </script>
 
 <template>
-  <main>
+  <div>
     <section class="section-space bg-surface">
       <div class="site-container">
         <div class="max-w-2xl">
           <p class="text-sm font-medium text-primary">
-            مجله کلینیک آرامش
+            مجله {{ siteConfig.name }}
           </p>
 
-          <h1 class="mt-4 text-heading-xl text-primary-900">
+          <h1 class="mt-4 text-heading-xl text-foreground">
             برای شناخت بیشتر خودتان
           </h1>
 
           <p class="mt-5 text-body-lg text-muted-foreground">
-            یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های
-            روزمره.
+            یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.
           </p>
         </div>
       </div>
@@ -62,11 +74,11 @@ const articles = [
 
               <span class="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock3 class="size-3.5" />
-                {{ article.readingTime }} دقیقه
+                {{ formatNumber(article.readingTime) }} دقیقه
               </span>
             </div>
 
-            <h2 class="mt-6 text-xl font-bold leading-9 text-primary-900">
+            <h2 class="mt-6 text-xl font-bold leading-9 text-foreground">
               {{ article.title }}
             </h2>
 
@@ -75,7 +87,7 @@ const articles = [
             </p>
 
             <NuxtLink :to="`/articles/${article.slug}`"
-              class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-700">
+              class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
               مطالعه مقاله
               <ArrowLeft class="size-4" />
             </NuxtLink>
@@ -83,5 +95,5 @@ const articles = [
         </div>
       </div>
     </section>
-  </main>
+  </div>
 </template>

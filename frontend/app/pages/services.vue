@@ -18,41 +18,24 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { siteConfig } from '~/data/site'
+import { servicesList, servicesPageContent } from '~/data/services'
 
 useHead({
-  title: 'خدمات روان‌شناسی | کلینیک آرامش',
+  title: `خدمات روان‌شناسی | ${siteConfig.name}`,
   meta: [
     {
       name: 'description',
-      content:
-        'آشنایی با خدمات مشاوره فردی، روابط و همراهی در مسیر تغییر در کلینیک آرامش.',
+      content: servicesPageContent.description,
     },
   ],
 })
 
-const services = [
-  {
-    icon: Sparkles,
-    title: 'مشاوره فردی',
-    description:
-      'فضایی امن برای شناخت بهتر خود، بررسی احساسات و پیدا کردن قدم‌های مناسب برای ادامه مسیر.',
-    topics: ['خودشناسی', 'اضطراب و نگرانی', 'تصمیم‌گیری'],
-  },
-  {
-    icon: HeartHandshake,
-    title: 'مشاوره روابط',
-    description:
-      'کمک به درک بهتر الگوهای ارتباطی، نیازها و مرزها در رابطه با خود و دیگران.',
-    topics: ['ارتباط مؤثر', 'مرزبندی', 'تعارض‌های رابطه'],
-  },
-  {
-    icon: UsersRound,
-    title: 'همراهی در تغییر',
-    description:
-      'برای زمانی که می‌خواهید الگوهای قدیمی را بهتر بشناسید و تغییر را با قدم‌های کوچک آغاز کنید.',
-    topics: ['تغییر عادت‌ها', 'اعتمادبه‌نفس', 'رشد شخصی'],
-  },
-]
+const iconMap: Record<string, any> = {
+  Sparkles,
+  HeartHandshake,
+  UsersRound,
+}
 
 const principles = [
   {
@@ -74,33 +57,32 @@ const principles = [
 </script>
 
 <template>
-  <main>
+  <div>
     <!-- Header -->
     <section class="section-space bg-surface">
       <div class="site-container">
         <div class="max-w-3xl">
-          <Badge variant="secondary" class="rounded-pill bg-sage-100 text-primary-800">
-            خدمات کلینیک
+          <Badge variant="secondary"
+            class="rounded-pill bg-sage-100 text-primary-800 dark:bg-primary-950 dark:text-sage-300">
+            {{ servicesPageContent.badge }}
           </Badge>
 
-          <h1 class="mt-6 text-heading-xl text-primary-900">
-            مسیری متناسب با
-            <span class="text-primary-700">نیاز شما</span>
+          <h1 class="mt-6 text-heading-xl text-foreground">
+            {{ servicesPageContent.title }}
           </h1>
 
           <p class="mt-6 text-body-lg text-muted-foreground">
-            خدمات ما بر پایه گفت‌وگو، شناخت و همراهی شکل می‌گیرند. برای شروع
-            لازم نیست پاسخ همه سؤال‌ها را بدانید.
+            {{ servicesPageContent.description }}
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Services -->
+    <!-- Services Grid -->
     <section class="section-space bg-background">
       <div class="site-container">
         <div class="grid gap-5 lg:grid-cols-3">
-          <Card v-for="(service, index) in services" :key="service.title" :class="[
+          <Card v-for="(service, index) in servicesList" :key="service.title" :class="[
             'group flex h-full flex-col rounded-[1.5rem] transition-all duration-300 hover:-translate-y-1',
             index === 0
               ? 'border-primary-700 bg-primary-900 text-white shadow-floating'
@@ -111,14 +93,14 @@ const principles = [
                 'flex size-12 items-center justify-center rounded-2xl',
                 index === 0
                   ? 'bg-sage-200 text-primary-900'
-                  : 'bg-sage-100 text-primary-700',
+                  : 'bg-sage-100 text-primary-700 dark:bg-primary-950 dark:text-sage-300',
               ]">
-                <component :is="service.icon" class="size-5" />
+                <component :is="iconMap[service.icon] || Sparkles" class="size-5" />
               </span>
 
               <CardTitle :class="[
                 'pt-5 text-2xl',
-                index === 0 ? 'text-white' : 'text-primary-900',
+                index === 0 ? 'text-white' : 'text-foreground',
               ]">
                 {{ service.title }}
               </CardTitle>
@@ -131,7 +113,7 @@ const principles = [
                   ? 'text-sage-200/80'
                   : 'text-muted-foreground',
               ]">
-                {{ service.description }}
+                {{ service.fullDescription || service.shortDescription }}
               </p>
 
               <div class="mt-6 flex flex-wrap gap-2">
@@ -139,7 +121,7 @@ const principles = [
                   'rounded-pill px-3 py-1 text-xs',
                   index === 0
                     ? 'border border-white/15 bg-white/10 text-sage-200'
-                    : 'bg-sage-100 text-primary-700',
+                    : 'bg-sage-100 text-primary-700 dark:bg-primary-950 dark:text-sage-300',
                 ]">
                   {{ topic }}
                 </span>
@@ -151,7 +133,7 @@ const principles = [
                 'rounded-pill px-0',
                 index === 0
                   ? 'text-sage-200 hover:bg-transparent hover:text-white'
-                  : 'text-primary hover:bg-transparent hover:text-primary-700',
+                  : 'text-primary hover:bg-transparent hover:text-primary-700 dark:hover:text-primary-foreground',
               ]">
                 <NuxtLink to="/#contact">
                   درباره شروع این مسیر
@@ -172,19 +154,20 @@ const principles = [
             این خدمات چگونه پیش می‌روند؟
           </p>
 
-          <h2 class="mt-4 text-heading-lg text-primary-900">
-            کیفیت همراهی، فقط به عنوان خدمت وابسته نیست.
+          <h2 class="mt-4 text-heading-lg text-foreground">
+            {{ servicesPageContent.principlesTitle }}
           </h2>
         </div>
 
         <div class="mt-10 grid gap-5 md:grid-cols-3">
           <div v-for="principle in principles" :key="principle.title"
             class="rounded-[1.375rem] border border-border/80 bg-card p-6">
-            <span class="flex size-11 items-center justify-center rounded-2xl bg-sage-100 text-primary-700">
+            <span
+              class="flex size-11 items-center justify-center rounded-2xl bg-sage-100 text-primary-700 dark:bg-primary-950 dark:text-sage-300">
               <component :is="principle.icon" class="size-5" />
             </span>
 
-            <h3 class="mt-5 text-lg font-bold text-primary-900">
+            <h3 class="mt-5 text-lg font-bold text-foreground">
               {{ principle.title }}
             </h3>
 
@@ -205,8 +188,7 @@ const principles = [
           </h2>
 
           <p class="mx-auto mt-4 max-w-2xl text-sm leading-8 text-sage-200/80">
-            می‌توانید در پیام اولیه درباره شرایط خود توضیح کوتاهی بدهید تا
-            درباره قدم بعدی گفت‌وگو کنیم.
+            می‌توانید در پیام اولیه درباره شرایط خود توضیح کوتاهی بدهید تا درباره قدم بعدی گفت‌وگو کنیم.
           </p>
 
           <Button as-child class="mt-7 rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover">
@@ -218,5 +200,5 @@ const principles = [
         </div>
       </div>
     </section>
-  </main>
+  </div>
 </template>

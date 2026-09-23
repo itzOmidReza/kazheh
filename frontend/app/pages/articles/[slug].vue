@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ArrowRight, Clock3, Share2 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
+import { toast } from 'vue-sonner'
+import { siteConfig } from '~/data'
 
 const route = useRoute()
 
@@ -94,7 +96,7 @@ if (!article.value) {
 }
 
 useHead(() => ({
-  title: `${article.value.title} | کلینیک آرامش`,
+  title: `${article.value.title} | ${siteConfig.name}`,
   meta: [
     {
       name: 'description',
@@ -102,6 +104,8 @@ useHead(() => ({
     },
   ],
 }))
+
+const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 
 const shareArticle = async () => {
   if (!import.meta.client) return
@@ -112,22 +116,26 @@ const shareArticle = async () => {
     url: window.location.href,
   }
 
-  if (navigator.share) {
-    await navigator.share(shareData)
-    return
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData)
+    } else {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success('پیوند مقاله در کلیپ‌بورد کپی شد.')
+    }
+  } catch {
+    // کاربر دیالوگ را بسته یا دسترسی داده نشده است
   }
-
-  await navigator.clipboard.writeText(window.location.href)
 }
 </script>
 
 <template>
-  <main>
+  <div>
     <article>
       <header class="section-space bg-surface">
         <div class="site-container">
           <NuxtLink to="/articles"
-            class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700">
+            class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
             <ArrowRight class="size-4" />
             بازگشت به مقالات
           </NuxtLink>
@@ -137,13 +145,13 @@ const shareArticle = async () => {
               {{ article.category }}
             </span>
 
-            <h1 class="mt-6 text-heading-xl text-primary-900">
+            <h1 class="mt-6 text-heading-xl text-foreground">
               {{ article.title }}
             </h1>
 
             <div class="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
               <Clock3 class="size-4" />
-              {{ article.readingTime }} دقیقه مطالعه
+              {{ formatNumber(article.readingTime) }} دقیقه مطالعه
             </div>
 
             <p class="mt-8 text-body-lg text-muted-foreground">
@@ -157,7 +165,7 @@ const shareArticle = async () => {
         <div class="site-container">
           <div class="max-w-3xl">
             <div v-for="section in article.sections" :key="section.title" class="mb-10 last:mb-0">
-              <h2 class="text-heading-md text-primary-900">
+              <h2 class="text-heading-md text-foreground">
                 {{ section.title }}
               </h2>
 
@@ -177,5 +185,5 @@ const shareArticle = async () => {
         </div>
       </section>
     </article>
-  </main>
+  </div>
 </template>
