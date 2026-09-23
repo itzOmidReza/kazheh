@@ -5,102 +5,28 @@ import { toast } from 'vue-sonner'
 import { siteConfig } from '~/data'
 
 const route = useRoute()
+const slug = computed(() => String(route.params.slug))
+// کوئری برای پیدا کردن مقاله بر اساس slug
 
-const articles = {
-  'understanding-anxiety': {
-    category: 'اضطراب و نگرانی',
-    title: 'چطور اضطراب را بهتر بشناسیم؟',
-    readingTime: 6,
-    intro:
-      'شناخت اضطراب به معنی حذف فوری آن نیست؛ یعنی بتوانیم پیام‌های ذهن و بدن خود را با دقت بیشتری ببینیم.',
-    sections: [
-      {
-        title: 'اضطراب همیشه دشمن ما نیست',
-        paragraphs: [
-          'اضطراب بخشی از واکنش طبیعی بدن در برابر موقعیت‌های مبهم یا تهدیدکننده است. مقدار کمی از آن می‌تواند ما را برای توجه و تصمیم‌گیری آماده کند.',
-          'مشکل زمانی آغاز می‌شود که نگرانی از موقعیت مشخص جدا شود و بیشتر زمان و انرژی ذهنی ما را درگیر کند.',
-        ],
-      },
-      {
-        title: 'به نشانه‌ها توجه کنید',
-        paragraphs: [
-          'تپش قلب، بی‌قراری، دشواری تمرکز و فکرهایی که مدام تکرار می‌شوند، می‌توانند نشانه‌هایی باشند که نیاز به توجه دارند.',
-          'ثبت موقعیت‌هایی که اضطراب در آن‌ها بیشتر می‌شود، به شناخت الگوهای شخصی کمک می‌کند.',
-        ],
-      },
-      {
-        title: 'از قدم‌های کوچک شروع کنید',
-        paragraphs: [
-          'لازم نیست برای تغییر، همه‌چیز را یک‌باره حل کنید. چند دقیقه مکث، نوشتن افکار و صحبت‌کردن با فردی متخصص می‌تواند شروع مناسبی باشد.',
-        ],
-      },
-    ],
-  },
-
-  'healthy-boundaries': {
-    category: 'روابط',
-    title: 'مرزهای سالم در رابطه چه معنایی دارند؟',
-    readingTime: 5,
-    intro:
-      'مرزبندی به معنی فاصله گرفتن از دیگران نیست؛ راهی برای شناختن نیازها و احترام متقابل است.',
-    sections: [
-      {
-        title: 'مرز شخصی چیست؟',
-        paragraphs: [
-          'مرز شخصی مشخص می‌کند چه چیزی برای شما قابل قبول است و در چه شرایطی به زمان، فاصله یا گفت‌وگوی بیشتری نیاز دارید.',
-          'مرز سالم با تهدید یا کنترل دیگران ساخته نمی‌شود؛ با بیان روشن و محترمانه نیازها شکل می‌گیرد.',
-        ],
-      },
-      {
-        title: 'نه گفتن بدون احساس گناه',
-        paragraphs: [
-          'نه گفتن به یک درخواست، به معنی رد کردن ارزش فرد مقابل نیست. شما حق دارید زمان، انرژی و ظرفیت خود را در نظر بگیرید.',
-        ],
-      },
-    ],
-  },
-
-  'starting-therapy': {
-    category: 'شروع درمان',
-    title: 'اگر برای شروع مشاوره مردد هستید',
-    readingTime: 4,
-    intro:
-      'مردد بودن پیش از اولین گفت‌وگو طبیعی است. شروع مشاوره تصمیمی شخصی است و باید با آگاهی و احساس امنیت همراه باشد.',
-    sections: [
-      {
-        title: 'لازم نیست آماده کامل باشید',
-        paragraphs: [
-          'بسیاری از افراد با سؤال‌ها و تردیدهای مختلف وارد جلسه اول می‌شوند. قرار نیست از ابتدا همه‌چیز را دقیق توضیح دهید.',
-        ],
-      },
-      {
-        title: 'سؤال‌های خود را بپرسید',
-        paragraphs: [
-          'می‌توانید درباره روند جلسات، محرمانگی، مدت زمان گفت‌وگو و شیوه ادامه مسیر سؤال کنید.',
-        ],
-      },
-    ],
-  },
-} as const
-
-const article = computed(() => {
-  const slug = String(route.params.slug)
-  return articles[slug as keyof typeof articles]
-})
-
+const { data: article } = await useAsyncData(`article-${slug.value}`, () =>
+  queryCollection('articles')
+    .where('slug', '=', slug.value)
+    .first()
+)
 if (!article.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: 'مقاله پیدا نشد',
+    statusMessage: 'مقاله مورد نظر پیدا نشد',
+    fatal: true,
   })
 }
 
 useHead(() => ({
-  title: `${article.value.title} | ${siteConfig.name}`,
+  title: `${article.value?.title} | ${siteConfig.name}`,
   meta: [
     {
       name: 'description',
-      content: article.value.intro,
+      content: article.value?.excerpt,
     },
   ],
 }))
@@ -111,8 +37,8 @@ const shareArticle = async () => {
   if (!import.meta.client) return
 
   const shareData = {
-    title: article.value.title,
-    text: article.value.intro,
+    title: article.value?.title || '',
+    text: article.value?.excerpt || '',
     url: window.location.href,
   }
 
@@ -124,13 +50,13 @@ const shareArticle = async () => {
       toast.success('پیوند مقاله در کلیپ‌بورد کپی شد.')
     }
   } catch {
-    // کاربر دیالوگ را بسته یا دسترسی داده نشده است
+    // نادیده گرفتن لغو کاربر
   }
 }
 </script>
 
 <template>
-  <div>
+  <div v-if="article">
     <article>
       <header class="section-space bg-surface">
         <div class="site-container">
@@ -149,13 +75,13 @@ const shareArticle = async () => {
               {{ article.title }}
             </h1>
 
-            <div class="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+            <div v-if="article.readingTime" class="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
               <Clock3 class="size-4" />
               {{ formatNumber(article.readingTime) }} دقیقه مطالعه
             </div>
 
             <p class="mt-8 text-body-lg text-muted-foreground">
-              {{ article.intro }}
+              {{ article.excerpt }}
             </p>
           </div>
         </div>
@@ -164,15 +90,10 @@ const shareArticle = async () => {
       <section class="section-space bg-background">
         <div class="site-container">
           <div class="max-w-3xl">
-            <div v-for="section in article.sections" :key="section.title" class="mb-10 last:mb-0">
-              <h2 class="text-heading-md text-foreground">
-                {{ section.title }}
-              </h2>
-
-              <p v-for="paragraph in section.paragraphs" :key="paragraph"
-                class="mt-5 text-body-lg text-muted-foreground">
-                {{ paragraph }}
-              </p>
+            <!-- رندر محتوای Markdown با استایل متناسب -->
+            <div
+              class="prose prose-neutral dark:prose-invert max-w-none leading-8 text-foreground [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:text-heading-md [&_p]:mb-5 [&_p]:text-body-lg [&_p]:text-muted-foreground">
+              <ContentRenderer :value="article" />
             </div>
 
             <div class="mt-12 border-t border-border pt-6">

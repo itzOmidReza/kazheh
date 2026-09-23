@@ -10,6 +10,24 @@ useHead({
     },
   ],
 })
+
+// دریافت ۳ مقاله آخر برای سکشن صفحه اصلی
+const { data: homeArticles } = await useAsyncData('home-articles', async () => {
+  const list = await queryCollection('articles')
+    .where('draft', '<>', true)
+    .order('createdAt', 'DESC')
+    .limit(3)
+    .all()
+
+  return list.map((item) => ({
+    id: item.slug || item.path,
+    title: item.title,
+    excerpt: item.excerpt,
+    href: `/articles/${item.slug}`,
+    category: item.category,
+    readingMinutes: item.readingTime,
+  }))
+})
 </script>
 
 <template>
@@ -20,7 +38,7 @@ useHead({
   <HomeApproachSection />
   <HomeProcessSection />
   <HomeTestimonialsSection />
-  <HomeArticlesSection />
+  <HomeArticlesSection :items="homeArticles || []" />
   <HomeFaqSection />
   <HomeContactSection />
 </template>

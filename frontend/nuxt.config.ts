@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['shadcn-nuxt', 'nuxt-lucide-icons'],
+  modules: ['shadcn-nuxt', 'nuxt-lucide-icons', '@nuxt/content'],
 
   shadcn: {
     prefix: '',

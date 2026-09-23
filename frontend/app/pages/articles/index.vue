@@ -12,32 +12,13 @@ useHead({
   ],
 })
 
-const articles = [
-  {
-    slug: 'understanding-anxiety',
-    category: 'اضطراب و نگرانی',
-    title: 'چطور اضطراب را بهتر بشناسیم؟',
-    excerpt:
-      'گاهی شناختن آنچه در ذهن و بدن ما می‌گذرد، اولین قدم برای برخورد آرام‌تر با اضطراب است.',
-    readingTime: 6,
-  },
-  {
-    slug: 'healthy-boundaries',
-    category: 'روابط',
-    title: 'مرزهای سالم در رابطه چه معنایی دارند؟',
-    excerpt:
-      'مرزبندی به معنی فاصله گرفتن از دیگران نیست؛ راهی برای شناختن نیازها و احترام متقابل است.',
-    readingTime: 5,
-  },
-  {
-    slug: 'starting-therapy',
-    category: 'شروع درمان',
-    title: 'اگر برای شروع مشاوره مردد هستید',
-    excerpt:
-      'مردد بودن پیش از اولین گفت‌وگو طبیعی است. چند نکته می‌تواند تصمیم‌گیری را ساده‌تر کند.',
-    readingTime: 4,
-  },
-]
+// دریافت مقالات منتشرشده و مرتب‌سازی بر اساس تاریخ
+const { data: articles } = await useAsyncData('articles-list', () =>
+  queryCollection('articles')
+    .where('draft', '<>', true)
+    .order('createdAt', 'DESC')
+    .all()
+)
 
 const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 </script>
@@ -64,15 +45,15 @@ const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 
     <section class="section-space bg-background">
       <div class="site-container">
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <article v-for="article in articles" :key="article.slug"
+        <div v-if="articles && articles.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <article v-for="article in articles" :key="article.path || article.slug"
             class="flex h-full flex-col rounded-[1.5rem] border border-border bg-card p-6 transition-shadow hover:shadow-card">
             <div class="flex items-center justify-between gap-3">
               <span class="rounded-pill bg-secondary px-3 py-1 text-xs text-secondary-foreground">
                 {{ article.category }}
               </span>
 
-              <span class="flex items-center gap-1 text-xs text-muted-foreground">
+              <span v-if="article.readingTime" class="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock3 class="size-3.5" />
                 {{ formatNumber(article.readingTime) }} دقیقه
               </span>
@@ -86,12 +67,16 @@ const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
               {{ article.excerpt }}
             </p>
 
-            <NuxtLink :to="`/articles/${article.slug}`"
+            <NuxtLink :to="article.path || `/articles/${article.slug}`"
               class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
               مطالعه مقاله
               <ArrowLeft class="size-4" />
             </NuxtLink>
           </article>
+        </div>
+
+        <div v-else class="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
+          هنوز مقاله‌ای منتشر نشده است.
         </div>
       </div>
     </section>
