@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { siteConfig } from '~/data'
+
 useHead({
-  title: 'کلینیک آرامش | روان‌شناسی آگاهانه',
+  title: `${siteConfig.name} | ${siteConfig.tagline}`,
   meta: [
     {
       name: 'description',
-      content:
-        'فضایی امن، انسانی و محرمانه برای شروع گفت‌وگو و شناختن قدم‌های بعدی.',
+      content: siteConfig.description,
     },
   ],
 })
