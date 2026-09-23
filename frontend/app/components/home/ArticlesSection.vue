@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeft } from '@lucide/vue'
+import { articlesContent } from '~/data'
 
 interface Article {
   id: string
@@ -32,16 +33,15 @@ const formatNumber = (value: number) =>
     <div class="site-container">
       <div class="max-w-2xl">
         <p class="text-sm font-medium text-primary">
-          برای خواندن و تأمل کردن
+          {{ articlesContent.badge }}
         </p>
 
         <h2 id="articles-title" class="mt-4 text-heading-xl text-foreground">
-          فرصتی برای شناخت بیشتر خودمان
+          {{ articlesContent.title }}
         </h2>
 
         <p class="mt-5 text-body-lg text-muted-foreground">
-          یادداشت‌هایی درباره احساسات، رابطه‌ها و تجربه‌های روزمره؛
-          با زبانی ساده و قابل فهم.
+          {{ articlesContent.description }}
         </p>
       </div>
 
@@ -58,7 +58,7 @@ const formatNumber = (value: number) =>
                 </span>
 
                 <span class="text-muted-foreground">
-                  {{ formatNumber(article.readingMinutes) }} دقیقه مطالعه
+                  {{ formatNumber(article.readingMinutes) }} {{ articlesContent.readTimeSuffix }}
                 </span>
               </div>
 
@@ -70,9 +70,9 @@ const formatNumber = (value: number) =>
                 {{ article.excerpt }}
               </p>
 
-              <NuxtLink :to="article.href" :aria-label="`مطالعه مقاله: ${article.title}`"
+              <NuxtLink :to="article.href" :aria-label="`${articlesContent.readArticleLabel}: ${article.title}`"
                 class="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-md text-sm font-semibold text-primary underline-offset-4 hover:underline">
-                مطالعه مقاله
+                {{ articlesContent.readArticleLabel }}
                 <ArrowLeft class="size-4" aria-hidden="true" />
               </NuxtLink>
             </div>

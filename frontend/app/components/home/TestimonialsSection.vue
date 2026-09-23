@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { testimonialsContent } from '~/data'
+
 interface Testimonial {
   id: string
   displayName: string
@@ -20,16 +22,15 @@ withDefaults(
     <div class="site-container">
       <div class="max-w-2xl">
         <p class="text-sm font-medium text-primary">
-          تجربه‌های به‌اشتراک‌گذاشته‌شده
+          {{ testimonialsContent.badge }}
         </p>
 
         <h2 id="testimonials-title" class="mt-4 text-heading-xl text-foreground">
-          هر کسی، روایت خودش را دارد.
+          {{ testimonialsContent.title }}
         </h2>
 
         <p class="mt-5 text-body-lg text-muted-foreground">
-          این روایت‌ها تجربه شخصی افراد هستند؛ مسیر و نتیجه جلسات برای
-          هر فرد می‌تواند متفاوت باشد.
+          {{ testimonialsContent.description }}
         </p>
       </div>
 

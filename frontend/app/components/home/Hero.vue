@@ -9,6 +9,9 @@ import {
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { heroContent } from '~/data'
+
+const icons = [Check, LockKeyhole, MessageCircle]
 </script>
 
 <template>
@@ -27,75 +30,51 @@ import { Button } from '@/components/ui/button'
         <!-- Content -->
         <div class="max-w-2xl">
           <Badge variant="secondary"
-            class="mb-6 rounded-pill border border-sage-300/70 bg-sage-100 px-4 py-2 text-xs font-medium text-primary-800">
+            class="mb-6 rounded-pill border border-sage-300/70 bg-sage-100 px-4 py-2 text-xs font-medium text-primary-800 dark:bg-primary-950 dark:text-sage-300">
             <Sparkles class="ml-2 size-3.5" />
-            فضایی برای آرام‌تر دیدن
+            {{ heroContent.badge }}
           </Badge>
 
-          <h1 class="max-w-xl text-display font-extrabold tracking-tight text-primary-900">
-            لازم نیست این مسیر را
-            <span class="relative inline-block text-primary-700">
-              تنها
+          <h1 class="max-w-xl text-display font-extrabold tracking-tight text-foreground">
+            {{ heroContent.title.beforeHighlight }}
+            <span class="relative inline-block text-primary-700 dark:text-primary">
+              {{ heroContent.title.highlight }}
               <span class="absolute -bottom-1 right-0 h-2 w-full rounded-full bg-warm-300/60" aria-hidden="true" />
             </span>
-            طی کنید.
+            {{ heroContent.title.afterHighlight }}
           </h1>
 
           <p class="mt-7 max-w-xl text-body-lg text-muted-foreground">
-            اگر هنوز نمی‌دانید دقیقاً چه چیزی آزارتان می‌دهد، گفت‌وگو
-            می‌تواند نقطه شروع خوبی برای شناختن خود و ساختن قدم‌های بعدی
-            باشد.
+            {{ heroContent.description }}
           </p>
 
           <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button as-child size="lg"
               class="h-13 rounded-pill bg-cta px-7 text-base font-bold text-cta-foreground shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-cta-hover hover:shadow-card">
-              <NuxtLink to="/#contact">
-                درخواست مشاوره اولیه
+              <NuxtLink :to="heroContent.primaryCta.href">
+                {{ heroContent.primaryCta.label }}
                 <ArrowLeft class="size-5" />
               </NuxtLink>
             </Button>
 
             <Button as-child variant="outline" size="lg"
-              class="h-13 rounded-pill border-primary/20 bg-background/70 px-7 text-base text-primary hover:bg-secondary">
-              <NuxtLink to="/#approach">
-                آشنایی با روش کاری
+              class="h-13 rounded-pill border-primary/20 bg-background/70 px-7 text-base text-primary hover:bg-secondary dark:border-border dark:text-foreground">
+              <NuxtLink :to="heroContent.secondaryCta.href">
+                {{ heroContent.secondaryCta.label }}
               </NuxtLink>
             </Button>
           </div>
 
           <!-- Trust points -->
           <div class="mt-10 grid max-w-lg gap-4 border-t border-border pt-6 sm:grid-cols-3">
-            <div class="flex items-start gap-3">
+            <div v-for="(point, index) in heroContent.trustPoints" :key="point.label" class="flex items-start gap-3">
               <span
-                class="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-sage-100 text-primary-700">
-                <Check class="size-4" />
+                class="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-sage-100 text-primary-700 dark:bg-primary-950 dark:text-sage-300">
+                <component :is="icons[index % icons.length]" class="size-4" />
               </span>
 
               <span class="text-sm leading-7 text-muted-foreground">
-                شنیدن بدون قضاوت
-              </span>
-            </div>
-
-            <div class="flex items-start gap-3">
-              <span
-                class="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-sage-100 text-primary-700">
-                <LockKeyhole class="size-4" />
-              </span>
-
-              <span class="text-sm leading-7 text-muted-foreground">
-                حفظ محرمانگی
-              </span>
-            </div>
-
-            <div class="flex items-start gap-3">
-              <span
-                class="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-sage-100 text-primary-700">
-                <MessageCircle class="size-4" />
-              </span>
-
-              <span class="text-sm leading-7 text-muted-foreground">
-                گفت‌وگوی انسانی
+                {{ point.label }}
               </span>
             </div>
           </div>
@@ -119,29 +98,28 @@ import { Button } from '@/components/ui/button'
                 </span>
 
                 <span class="rounded-pill border border-white/20 px-3 py-1 text-xs text-sage-200">
-                  فضای امن و محرمانه
+                  {{ heroContent.visualPanel.badge }}
                 </span>
               </div>
 
               <div class="py-12">
                 <p class="text-sm text-sage-200/80">
-                  یک مکث کوتاه
+                  {{ heroContent.visualPanel.preTitle }}
                 </p>
 
                 <p class="mt-4 max-w-sm text-3xl font-bold leading-[1.8] text-white sm:text-4xl">
-                  گاهی شروع تغییر،
-                  فقط با یک گفت‌وگوی صادقانه آغاز می‌شود.
+                  {{ heroContent.visualPanel.quote }}
                 </p>
               </div>
 
               <div class="flex items-center justify-between gap-4 border-t border-white/15 pt-5">
                 <div>
                   <p class="text-sm font-semibold text-white">
-                    کلینیک آرامش
+                    {{ heroContent.visualPanel.clinicName }}
                   </p>
 
                   <p class="mt-1 text-xs text-sage-200/70">
-                    روان‌شناسی آگاهانه و انسانی
+                    {{ heroContent.visualPanel.clinicTagline }}
                   </p>
                 </div>
 
@@ -156,17 +134,18 @@ import { Button } from '@/components/ui/button'
           <div
             class="absolute -bottom-5 -right-4 max-w-[15rem] rounded-2xl border border-border/80 bg-card p-4 shadow-card sm:-right-8">
             <div class="flex items-start gap-3">
-              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sage-100 text-primary-700">
+              <span
+                class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sage-100 text-primary-700 dark:bg-primary-950 dark:text-sage-300">
                 <LockKeyhole class="size-4" />
               </span>
 
               <div>
                 <p class="text-sm font-semibold text-card-foreground">
-                  حریم خصوصی شما مهم است
+                  {{ heroContent.visualPanel.floatingCard.title }}
                 </p>
 
                 <p class="mt-1 text-xs leading-6 text-muted-foreground">
-                  گفت‌وگوها با احترام و محرمانگی همراه هستند.
+                  {{ heroContent.visualPanel.floatingCard.description }}
                 </p>
               </div>
             </div>
