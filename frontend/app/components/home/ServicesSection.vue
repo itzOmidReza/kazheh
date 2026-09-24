@@ -163,7 +163,7 @@ const services = [
           </p>
         </div>
 
-        <Button as-child class="shrink-0 rounded-pill bg-primary px-5 text-primary-foreground hover:bg-primary-700">
+        <Button as-child class="w-full sm:w-auto shrink-0 rounded-pill bg-primary px-5 text-primary-foreground hover:bg-primary-700">
           <NuxtLink to="/#contact">
             شروع گفت‌وگو
             <ArrowLeft class="size-4" />

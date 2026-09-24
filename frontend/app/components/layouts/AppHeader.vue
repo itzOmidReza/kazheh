@@ -9,15 +9,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { mainNavigation } from '~/data/navigation'
 
 const isMobileMenuOpen = ref(false)
-
-const navigation = [
-  { label: 'خانه', href: '/' },
-  { label: 'خدمات', href: '/#services' },
-  { label: 'روش کاری', href: '/#approach' },
-  { label: 'مقالات', href: '/articles' },
-]
+const navigation = mainNavigation
 
 const route = useRoute()
 
@@ -86,14 +81,14 @@ const closeMobileMenu = () => {
         <!-- Mobile menu -->
         <Sheet v-model:open="isMobileMenuOpen">
           <SheetTrigger as-child>
-            <Button variant="outline" size="icon" class="rounded-xl lg:hidden" aria-label="باز کردن منو">
+            <Button variant="outline" size="icon" class="size-11 rounded-xl lg:hidden" aria-label="باز کردن منو">
               <Menu class="size-5" />
             </Button>
           </SheetTrigger>
 
-          <SheetContent side="right" class="w-[min(88vw,380px)] border-l-0 border-border bg-background">
+          <SheetContent side="right" class="w-[min(88vw,380px)] border-l-0 border-border bg-background p-6">
             <SheetHeader class="border-b border-border pb-5 text-right">
-              <SheetTitle class="text-primary">
+              <SheetTitle class="text-primary font-bold">
                 کلینیک آرامش
               </SheetTitle>
             </SheetHeader>
@@ -101,7 +96,7 @@ const closeMobileMenu = () => {
             <nav class="mt-8 flex flex-col gap-2" aria-label="منوی موبایل">
               <SheetClose v-for="item in navigation" :key="item.href" as-child>
                 <NuxtLink :to="item.href" :class="[
-                  'rounded-xl px-4 py-3 text-right text-base font-medium transition-colors',
+                  'flex min-h-11 items-center rounded-xl px-4 py-3 text-right text-base font-medium transition-colors',
                   isActive(item.href)
                     ? 'bg-secondary text-primary'
                     : 'text-muted-foreground hover:bg-secondary hover:text-primary',
@@ -113,7 +108,7 @@ const closeMobileMenu = () => {
 
             <div class="mt-8">
               <SheetClose as-child>
-                <Button as-child class="w-full rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover"
+                <Button as-child class="min-h-12 w-full rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover"
                   @click="closeMobileMenu">
                   <NuxtLink to="/#contact">
                     درخواست مشاوره اولیه

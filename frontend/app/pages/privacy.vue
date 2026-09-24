@@ -9,7 +9,12 @@ useHead({
       content:
         'سیاست حفظ حریم خصوصی و نحوه استفاده از اطلاعات کاربران در کلینیک آرامش.',
     },
+    { property: 'og:title', content: 'حریم خصوصی | کلینیک آرامش' },
+    { property: 'og:description', content: 'سیاست حفظ حریم خصوصی و نحوه استفاده از اطلاعات کاربران در کلینیک آرامش.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:locale', content: 'fa_IR' },
   ],
+  link: [{ rel: 'canonical', href: '/privacy' }],
 })
 
 const sections = [
@@ -55,7 +60,7 @@ const sections = [
   <main>
     <section class="section-space bg-surface">
       <div class="site-container">
-        <NuxtLink to="/" class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700">
+        <NuxtLink to="/" class="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary hover:text-primary-700">
           <ArrowRight class="size-4" />
           بازگشت به صفحه اصلی
         </NuxtLink>

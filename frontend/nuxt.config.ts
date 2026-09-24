@@ -6,6 +6,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/tailwind.css'],
 
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_URL || process.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1',
+    },
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },
@@ -23,6 +29,10 @@ export default defineNuxtConfig({
         lang: 'fa',
         dir: 'rtl',
       },
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover' },
+        { name: 'theme-color', content: '#16484a' },
+      ],
     },
   },
 });

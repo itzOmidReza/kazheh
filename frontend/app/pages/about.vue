@@ -24,7 +24,12 @@ useHead({
       content:
         'آشنایی با رویکرد کلینیک آرامش و اصولی که مسیر گفت‌وگو و همراهی را شکل می‌دهند.',
     },
+    { property: 'og:title', content: 'درباره کلینیک | کلینیک آرامش' },
+    { property: 'og:description', content: 'آشنایی با رویکرد کلینیک آرامش و اصولی که مسیر گفت‌وگو و همراهی را شکل می‌دهند.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:locale', content: 'fa_IR' },
   ],
+  link: [{ rel: 'canonical', href: '/about' }],
 })
 
 const values = [
@@ -73,7 +78,7 @@ const values = [
               تجربه‌ها و دغدغه‌های خود را بررسی کنید.
             </p>
 
-            <Button as-child class="mt-8 rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover">
+            <Button as-child class="mt-8 min-h-12 w-full rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover sm:w-auto">
               <NuxtLink to="/#contact">
                 شروع گفت‌وگو
                 <ArrowLeft class="size-4" />
@@ -81,7 +86,7 @@ const values = [
             </Button>
           </div>
 
-          <div class="relative min-h-[22rem] overflow-hidden rounded-[2rem] bg-primary-900 p-8 shadow-floating">
+          <div class="relative min-h-[20rem] overflow-hidden rounded-[2rem] bg-primary-900 p-6 shadow-floating sm:p-8">
             <div class="absolute -left-16 -top-16 size-56 rounded-full bg-warm-500/30 blur-3xl" aria-hidden="true" />
 
             <div class="absolute -bottom-20 -right-16 size-64 rounded-full bg-primary-700 blur-3xl"
@@ -176,7 +181,7 @@ const values = [
     <!-- CTA -->
     <section class="section-space bg-background">
       <div class="site-container">
-        <div class="rounded-[1.5rem] border border-border bg-card p-8 text-center sm:p-12">
+        <div class="rounded-[1.5rem] border border-border bg-card p-6 text-center sm:p-12">
           <h2 class="text-heading-lg text-primary-900">
             اگر می‌خواهید بیشتر بدانید، می‌توانیم از یک گفت‌وگوی ساده شروع کنیم.
           </h2>
@@ -186,7 +191,7 @@ const values = [
             شرایط همراهی مطرح کنید.
           </p>
 
-          <Button as-child class="mt-7 rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover">
+          <Button as-child class="mt-7 min-h-12 w-full rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover sm:w-auto">
             <NuxtLink to="/#contact">
               درخواست مشاوره اولیه
               <ArrowLeft class="size-4" />

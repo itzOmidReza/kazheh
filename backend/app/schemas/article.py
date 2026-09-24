@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+from app.core.security import sanitize_content
 
 
 class ArticleBase(BaseModel):
@@ -7,6 +8,13 @@ class ArticleBase(BaseModel):
     summary: str | None = Field(default=None, max_length=500, description="Short summary/excerpt")
     content: str = Field(..., min_length=10, description="Full markdown/HTML body content")
     is_published: bool = Field(default=False, description="Publication status")
+
+    @field_validator("title", "summary", "content")
+    @classmethod
+    def sanitize_article_fields(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return sanitize_content(v)
 
 
 class ArticleCreate(ArticleBase):
@@ -23,6 +31,13 @@ class ArticleUpdate(BaseModel):
     summary: str | None = Field(default=None, max_length=500)
     content: str | None = Field(default=None, min_length=10)
     is_published: bool | None = None
+
+    @field_validator("title", "summary", "content")
+    @classmethod
+    def sanitize_article_update_fields(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return sanitize_content(v)
 
 
 # Lightweight schema for cards/lists (omits large content body)

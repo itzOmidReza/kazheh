@@ -6,20 +6,11 @@ import {
   MapPin,
   Phone,
 } from '@lucide/vue'
+import { footerNavigation, supportNavigation } from '~/data/navigation'
 
 const footerLinks = {
-  navigation: [
-    { label: 'خانه', href: '/' },
-    { label: 'خدمات', href: '/#services' },
-    { label: 'روش کاری', href: '/#approach' },
-    { label: 'مقالات', href: '/articles' },
-  ],
-
-  support: [
-    { label: 'سؤالات متداول', href: '/#faq' },
-    { label: 'تماس با ما', href: '/#contact' },
-    { label: 'حریم خصوصی', href: '/privacy' },
-  ],
+  navigation: footerNavigation,
+  support: supportNavigation,
 }
 </script>
 
@@ -101,7 +92,7 @@ const footerLinks = {
           </p>
 
           <NuxtLink to="/#contact"
-            class="mt-5 inline-flex items-center gap-2 rounded-pill bg-cta px-5 py-3 text-sm font-bold text-cta-foreground transition-colors hover:bg-cta-hover">
+            class="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-cta px-5 py-3 text-sm font-bold text-cta-foreground transition-colors hover:bg-cta-hover sm:w-auto sm:justify-start">
             درخواست مشاوره اولیه
             <ArrowLeft class="size-4" />
           </NuxtLink>

@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from jose import jwt
@@ -9,6 +10,37 @@ BCRYPT_MAX_PASSWORD_BYTES = 72
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Single source of truth: the signing algorithm comes from the environment.
 ALGORITHM = settings.ALGORITHM
+
+DANGEROUS_TAGS_PATTERN = re.compile(
+    r"<\s*(script|iframe|object|embed|applet|meta|link|style|base|svg|form)\b[^>]*>.*?<\s*/\s*\1\s*>",
+    re.IGNORECASE | re.DOTALL,
+)
+SELF_CLOSING_DANGEROUS_TAGS = re.compile(
+    r"<\s*(script|iframe|object|embed|applet|meta|link|style|base|svg|form)\b[^>]*\/?>",
+    re.IGNORECASE,
+)
+EVENT_HANDLER_PATTERN = re.compile(
+    r"\s*on\w+\s*=\s*(?:'[^']*'|\"[^\"]*\"|[^\s>]+)",
+    re.IGNORECASE,
+)
+JAVASCRIPT_URI_PATTERN = re.compile(
+    r"(javascript|vbscript|data):",
+    re.IGNORECASE,
+)
+
+
+def sanitize_content(text: str | None) -> str | None:
+    """
+    Sanitizes user input to prevent stored XSS attacks while preserving safe text and formatting.
+    Removes script tags, iframes, event handlers, and dangerous URL schemes.
+    """
+    if not text:
+        return text
+    clean = DANGEROUS_TAGS_PATTERN.sub("", text)
+    clean = SELF_CLOSING_DANGEROUS_TAGS.sub("", clean)
+    clean = EVENT_HANDLER_PATTERN.sub("", clean)
+    clean = JAVASCRIPT_URI_PATTERN.sub("", clean)
+    return clean.strip()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

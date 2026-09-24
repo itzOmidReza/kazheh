@@ -27,7 +27,12 @@ useHead({
       content:
         'آشنایی با خدمات مشاوره فردی، روابط و همراهی در مسیر تغییر در کلینیک آرامش.',
     },
+    { property: 'og:title', content: 'خدمات روان‌شناسی | کلینیک آرامش' },
+    { property: 'og:description', content: 'آشنایی با خدمات مشاوره فردی، روابط و همراهی در مسیر تغییر در کلینیک آرامش.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:locale', content: 'fa_IR' },
   ],
+  link: [{ rel: 'canonical', href: '/services' }],
 })
 
 const services = [
@@ -199,7 +204,7 @@ const principles = [
     <!-- CTA -->
     <section class="section-space bg-background">
       <div class="site-container">
-        <div class="rounded-[1.5rem] bg-primary-900 p-8 text-center text-white sm:p-12">
+        <div class="rounded-[1.5rem] bg-primary-900 p-6 text-center text-white sm:p-12">
           <h2 class="text-heading-lg text-white">
             نمی‌دانید کدام خدمت برای شما مناسب‌تر است؟
           </h2>
@@ -209,7 +214,7 @@ const principles = [
             درباره قدم بعدی گفت‌وگو کنیم.
           </p>
 
-          <Button as-child class="mt-7 rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover">
+          <Button as-child class="mt-7 min-h-12 w-full rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover sm:w-auto">
             <NuxtLink to="/#contact">
               درخواست مشاوره اولیه
               <ArrowLeft class="size-4" />

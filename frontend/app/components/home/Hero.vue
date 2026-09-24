@@ -49,7 +49,7 @@ import { Button } from '@/components/ui/button'
 
           <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button as-child size="lg"
-              class="h-13 rounded-pill bg-cta px-7 text-base font-bold text-cta-foreground shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-cta-hover hover:shadow-card">
+              class="h-13 w-full rounded-pill bg-cta px-7 text-base font-bold text-cta-foreground shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-cta-hover hover:shadow-card sm:w-auto">
               <NuxtLink to="/#contact">
                 درخواست مشاوره اولیه
                 <ArrowLeft class="size-5" />
@@ -57,7 +57,7 @@ import { Button } from '@/components/ui/button'
             </Button>
 
             <Button as-child variant="outline" size="lg"
-              class="h-13 rounded-pill border-primary/20 bg-background/70 px-7 text-base text-primary hover:bg-secondary">
+              class="h-13 w-full rounded-pill border-primary/20 bg-background/70 px-7 text-base text-primary hover:bg-secondary sm:w-auto">
               <NuxtLink to="/#approach">
                 آشنایی با روش کاری
               </NuxtLink>
@@ -123,12 +123,12 @@ import { Button } from '@/components/ui/button'
                 </span>
               </div>
 
-              <div class="py-12">
+              <div class="py-8 sm:py-12">
                 <p class="text-sm text-sage-200/80">
                   یک مکث کوتاه
                 </p>
 
-                <p class="mt-4 max-w-sm text-3xl font-bold leading-[1.8] text-white sm:text-4xl">
+                <p class="mt-4 max-w-sm text-2xl font-bold leading-[1.8] text-white sm:text-3xl lg:text-4xl">
                   گاهی شروع تغییر،
                   فقط با یک گفت‌وگوی صادقانه آغاز می‌شود.
                 </p>
@@ -154,7 +154,7 @@ import { Button } from '@/components/ui/button'
 
           <!-- Floating note -->
           <div
-            class="absolute -bottom-5 -right-4 max-w-[15rem] rounded-2xl border border-border/80 bg-card p-4 shadow-card sm:-right-8">
+            class="absolute -bottom-5 right-2 max-w-[15rem] rounded-2xl border border-border/80 bg-card p-4 shadow-card sm:right-auto sm:-right-8">
             <div class="flex items-start gap-3">
               <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sage-100 text-primary-700">
                 <LockKeyhole class="size-4" />

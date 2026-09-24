@@ -1,32 +1,34 @@
 <script setup lang="ts">
 import { ArrowLeft, Clock3 } from '@lucide/vue'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { ArticleListItem } from '~/types/api'
 
-const articles = [
-  {
-    slug: 'understanding-anxiety',
-    category: 'اضطراب و نگرانی',
-    title: 'چطور اضطراب را بهتر بشناسیم؟',
-    excerpt:
-      'گاهی شناختن آنچه در ذهن و بدن ما می‌گذرد، اولین قدم برای برخورد آرام‌تر با اضطراب است.',
-    readingTime: 6,
-  },
-{
-  slug: 'healthy-boundaries',
-    category: 'روابط',
-      title: 'مرزهای سالم در رابطه چه معنایی دارند؟',
-        excerpt:
-  'مرزبندی به معنی فاصله گرفتن از دیگران نیست؛ راهی برای شناختن نیازها و احترام متقابل است.',
-    readingTime: 5,
-},
-{
-  slug: 'starting-therapy',
-    category: 'شروع درمان',
-      title: 'اگر برای شروع مشاوره مردد هستید',
-        excerpt:
-  'مردد بودن پیش از اولین گفت‌وگو طبیعی است. چند نکته می‌تواند تصمیم‌گیری را ساده‌تر کند.',
-    readingTime: 4,
-},
-]
+useHead({
+  title: 'مجله و مقالات تخصصی روان‌شناسی | کلینیک آرامش',
+  meta: [
+    {
+      name: 'description',
+      content: 'یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.',
+    },
+    { property: 'og:title', content: 'مجله و مقالات تخصصی روان‌شناسی | کلینیک آرامش' },
+    { property: 'og:description', content: 'یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:locale', content: 'fa_IR' },
+  ],
+  link: [{ rel: 'canonical', href: '/articles' }],
+})
+
+const { apiFetch } = useApi()
+
+const { data: articles, status } = await useAsyncData<ArticleListItem[]>('public-articles', () =>
+  apiFetch('/articles?limit=50')
+)
+
+const calculateReadingTime = (text?: string | null) => {
+  if (!text) return 4
+  const words = text.trim().split(/\s+/).length
+  return Math.max(2, Math.ceil(words / 150))
+}
 </script>
 
 <template>
@@ -52,17 +54,45 @@ const articles = [
 
     <section class="section-space bg-background">
       <div class="site-container">
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <article v-for="article in articles" :key="article.slug"
-            class="flex h-full flex-col rounded-[1.5rem] border border-border bg-card p-6 transition-shadow hover:shadow-card">
+        <!-- Loading state -->
+        <div v-if="status === 'pending'" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div v-for="i in 3" :key="i" class="flex h-72 flex-col rounded-[1.5rem] border border-border bg-card p-6">
+            <div class="flex items-center justify-between">
+              <Skeleton class="h-6 w-20 rounded-pill" />
+              <Skeleton class="h-4 w-16" />
+            </div>
+            <Skeleton class="mt-6 h-6 w-3/4" />
+            <Skeleton class="mt-4 h-4 w-full" />
+            <Skeleton class="mt-2 h-4 w-2/3" />
+            <Skeleton class="mt-auto h-4 w-24" />
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div v-else-if="!articles || articles.length === 0" class="rounded-[1.5rem] border border-border bg-card p-12 text-center">
+          <p class="text-lg font-medium text-primary-900">
+            هنوز مقاله‌ای منتشر نشده است.
+          </p>
+          <p class="mt-2 text-sm text-muted-foreground">
+            به‌زودی مقالات جدید در این بخش قرار خواهند گرفت.
+          </p>
+        </div>
+
+        <!-- Articles grid -->
+        <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <article
+            v-for="article in articles"
+            :key="article.slug"
+            class="flex h-full flex-col rounded-[1.5rem] border border-border bg-card p-6 transition-shadow hover:shadow-card"
+          >
             <div class="flex items-center justify-between gap-3">
               <span class="rounded-pill bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-                {{ article.category }}
+                روان‌شناسی
               </span>
 
               <span class="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock3 class="size-3.5" />
-                {{ article.readingTime }} دقیقه
+                {{ calculateReadingTime(article.summary) }} دقیقه
               </span>
             </div>
 
@@ -71,11 +101,13 @@ const articles = [
             </h2>
 
             <p class="mt-3 flex-1 text-sm leading-8 text-muted-foreground">
-              {{ article.excerpt }}
+              {{ article.summary || '' }}
             </p>
 
-            <NuxtLink :to="`/articles/${article.slug}`"
-              class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-700">
+            <NuxtLink
+              :to="`/articles/${article.slug}`"
+              class="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary hover:text-primary-700"
+            >
               مطالعه مقاله
               <ArrowLeft class="size-4" />
             </NuxtLink>

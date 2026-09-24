@@ -33,8 +33,8 @@ const trustItems = [
 <template>
   <section aria-label="ویژگی‌های کلینیک" class="border-y border-border/80 bg-card">
     <div class="site-container">
-      <div class="grid divide-y divide-border/80 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
-        <div v-for="item in trustItems" :key="item.title" class="flex items-start gap-4 px-0 py-7 sm:px-6 lg:px-7">
+      <div class="grid grid-cols-1 divide-y divide-border/80 sm:grid-cols-2 sm:divide-y-0 sm:gap-6 lg:grid-cols-4 lg:gap-8">
+        <div v-for="item in trustItems" :key="item.title" class="flex items-start gap-4 py-6 sm:py-7">
           <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-sage-100 text-primary-700">
             <component :is="item.icon" class="size-5" />
           </span>

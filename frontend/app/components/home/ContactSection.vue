@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
 
+const { apiFetch } = useApi()
+
 const form = reactive({
   name: '',
   phone: '',
@@ -26,14 +28,32 @@ const submitForm = async () => {
 
   // اتصال API در مرحله بک‌اند اضافه می‌شود.
   await new Promise((resolve) => setTimeout(resolve, 700))
+  try {
+    await apiFetch('/contact', {
+      method: 'POST',
+      body: {
+        full_name: form.name.trim(),
+        phone: form.phone.trim(),
+        subject: form.subject.trim() || null,
+        message: form.message.trim(),
+      },
+    })
 
-  toast.success('درخواست شما ثبت شد؛ به‌زودی با شما تماس می‌گیریم.')
+    toast.success('درخواست شما ثبت شد؛ به‌زودی با شما تماس می‌گیریم.')
 
-  form.name = ''
-  form.phone = ''
-  form.subject = ''
-  form.message = ''
-  isSubmitting.value = false
+    form.name = ''
+    form.phone = ''
+    form.subject = ''
+    form.message = ''
+  } catch (err: any) {
+    const errorDetail = err?.data?.detail
+    const msg = typeof errorDetail === 'string'
+      ? errorDetail
+      : (Array.isArray(errorDetail) ? errorDetail.map((d: any) => d.msg).join(' - ') : 'خطایی در ثبت پیام رخ داد. لطفاً مجدداً تلاش کنید.')
+    toast.error(msg)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 

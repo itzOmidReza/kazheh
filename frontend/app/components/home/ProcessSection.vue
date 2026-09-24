@@ -58,7 +58,7 @@ const steps = [
 
       <!-- Steps -->
       <ol class="mt-12 grid gap-8 lg:mt-16 lg:grid-cols-3 lg:gap-10">
-        <li v-for="step in steps" :key="step.number" class="relative flex gap-5 lg:flex-col lg:gap-6">
+        <li v-for="(step, idx) in steps" :key="step.number" class="relative flex gap-5 lg:flex-col lg:gap-6">
           <div class="flex shrink-0 flex-col items-center">
             <span
               class="flex size-14 items-center justify-center rounded-full border border-border bg-secondary text-lg font-bold text-secondary-foreground lg:size-16"
@@ -66,7 +66,7 @@ const steps = [
               {{ step.number }}
             </span>
 
-            <span class="mt-4 w-px flex-1 bg-border lg:hidden" aria-hidden="true" />
+            <span v-if="idx < steps.length - 1" class="mt-4 w-px flex-1 bg-border lg:hidden" aria-hidden="true" />
           </div>
 
           <div class="min-w-0 flex-1 pb-4 lg:pb-0">

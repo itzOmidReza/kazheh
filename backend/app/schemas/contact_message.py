@@ -1,6 +1,6 @@
 from datetime import datetime
-
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from app.core.security import sanitize_content
 
 
 class ContactMessageBase(BaseModel):
@@ -17,6 +17,13 @@ class ContactMessageBase(BaseModel):
         description="Inquiry subject or consultation topic",
     )
     message: str = Field(..., min_length=10, max_length=5000, description="Message text")
+
+    @field_validator("full_name", "subject", "message")
+    @classmethod
+    def sanitize_text_fields(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return sanitize_content(v)
 
 
 class ContactMessageCreate(ContactMessageBase):
