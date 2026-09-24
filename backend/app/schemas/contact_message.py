@@ -11,6 +11,11 @@ class ContactMessageBase(BaseModel):
         max_length=100,
         description="Client's email address",
     )
+    subject: str | None = Field(
+        default=None,
+        max_length=200,
+        description="Inquiry subject or consultation topic",
+    )
     message: str = Field(..., min_length=10, max_length=5000, description="Message text")
 
 
@@ -29,6 +34,7 @@ class ContactMessageResponse(BaseModel):
     full_name: str
     phone: str
     email: str | None = None
+    subject: str | None = None
     message: str
     is_read: bool
     created_at: datetime

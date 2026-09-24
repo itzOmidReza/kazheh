@@ -39,9 +39,9 @@ def get_current_admin(
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         phone: str = payload.get("sub")
-        if phone is None:
+        if not phone or not str(phone).strip():
             raise credentials_exception
-        token_data = TokenPayload(sub=phone)
+        token_data = TokenPayload(sub=str(phone).strip())
     except JWTError:
         raise credentials_exception
 
@@ -50,7 +50,7 @@ def get_current_admin(
         raise credentials_exception
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive admin account",
         )
     return user
