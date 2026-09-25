@@ -7,6 +7,7 @@ class ArticleBase(BaseModel):
     title: str = Field(..., min_length=3, max_length=200, description="Article title")
     summary: str | None = Field(default=None, max_length=500, description="Short summary/excerpt")
     content: str = Field(..., min_length=10, description="Full markdown/HTML body content")
+    cover_image_url: str | None = Field(default=None, max_length=500, description="Cover image static URL")
     is_published: bool = Field(default=False, description="Publication status")
 
     @field_validator("title", "summary", "content")
@@ -30,6 +31,7 @@ class ArticleUpdate(BaseModel):
     slug: str | None = Field(default=None, max_length=220)
     summary: str | None = Field(default=None, max_length=500)
     content: str | None = Field(default=None, min_length=10)
+    cover_image_url: str | None = Field(default=None, max_length=500)
     is_published: bool | None = None
 
     @field_validator("title", "summary", "content")
@@ -46,6 +48,7 @@ class ArticleListItem(BaseModel):
     title: str
     slug: str
     summary: str | None = None
+    cover_image_url: str | None = None
     is_published: bool
     author_id: int
     created_at: datetime

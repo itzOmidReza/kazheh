@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_admin, get_db
@@ -10,8 +10,24 @@ from app.schemas.article import (
     ArticleUpdate,
 )
 from app.services.article_service import ArticleService
+from app.services.image_service import process_and_save_article_image
 
 router = APIRouter(prefix="/articles", tags=["Articles"])
+
+
+# 0. ADMIN ONLY: Upload and optimize article cover image
+@router.post(
+    "/upload-image",
+    response_model=dict[str, str],
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload and optimize article cover image (Admin Only)",
+)
+async def upload_article_image(
+    file: UploadFile = File(...),
+    current_admin: AdminUser = Depends(get_current_admin),
+):
+    url = await process_and_save_article_image(file)
+    return {"url": url}
 
 
 # 1. PUBLIC: List published articles

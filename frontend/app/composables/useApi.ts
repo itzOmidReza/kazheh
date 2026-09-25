@@ -29,7 +29,8 @@ export const useApi = () => {
       })
     } catch (err: any) {
       // 401 Unauthorized handling: clear expired auth state and redirect unless already on login page
-      if (err?.response?.status === 401 && token.value) {
+      const status = err?.response?.status || err?.status || err?.statusCode
+      if (status === 401 && token.value) {
         if (route.path !== '/admin/login') {
           logout()
         }

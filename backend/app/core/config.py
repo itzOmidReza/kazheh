@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     )
     PROJECT_NAME: str = "Kazheh"
     API_V1_STR: str = "/api/v1"
-    MAX_REQUEST_BODY_BYTES: int = 65536
+    MAX_REQUEST_BODY_BYTES: int = 10 * 1024 * 1024  # 10MB to support image uploads up to 5MB
     CONTACT_RATE_LIMIT_REQUESTS: int = 10
     CONTACT_RATE_LIMIT_WINDOW_SECONDS: int = 60
     LOGIN_RATE_LIMIT_REQUESTS: int = 10

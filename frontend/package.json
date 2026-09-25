@@ -15,6 +15,8 @@
     "@vueuse/core": "^15.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "isomorphic-dompurify": "^4.3.0",
+    "marked": "^18.0.14",
     "nuxt": "^4.5.2",
     "nuxt-lucide-icons": "2.1.0",
     "reka-ui": "^2.10.4",

@@ -12,6 +12,14 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    routeRules: {
+      '/static/**': {
+        proxy: (process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/api\/v1\/?$/, '') + '/static/**',
+      },
+    },
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

@@ -83,6 +83,7 @@ class ArticleService:
             slug=unique_slug,
             summary=article_in.summary.strip() if article_in.summary else None,
             content=article_in.content,
+            cover_image_url=article_in.cover_image_url.strip() if article_in.cover_image_url else None,
             is_published=article_in.is_published,
             author_id=author_id,
         )

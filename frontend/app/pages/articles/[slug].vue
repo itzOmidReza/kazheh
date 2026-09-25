@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ArrowRight, Clock3, Share2 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer.vue'
 import { toast } from 'vue-sonner'
 import type { ArticleResponse } from '~/types/api'
 
 const route = useRoute()
 const slug = computed(() => String(route.params.slug))
 const { apiFetch } = useApi()
+const { resolveImageUrl } = useImageUrl()
 
 const { data: article, error } = await useAsyncData<ArticleResponse>(
   `article-${slug.value}`,
@@ -32,47 +34,6 @@ const readingTime = computed(() => {
   return calculateReadingTime(fullText)
 })
 
-// Parse content into sections or paragraphs for readable rendering
-interface ParsedSection {
-  title?: string
-  paragraphs: string[]
-}
-
-const parsedSections = computed<ParsedSection[]>(() => {
-  if (!article.value?.content) return []
-
-  const raw = article.value.content
-  // Check if content uses markdown headings (# or ##)
-  if (raw.includes('#')) {
-    const rawSections = raw.split(/(?=^#{1,3}\s)/m)
-    const result: ParsedSection[] = []
-
-    for (const sec of rawSections) {
-      const trimmed = sec.trim()
-      if (!trimmed) continue
-
-      const lines = trimmed.split('\n')
-      const firstLine = lines[0].trim()
-
-      if (firstLine.startsWith('#')) {
-        const title = firstLine.replace(/^#+\s*/, '')
-        const bodyLines = lines.slice(1).join('\n').trim()
-        const paras = bodyLines.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
-        result.push({ title, paragraphs: paras })
-      } else {
-        const paras = trimmed.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
-        result.push({ paragraphs: paras })
-      }
-    }
-
-    if (result.length > 0) return result
-  }
-
-  // Fallback: split by double newlines into simple paragraphs
-  const paras = raw.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
-  return [{ paragraphs: paras }]
-})
-
 useHead(() => ({
   title: `${article.value?.title || 'مقاله'} | کلینیک آرامش`,
   meta: [
@@ -88,6 +49,9 @@ useHead(() => ({
       property: 'og:description',
       content: article.value?.summary || 'مطالعه مقاله تخصصی در کلینیک آرامش',
     },
+    ...(article.value?.cover_image_url
+      ? [{ property: 'og:image', content: resolveImageUrl(article.value.cover_image_url) }]
+      : []),
     { property: 'og:type', content: 'article' },
     { property: 'og:locale', content: 'fa_IR' },
     {
@@ -134,12 +98,12 @@ const shareArticle = async () => {
             بازگشت به مقالات
           </NuxtLink>
 
-          <div class="mt-10 max-w-3xl">
+          <div class="mt-8 max-w-3xl">
             <span class="rounded-pill bg-secondary px-3 py-1 text-xs text-secondary-foreground">
               روان‌شناسی
             </span>
 
-            <h1 class="mt-6 text-heading-xl text-primary-900">
+            <h1 class="mt-6 text-heading-xl text-primary-900 leading-tight">
               {{ article.title }}
             </h1>
 
@@ -148,9 +112,21 @@ const shareArticle = async () => {
               {{ readingTime }} دقیقه مطالعه
             </div>
 
-            <p v-if="article.summary" class="mt-8 text-body-lg text-muted-foreground">
+            <p v-if="article.summary" class="mt-8 text-body-lg text-muted-foreground leading-8">
               {{ article.summary }}
             </p>
+          </div>
+
+          <!-- Hero Cover Image -->
+          <div v-if="article.cover_image_url" class="mt-10 max-w-4xl overflow-hidden rounded-[1.75rem] border border-border bg-card shadow-card">
+            <img
+              :src="resolveImageUrl(article.cover_image_url)"
+              :alt="article.title"
+              width="1280"
+              height="720"
+              class="aspect-[16/9] w-full object-cover"
+              loading="eager"
+            />
           </div>
         </div>
       </header>
@@ -158,19 +134,8 @@ const shareArticle = async () => {
       <section class="section-space bg-background">
         <div class="site-container">
           <div class="max-w-3xl">
-            <div v-for="(section, sIdx) in parsedSections" :key="sIdx" class="mb-10 last:mb-0">
-              <h2 v-if="section.title" class="text-heading-md text-primary-900">
-                {{ section.title }}
-              </h2>
-
-              <p
-                v-for="(paragraph, pIdx) in section.paragraphs"
-                :key="pIdx"
-                class="mt-5 text-body-lg leading-9 text-muted-foreground whitespace-pre-line"
-              >
-                {{ paragraph }}
-              </p>
-            </div>
+            <!-- Full Rich Markdown Body -->
+            <MarkdownRenderer :content="article.content" />
 
             <div class="mt-12 border-t border-border pt-6">
               <Button type="button" variant="outline" class="min-h-12 w-full sm:w-auto rounded-pill" @click="shareArticle">

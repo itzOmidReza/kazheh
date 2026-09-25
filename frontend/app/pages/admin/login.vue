@@ -30,13 +30,19 @@ const handleLogin = async () => {
     const success = await login(phone.value.trim(), password.value)
     if (success) {
       toast.success('ورود با موفقیت انجام شد.')
-      await navigateTo('/admin')
+      await navigateTo('/admin', { replace: true })
     } else {
       toast.error('شماره تماس یا رمز عبور اشتباه است.')
     }
   } catch (err: any) {
-    const detail = err?.data?.detail
-    const msg = typeof detail === 'string' ? detail : 'خطا در برقراری ارتباط با سرور. لطفاً مجدداً تلاش کنید.'
+    const status = err?.response?.status || err?.status || err?.statusCode
+    const detail = err?.data?.detail || err?.message
+    let msg = 'خطا در برقراری ارتباط با سرور. لطفاً مجدداً تلاش کنید.'
+    if (status === 401 || (typeof detail === 'string' && (detail.includes('Incorrect') || detail.includes('credentials')))) {
+      msg = 'شماره تماس یا رمز عبور اشتباه است.'
+    } else if (typeof detail === 'string') {
+      msg = detail
+    }
     toast.error(msg)
   } finally {
     isSubmitting.value = false

@@ -18,6 +18,7 @@ useHead({
 })
 
 const { apiFetch } = useApi()
+const { resolveImageUrl } = useImageUrl()
 const { data: rawArticles } = await useAsyncData<ArticleListItem[]>('home-articles', () =>
   apiFetch('/articles?limit=3')
 )
@@ -27,10 +28,16 @@ const homeArticles = computed(() => {
   return rawArticles.value.map((a) => ({
     id: String(a.id),
     title: a.title,
-    excerpt: a.summary || '',
+    excerpt: stripMarkdown(a.summary || ''),
     href: `/articles/${a.slug}`,
     category: 'روان‌شناسی',
-    readingMinutes: Math.max(2, Math.ceil((a.summary?.split(/\s+/).length || 50) / 150)),
+    readingMinutes: Math.max(2, Math.ceil(((a.summary || '').split(/\s+/).length || 50) / 150)),
+    image: a.cover_image_url
+      ? {
+          src: resolveImageUrl(a.cover_image_url),
+          alt: a.title,
+        }
+      : undefined,
   }))
 })
 

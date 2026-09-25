@@ -18,6 +18,9 @@ import {
   Inbox,
   ArrowRight,
   Loader2,
+  UploadCloud,
+  Image as ImageIcon,
+  X,
 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -45,6 +48,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer.vue'
 import { toast } from 'vue-sonner'
 import type { ContactMessage, ArticleListItem, ArticleResponse } from '~/types/api'
 
@@ -56,8 +60,9 @@ useHead({
   title: 'پنل مدیریت | کلینیک آرامش',
 })
 
-const { admin, logout } = useAuth()
-const { apiFetch } = useApi()
+const { admin, logout, fetchProfile } = useAuth()
+const { apiFetch, getErrorMessage } = useApi()
+const { resolveImageUrl } = useImageUrl()
 
 // -------------------------------------------------------------
 // Active Tab State
@@ -215,13 +220,72 @@ const isEditing = ref(false)
 const currentArticleId = ref<number | null>(null)
 const isSavingArticle = ref(false)
 
+// Cover image upload & markdown editor tab state
+const isUploadingImage = ref(false)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const isDragging = ref(false)
+const contentEditorTab = ref<'editor' | 'preview'>('editor')
+
 const articleForm = reactive({
   title: '',
   slug: '',
   summary: '',
   content: '',
+  cover_image_url: null as string | null,
   is_published: false,
 })
+
+const handleImageFile = async (file: File) => {
+  if (!file) return
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp']
+  if (!validTypes.includes(file.type)) {
+    toast.error('فرمت فایل مجاز نیست. لطفاً یک تصویر با فرمت JPG، PNG یا WebP انتخاب کنید.')
+    return
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error('حجم فایل بیشتر از حد مجاز (۵ مگابایت) است.')
+    return
+  }
+
+  isUploadingImage.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const res = await apiFetch<{ url: string }>('/articles/upload-image', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (res?.url) {
+      articleForm.cover_image_url = res.url
+      toast.success('تصویر شاخص با موفقیت بارگذاری و به فرمت بهینه WebP تبدیل شد.')
+    }
+  } catch (err: any) {
+    toast.error(getErrorMessage(err, 'خطا در بارگذاری تصویر شاخص.'))
+  } finally {
+    isUploadingImage.value = false
+    if (fileInputRef.value) fileInputRef.value.value = ''
+  }
+}
+
+const onFileInputChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    handleImageFile(target.files[0])
+  }
+}
+
+const onDrop = (e: DragEvent) => {
+  isDragging.value = false
+  if (e.dataTransfer?.files && e.dataTransfer.files[0]) {
+    handleImageFile(e.dataTransfer.files[0])
+  }
+}
+
+const removeCoverImage = () => {
+  articleForm.cover_image_url = null
+}
 
 const openCreateArticle = () => {
   isEditing.value = false
@@ -230,13 +294,16 @@ const openCreateArticle = () => {
   articleForm.slug = ''
   articleForm.summary = ''
   articleForm.content = ''
+  articleForm.cover_image_url = null
   articleForm.is_published = false
+  contentEditorTab.value = 'editor'
   isArticleFormOpen.value = true
 }
 
 const openEditArticle = async (item: ArticleListItem) => {
   isEditing.value = true
   currentArticleId.value = item.id
+  contentEditorTab.value = 'editor'
   isArticleFormOpen.value = true
 
   try {
@@ -245,6 +312,7 @@ const openEditArticle = async (item: ArticleListItem) => {
     articleForm.slug = detailed.slug
     articleForm.summary = detailed.summary || ''
     articleForm.content = detailed.content
+    articleForm.cover_image_url = detailed.cover_image_url || null
     articleForm.is_published = detailed.is_published
   } catch {
     // Fallback to item data
@@ -252,6 +320,7 @@ const openEditArticle = async (item: ArticleListItem) => {
     articleForm.slug = item.slug
     articleForm.summary = item.summary || ''
     articleForm.content = ''
+    articleForm.cover_image_url = item.cover_image_url || null
     articleForm.is_published = item.is_published
     toast.error('خطا در دریافت محتوای کامل مقاله.')
   }
@@ -265,28 +334,25 @@ const handleSaveArticle = async () => {
 
   isSavingArticle.value = true
   try {
+    const payload = {
+      title: articleForm.title.trim(),
+      slug: articleForm.slug.trim() || null,
+      summary: articleForm.summary.trim() || null,
+      content: articleForm.content.trim(),
+      cover_image_url: articleForm.cover_image_url || null,
+      is_published: articleForm.is_published,
+    }
+
     if (isEditing.value && currentArticleId.value) {
       await apiFetch<ArticleResponse>(`/articles/${currentArticleId.value}`, {
         method: 'PATCH',
-        body: {
-          title: articleForm.title.trim(),
-          slug: articleForm.slug.trim() || null,
-          summary: articleForm.summary.trim() || null,
-          content: articleForm.content.trim(),
-          is_published: articleForm.is_published,
-        },
+        body: payload,
       })
       toast.success('مقاله با موفقیت ویرایش شد.')
     } else {
       await apiFetch<ArticleResponse>('/articles', {
         method: 'POST',
-        body: {
-          title: articleForm.title.trim(),
-          slug: articleForm.slug.trim() || null,
-          summary: articleForm.summary.trim() || null,
-          content: articleForm.content.trim(),
-          is_published: articleForm.is_published,
-        },
+        body: payload,
       })
       toast.success('مقاله جدید با موفقیت ایجاد شد.')
     }
@@ -344,6 +410,9 @@ const formatDate = (isoString: string) => {
 
 // Load data on mount
 onMounted(() => {
+  if (!admin.value) {
+    fetchProfile()
+  }
   fetchMessages()
   fetchArticles()
 })
@@ -612,6 +681,16 @@ onMounted(() => {
               :key="item.id"
               class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 transition-shadow hover:shadow-card"
             >
+              <!-- Cover image thumbnail if present -->
+              <div v-if="item.cover_image_url" class="size-16 shrink-0 overflow-hidden rounded-xl border border-border bg-secondary/30">
+                <img
+                  :src="resolveImageUrl(item.cover_image_url)"
+                  :alt="item.title"
+                  class="size-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+
               <div class="space-y-1 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="text-base font-bold text-primary-900">
@@ -792,6 +871,91 @@ onMounted(() => {
             </p>
           </div>
 
+          <!-- Cover Image Uploader -->
+          <div class="space-y-2">
+            <Label>تصویر شاخص مقاله (تبدیل و بهینه‌سازی خودکار به WebP)</Label>
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              class="hidden"
+              @change="onFileInputChange"
+            />
+
+            <!-- Preview if cover image exists -->
+            <div
+              v-if="articleForm.cover_image_url"
+              class="relative overflow-hidden rounded-2xl border border-border bg-secondary/20 p-3"
+            >
+              <div class="relative max-h-52 overflow-hidden rounded-xl border border-border bg-card">
+                <img
+                  :src="resolveImageUrl(articleForm.cover_image_url)"
+                  alt="پیش‌نمایش تصویر شاخص"
+                  class="aspect-[16/9] w-full object-cover"
+                />
+                <div class="absolute top-2 right-2">
+                  <Badge class="bg-primary text-primary-foreground text-xs shadow-soft rounded-pill">
+                    WebP بهینه‌شده
+                  </Badge>
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-center justify-between gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  class="rounded-pill text-xs min-h-8"
+                  :disabled="isUploadingImage"
+                  @click="fileInputRef?.click()"
+                >
+                  <UploadCloud class="size-3.5" />
+                  تغییر تصویر
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  class="rounded-pill text-xs min-h-8 text-destructive hover:bg-destructive/10"
+                  @click="removeCoverImage"
+                >
+                  <Trash2 class="size-3.5" />
+                  حذف تصویر
+                </Button>
+              </div>
+            </div>
+
+            <!-- Dropzone if no cover image -->
+            <div
+              v-else
+              :class="[
+                'flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors',
+                isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40 bg-secondary/15 hover:bg-secondary/30',
+              ]"
+              @dragover.prevent="isDragging = true"
+              @dragleave.prevent="isDragging = false"
+              @drop.prevent="onDrop"
+              @click="fileInputRef?.click()"
+            >
+              <div v-if="isUploadingImage" class="flex flex-col items-center gap-2 py-4">
+                <Loader2 class="size-8 animate-spin text-primary" />
+                <span class="text-xs font-medium text-primary">در حال آپلود و تبدیل خودکار به WebP...</span>
+              </div>
+              <div v-else class="flex flex-col items-center gap-2">
+                <div class="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <UploadCloud class="size-5" />
+                </div>
+                <div class="text-xs font-semibold text-primary-900">
+                  برای انتخاب تصویر شاخص کلیک کنید یا فایل را به اینجا بکشید
+                </div>
+                <div class="text-[11px] text-muted-foreground">
+                  فرمت‌های مجاز: JPG، PNG، WebP (حداکثر ۵ مگابایت - بهینه‌سازی خودکار با عرض ۱۶۰۰px و فرمت WebP)
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="space-y-2">
             <Label for="art-summary">خلاصه کوتاه (Excerpt)</Label>
             <Textarea
@@ -803,16 +967,63 @@ onMounted(() => {
             />
           </div>
 
+          <!-- Content with Markdown Editor & Live Preview Tabs -->
           <div class="space-y-2">
-            <Label for="art-content">متن کامل مقاله * (پشتیبانی از پاراگراف یا تیترهای Markdown مانند # یا ##)</Label>
-            <Textarea
-              id="art-content"
-              v-model="articleForm.content"
-              rows="8"
-              placeholder="متن مقاله را اینجا بنویسید..."
-              required
-              class="leading-7"
-            />
+            <div class="flex items-center justify-between">
+              <Label for="art-content">متن کامل مقاله * (پشتیبانی کامل از Markdown)</Label>
+              <div class="flex items-center rounded-pill bg-secondary p-0.5 text-xs">
+                <button
+                  type="button"
+                  :class="[
+                    'px-3 py-1 rounded-pill transition-all font-medium',
+                    contentEditorTab === 'editor' ? 'bg-card text-primary font-bold shadow-soft' : 'text-muted-foreground hover:text-foreground',
+                  ]"
+                  @click="contentEditorTab = 'editor'"
+                >
+                  ویرایشگر
+                </button>
+                <button
+                  type="button"
+                  :class="[
+                    'px-3 py-1 rounded-pill transition-all font-medium',
+                    contentEditorTab === 'preview' ? 'bg-card text-primary font-bold shadow-soft' : 'text-muted-foreground hover:text-foreground',
+                  ]"
+                  @click="contentEditorTab = 'preview'"
+                >
+                  پیش‌نمایش زنده
+                </button>
+              </div>
+            </div>
+
+            <!-- Editor View -->
+            <div v-show="contentEditorTab === 'editor'">
+              <Textarea
+                id="art-content"
+                v-model="articleForm.content"
+                rows="9"
+                placeholder="متن مقاله را اینجا بنویسید... (مانند: # تیتر اصلی، ## زیرتیتر، **متن ضخیم**، - لیست‌ها، > نقل قول)"
+                required
+                class="leading-7 font-mono text-sm"
+              />
+              <div class="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                <span>راهنما: <code>#</code> تیتر، <code>##</code> زیرتیتر، <code>**ضخیم**</code>، <code>*مورب*</code>، <code>-</code> لیست، <code>></code> نقل‌قول</span>
+                <span>{{ articleForm.content.length }} نویسه</span>
+              </div>
+            </div>
+
+            <!-- Live Preview View -->
+            <div
+              v-show="contentEditorTab === 'preview'"
+              class="min-h-[14rem] max-h-[22rem] overflow-y-auto rounded-xl border border-border bg-card p-4 shadow-inner"
+            >
+              <MarkdownRenderer
+                v-if="articleForm.content.trim()"
+                :content="articleForm.content"
+              />
+              <div v-else class="py-12 text-center text-xs text-muted-foreground">
+                متنی برای نمایش پیش‌نمایش وارد نشده است.
+              </div>
+            </div>
           </div>
 
           <div class="flex items-center gap-2 pt-2">

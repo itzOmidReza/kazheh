@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ArrowLeft, Clock3 } from '@lucide/vue'
 import { Skeleton } from '@/components/ui/skeleton'
+import { stripMarkdown } from '~/utils/markdown'
 import type { ArticleListItem } from '~/types/api'
 
 useHead({
@@ -19,6 +20,7 @@ useHead({
 })
 
 const { apiFetch } = useApi()
+const { resolveImageUrl } = useImageUrl()
 
 const { data: articles, status } = await useAsyncData<ArticleListItem[]>('public-articles', () =>
   apiFetch('/articles?limit=50')
@@ -83,8 +85,20 @@ const calculateReadingTime = (text?: string | null) => {
           <article
             v-for="article in articles"
             :key="article.slug"
-            class="flex h-full flex-col rounded-[1.5rem] border border-border bg-card p-6 transition-shadow hover:shadow-card"
+            class="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-border bg-card p-6 transition-shadow hover:shadow-card"
           >
+            <!-- Thumbnail cover image if present -->
+            <div v-if="article.cover_image_url" class="-mx-6 -mt-6 mb-5 overflow-hidden border-b border-border bg-secondary/30">
+              <img
+                :src="resolveImageUrl(article.cover_image_url)"
+                :alt="article.title"
+                width="640"
+                height="360"
+                loading="lazy"
+                class="aspect-[16/9] w-full object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+
             <div class="flex items-center justify-between gap-3">
               <span class="rounded-pill bg-secondary px-3 py-1 text-xs text-secondary-foreground">
                 روان‌شناسی
@@ -96,12 +110,12 @@ const calculateReadingTime = (text?: string | null) => {
               </span>
             </div>
 
-            <h2 class="mt-6 text-xl font-bold leading-9 text-primary-900">
+            <h2 class="mt-5 text-xl font-bold leading-9 text-primary-900">
               {{ article.title }}
             </h2>
 
-            <p class="mt-3 flex-1 text-sm leading-8 text-muted-foreground">
-              {{ article.summary || '' }}
+            <p class="mt-3 flex-1 text-sm leading-8 text-muted-foreground line-clamp-3">
+              {{ stripMarkdown(article.summary) }}
             </p>
 
             <NuxtLink

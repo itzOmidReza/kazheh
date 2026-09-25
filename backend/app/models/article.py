@@ -16,6 +16,7 @@ class Article(Base):
     slug: Mapped[str] = mapped_column(String(220), unique=True, index=True, nullable=False)
     summary: Mapped[str | None] = mapped_column(String(500), nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    cover_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     author_id: Mapped[int] = mapped_column(Integer, ForeignKey("admin_user.id"), nullable=False)

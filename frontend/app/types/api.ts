@@ -26,6 +26,7 @@ export interface ArticleListItem {
   title: string
   slug: string
   summary?: string | null
+  cover_image_url?: string | null
   is_published: boolean
   author_id: number
   created_at: string
@@ -41,6 +42,7 @@ export interface ArticleCreate {
   slug?: string | null
   summary?: string | null
   content: string
+  cover_image_url?: string | null
   is_published?: boolean
 }
 
@@ -49,6 +51,7 @@ export interface ArticleUpdate {
   slug?: string | null
   summary?: string | null
   content?: string | null
+  cover_image_url?: string | null
   is_published?: boolean | null
 }
 
