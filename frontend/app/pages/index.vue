@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import type { ArticleListItem } from '~/types/api'
+import { siteConfig } from '~/data'
 
 useHead({
-  title: 'کلینیک آرامش | روان‌شناسی آگاهانه و مشاوره تخصصی',
+  title: `${siteConfig.name} | ${siteConfig.tagline}`,
   meta: [
     {
       name: 'description',
-      content:
-        'فضایی امن، انسانی و محرمانه برای شروع گفت‌وگو، مشاوره فردی و روابط، و شناختن قدم‌های بعدی.',
+      content: siteConfig.description,
     },
-    { property: 'og:title', content: 'کلینیک آرامش | روان‌شناسی آگاهانه و مشاوره تخصصی' },
-    { property: 'og:description', content: 'فضایی امن، انسانی و محرمانه برای شروع گفت‌وگو، مشاوره فردی و روابط، و شناختن قدم‌های بعدی.' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:locale', content: 'fa_IR' },
   ],
-  link: [{ rel: 'canonical', href: '/' }],
 })
 
+<<<<<<< HEAD
 const { apiFetch } = useApi()
 const { resolveImageUrl } = useImageUrl()
 const { data: rawArticles } = await useAsyncData<ArticleListItem[]>('home-articles', () =>
@@ -38,26 +33,25 @@ const homeArticles = computed(() => {
           alt: a.title,
         }
       : undefined,
+=======
+// دریافت ۳ مقاله آخر برای سکشن صفحه اصلی
+const { data: homeArticles } = await useAsyncData('home-articles', async () => {
+  const list = await queryCollection('articles')
+    .where('draft', '<>', true)
+    .order('createdAt', 'DESC')
+    .limit(3)
+    .all()
+
+  return list.map((item) => ({
+    id: item.slug || item.path,
+    title: item.title,
+    excerpt: item.excerpt,
+    href: `/articles/${item.slug}`,
+    category: item.category,
+    readingMinutes: item.readingTime,
+>>>>>>> 78d5ecf57b5831113f6e6919549fcbda5806b225
   }))
 })
-
-const homeTestimonials = [
-  {
-    id: '1',
-    displayName: 'م. ر. (مراجع مشاوره فردی)',
-    text: 'فضای جلسات به من کمک کرد بدون احساس قضاوت شدن، احساساتم را بیان کنم و زاویه دید روشن‌تری نسبت به چالش‌هایم پیدا کنم.',
-  },
-  {
-    id: '2',
-    displayName: 'س. ت. (مراجع مشاوره روابط)',
-    text: 'یاد گرفتم چطور مرزهای ارتباطی‌ام را بهتر بشناسم و با اطرافیانم شفاف‌تر و آرام‌تر گفت‌وگو کنم.',
-  },
-  {
-    id: '3',
-    displayName: 'الف. ن. (مراجع همراهی در تغییر)',
-    text: 'قدم‌های کوچک و واقعی که در جلسات طراحی کردیم، تغییراتی پایدار و بدون اضطراب در زندگی روزمره‌ام به وجود آورد.',
-  },
-]
 </script>
 
 <template>
@@ -67,8 +61,8 @@ const homeTestimonials = [
   <HomeServicesSection />
   <HomeApproachSection />
   <HomeProcessSection />
-  <HomeTestimonialsSection :items="homeTestimonials" />
-  <HomeArticlesSection :items="homeArticles" />
+  <HomeTestimonialsSection />
+  <HomeArticlesSection :items="homeArticles || []" />
   <HomeFaqSection />
   <HomeContactSection />
 </template>

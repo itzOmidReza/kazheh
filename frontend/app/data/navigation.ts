@@ -1,22 +1,24 @@
-export interface NavigationItem {
+export interface NavItem {
   label: string;
   href: string;
 }
 
-export const mainNavigation: NavigationItem[] = [
+export const mainNavigation: NavItem[] = [
   { label: 'خانه', href: '/' },
   { label: 'خدمات', href: '/services' },
-  { label: 'درباره ما', href: '/about' },
   { label: 'مقالات', href: '/articles' },
+  { label: 'درباره ما', href: '/about' },
 ];
 
-export const footerNavigation: NavigationItem[] = [
-  ...mainNavigation,
-  { label: 'روش کاری', href: '/#approach' },
+export const footerQuickLinks: NavItem[] = [
+  { label: 'خانه', href: '/' },
+  { label: 'خدمات تخصصی', href: '/services' },
+  { label: 'مجله و مقالات', href: '/articles' },
+  { label: 'درباره کلینیک', href: '/about' },
 ];
 
-export const supportNavigation: NavigationItem[] = [
+export const footerSupportLinks: NavItem[] = [
   { label: 'سؤالات متداول', href: '/#faq' },
-  { label: 'تماس با ما', href: '/#contact' },
+  { label: 'شروع گفتگو', href: '/#contact' },
   { label: 'حریم خصوصی', href: '/privacy' },
 ];
