@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -144,6 +144,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --font-heading: var(--font-sans);
 }
 
 /* ========================================
@@ -300,4 +301,49 @@
 
 @utility section-space {
   padding-block: var(--spacing-section);
+}
+/* ========================================
+   Base styles
+   ======================================== */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    scroll-padding-block-start: 6rem;
+    direction: rtl;
+    text-align: right;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+    min-block-size: 100svh;
+    font-size: 0.9375rem;
+    line-height: 2;
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* اجبار قفل‌شدن راست‌چین و درست شدن فلکس‌باکس‌ها */
+  html,
+  body,
+  #__nuxt {
+    direction: rtl !important;
+    text-align: right !important;
+  }
+
+  /* اصلاح تمام بخش‌های flex که چپ به راست باز شده بودند */
+  [dir='rtl'] .justify-between,
+  .justify-between {
+    direction: rtl !important;
+  }
+
+  /* کارت‌ها و پیام‌ها و عناوین هدر */
+  .flex-1 {
+    text-align: right !important;
+  }
 }

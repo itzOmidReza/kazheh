@@ -4,3 +4,4 @@ export * from './services';
 export * from './home';
 export * from './faqs';
 export * from './pages';
+export * from './admin';

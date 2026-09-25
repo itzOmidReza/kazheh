@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Toaster } from 'vue-sonner'
+import 'vue-sonner/style.css'
+import { Toaster } from '@/components/ui/sonner'
 </script>
 
 <template>
   <NuxtLayout>
     <NuxtRouteAnnouncer />
     <NuxtPage />
-    <Toaster position="bottom-left" dir="rtl" rich-colors />
   </NuxtLayout>
+
+  <Toaster dir="rtl" position="top-center" />
 </template>
