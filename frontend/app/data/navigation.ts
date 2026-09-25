@@ -5,20 +5,20 @@ export interface NavItem {
 
 export const mainNavigation: NavItem[] = [
   { label: 'خانه', href: '/' },
-  { label: 'خدمات', href: '/#services' },
-  { label: 'روش کاری', href: '/#approach' },
+  { label: 'خدمات', href: '/services' },
   { label: 'مقالات', href: '/articles' },
+  { label: 'درباره ما', href: '/about' },
 ];
 
 export const footerQuickLinks: NavItem[] = [
   { label: 'خانه', href: '/' },
-  { label: 'خدمات', href: '/#services' },
-  { label: 'روش کاری', href: '/#approach' },
-  { label: 'مقالات', href: '/articles' },
+  { label: 'خدمات تخصصی', href: '/services' },
+  { label: 'مجله و مقالات', href: '/articles' },
+  { label: 'درباره کلینیک', href: '/about' },
 ];
 
 export const footerSupportLinks: NavItem[] = [
   { label: 'سؤالات متداول', href: '/#faq' },
-  { label: 'تماس با ما', href: '/#contact' },
+  { label: 'شروع گفتگو', href: '/#contact' },
   { label: 'حریم خصوصی', href: '/privacy' },
 ];

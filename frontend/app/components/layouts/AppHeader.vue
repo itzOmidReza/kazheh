@@ -59,8 +59,8 @@ const closeMobileMenu = () => {
           <NuxtLink v-for="item in mainNavigation" :key="item.href" :to="item.href" :class="[
             'rounded-pill px-4 py-2 text-sm font-medium transition-colors',
             isActive(item.href)
-              ? 'bg-secondary text-primary font-bold'
-              : 'text-muted-foreground hover:bg-secondary/70 hover:text-primary',
+              ? 'bg-secondary font-bold text-primary dark:text-foreground'
+              : 'text-muted-foreground hover:bg-secondary/70 hover:text-primary dark:hover:text-foreground',
           ]">
             {{ item.label }}
           </NuxtLink>
@@ -69,13 +69,13 @@ const closeMobileMenu = () => {
         <!-- Desktop CTA -->
         <div class="hidden items-center gap-3 lg:flex">
           <NuxtLink :to="siteConfig.contactCta.buttonHref"
-            class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary dark:hover:text-foreground">
             تماس با ما
           </NuxtLink>
 
           <Button as-child class="rounded-pill bg-cta px-5 text-cta-foreground shadow-soft hover:bg-cta-hover">
             <NuxtLink :to="siteConfig.contactCta.buttonHref">
-              {{ siteConfig.contactCta.title }}
+              {{ siteConfig.contactCta.buttonText || siteConfig.contactCta.title }}
               <ArrowLeft class="size-4" />
             </NuxtLink>
           </Button>
@@ -101,8 +101,8 @@ const closeMobileMenu = () => {
                 <NuxtLink :to="item.href" :class="[
                   'rounded-xl px-4 py-3 text-right text-base font-medium transition-colors',
                   isActive(item.href)
-                    ? 'bg-secondary text-primary font-bold'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-primary',
+                    ? 'bg-secondary font-bold text-primary dark:text-foreground'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-primary dark:hover:text-foreground',
                 ]" @click="closeMobileMenu">
                   {{ item.label }}
                 </NuxtLink>
@@ -114,7 +114,7 @@ const closeMobileMenu = () => {
                 <Button as-child class="w-full rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover"
                   @click="closeMobileMenu">
                   <NuxtLink :to="siteConfig.contactCta.buttonHref">
-                    {{ siteConfig.contactCta.buttonText }}
+                    {{ siteConfig.contactCta.buttonText || siteConfig.contactCta.title }}
                     <ArrowLeft class="size-4" />
                   </NuxtLink>
                 </Button>
