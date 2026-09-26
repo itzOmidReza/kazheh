@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
 from app.models.admin_user import AdminUser
-from app.schemas.admin_user import AdminUserCreate
+from app.schemas.admin_user import AdminUserCreate, AdminUserUpdate
 
 
 class AuthService:
@@ -49,6 +49,52 @@ class AuthService:
             db.commit()
             db.refresh(db_user)
             return db_user
+        except Exception:
+            db.rollback()
+            raise
+
+    @staticmethod
+    def update_admin(
+        db: Session,
+        db_admin: AdminUser,
+        update_in: AdminUserUpdate,
+    ) -> AdminUser:
+        """Applies a partial update (profile fields) to an existing admin user."""
+        update_data = update_in.model_dump(exclude_unset=True)
+
+        # `phone` is a non-nullable column and doubles as the login identifier:
+        # an explicit null is treated as "no change" instead of wiping it out.
+        if update_data.get("phone") is None:
+            update_data.pop("phone", None)
+        else:
+            update_data["phone"] = update_data["phone"].strip()
+
+        if isinstance(update_data.get("full_name"), str):
+            stripped_name = update_data["full_name"].strip()
+            update_data["full_name"] = stripped_name or None
+
+        if not update_data:
+            return db_admin
+
+        try:
+            for field, value in update_data.items():
+                setattr(db_admin, field, value)
+
+            db.commit()
+            db.refresh(db_admin)
+            return db_admin
+        except Exception:
+            db.rollback()
+            raise
+
+    @staticmethod
+    def change_password(db: Session, db_admin: AdminUser, new_password: str) -> AdminUser:
+        """Hashes and stores a new password for an existing admin user."""
+        try:
+            db_admin.hashed_password = get_password_hash(new_password)
+            db.commit()
+            db.refresh(db_admin)
+            return db_admin
         except Exception:
             db.rollback()
             raise
