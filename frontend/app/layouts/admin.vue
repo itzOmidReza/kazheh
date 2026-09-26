@@ -1,7 +1,5 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth',
-})
+import { computed, ref, onMounted } from 'vue'
 import {
   LayoutDashboard,
   Mail,
@@ -27,14 +25,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { siteConfig, adminLayoutData, initialAdminProfile } from '~/data'
+import { siteConfig, adminLayoutData } from '~/data'
+import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 
-// بارگذاری پروفایل ادمین از لایه متمرکز
-const admin = ref({ ...initialAdminProfile })
+// دریافت نام و شماره تلفن کاربر لاگین‌شده از استور، با مقادیر پیش‌فرض
+const admin = computed(() => ({
+  full_name: authStore.user?.full_name || 'مدیر کلینیک کاژه',
+  phone: authStore.user?.phone || '09121234567',
+}))
 
+// خروج واقعی: پاک‌سازی توکن و استیت سپس انتقال به صفحه ورود
 const logout = () => {
+  authStore.logout()
   navigateTo('/admin/login')
 }
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ArrowRight, Loader2, Lock, Phone } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,12 +8,14 @@ import { toast } from 'vue-sonner'
 import { adminAuthData } from '~/data/admin'
 import { useAuthStore } from '~/stores/auth'
 
-// اعمال لایه‌بندی ایزوله برای لاگین
+// اعمال لایه‌بندی اختصاصی برای لاگین
 definePageMeta({
   layout: 'auth',
 })
 
 const authStore = useAuthStore()
+const route = useRoute()
+const router = useRouter()
 
 const phone = ref('')
 const password = ref('')
@@ -23,8 +26,14 @@ const handleLogin = async () => {
     return
   }
 
-  // فراخوانی اکشن لاگین از استور Pinia که مستقیماً به بک‌اند وصل است
-  await authStore.login(phone.value, password.value)
+  // فراخوانی اکشن لاگین از استور
+  const success = await authStore.login(phone.value, password.value)
+
+  // در صورت ورود موفق، ریدایرکت به مسیر قبلی یا داشبورد ادمین
+  if (success || authStore.isAuthenticated) {
+    const targetUrl = (route.query.redirect as string) || '/admin'
+    await router.push(targetUrl)
+  }
 }
 </script>
 
