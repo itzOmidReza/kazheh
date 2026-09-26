@@ -1,5 +1,7 @@
+import { siteConfig } from './site';
+
 export const homeData = {
-  // ۱. بخش Hero (بر اساس Hero.vue)
+  // ۱. بخش Hero
   hero: {
     badge: 'فضایی برای آرام‌تر دیدن',
     title: {
@@ -11,7 +13,7 @@ export const homeData = {
       'اگر هنوز نمی‌دانید دقیقاً چه چیزی آزارتان می‌دهد، گفت‌وگو می‌تواند نقطه شروع خوبی برای شناختن خود و ساختن قدم‌های بعدی باشد.',
     primaryCta: {
       label: 'درخواست مشاوره اولیه',
-      href: '/#contact',
+      href: '/contact',
     },
     secondaryCta: {
       label: 'آشنایی با روش کاری',
@@ -26,8 +28,8 @@ export const homeData = {
       badge: 'فضای امن و محرمانه',
       preTitle: 'یک مکث کوتاه',
       quote: 'گاهی شروع تغییر، فقط با یک گفت‌وگوی صادقانه آغاز می‌شود.',
-      clinicName: 'کلینیک آرامش',
-      clinicTagline: 'روان‌شناسی آگاهانه و انسانی',
+      clinicName: siteConfig.name,
+      clinicTagline: siteConfig.tagline,
       floatingCard: {
         title: 'حریم خصوصی شما مهم است',
         description: 'گفت‌وگوها با احترام و محرمانگی همراه هستند.',
@@ -35,7 +37,7 @@ export const homeData = {
     },
   },
 
-  // ۲. بخش اعتمادسازی (بر اساس TrustBar.vue)
+  // ۲. بخش اعتمادسازی (TrustBar)
   trustBar: {
     ariaLabel: 'ویژگی‌های کلینیک',
     items: [
@@ -62,7 +64,7 @@ export const homeData = {
     ],
   },
 
-  // ۳. بخش دغدغه‌ها (بر اساس ConcernsSection.vue)
+  // ۳. بخش دغدغه‌ها (ConcernsSection)
   concerns: {
     badge: 'شاید این تجربه برای شما آشنا باشد',
     title: {
@@ -74,7 +76,7 @@ export const homeData = {
       'لازم نیست برای شروع گفت‌وگو، مسئله‌تان را دقیق تعریف کرده باشید. همین که احساس می‌کنید چیزی نیاز به توجه دارد، می‌تواند نقطه شروع خوبی باشد.',
     cta: {
       label: 'شروع یک گفت‌وگوی ساده',
-      href: '/#contact',
+      href: '/contact',
     },
     items: [
       {
@@ -103,7 +105,7 @@ export const homeData = {
       'قرار نیست همه‌چیز را همین امروز حل کنید؛ گاهی فقط باید جایی امن برای شروع داشته باشید.',
   },
 
-  // ۴. بخش رویکرد کاری (بر اساس ApproachSection.vue)
+  // ۴. بخش رویکرد کاری (ApproachSection)
   approach: {
     badge: 'رویکرد ما',
     title: {
@@ -114,7 +116,7 @@ export const homeData = {
       'هر فرد مسیر متفاوتی دارد. هدف این است که در فضایی امن و محترمانه، امکان دیدن، فهمیدن و انتخاب کردن دوباره فراهم شود.',
     cta: {
       label: 'درباره شروع مسیر بدانید',
-      href: '/#contact',
+      href: '/contact',
     },
     principles: [
       {
@@ -143,7 +145,7 @@ export const homeData = {
       '«قرار نیست برای بهتر شدن، شبیه شخص دیگری شوید؛ قرار است خودتان را با وضوح و مهربانی بیشتری ببینید.»',
   },
 
-  // ۵. بخش مراحل (بر اساس ProcessSection.vue)
+  // ۵. بخش مراحل (ProcessSection)
   process: {
     badge: 'از کجا شروع کنیم؟',
     title: {
@@ -184,12 +186,12 @@ export const homeData = {
         'در پیام اولیه، فقط اطلاعاتی را بنویسید که مایل به اشتراک‌گذاری آن هستید.',
       cta: {
         label: 'درخواست مشاوره اولیه',
-        href: '/#contact',
+        href: '/contact',
       },
     },
   },
 
-  // ۶. بخش مقالات (بر اساس ArticlesSection.vue)
+  // ۶. بخش مقالات (ArticlesSection)
   articles: {
     badge: 'برای خواندن و تأمل کردن',
     title: 'فرصتی برای شناخت بیشتر خودمان',
@@ -199,7 +201,7 @@ export const homeData = {
     readArticleLabel: 'مطالعه مقاله',
   },
 
-  // ۷. بخش نظرات مراجعان (بر اساس TestimonialsSection.vue)
+  // ۷. بخش نظرات مراجعان (TestimonialsSection)
   testimonials: {
     badge: 'تجربه‌های به‌اشتراک‌گذاشته‌شده',
     title: 'هر کسی، روایت خودش را دارد.',
@@ -207,7 +209,7 @@ export const homeData = {
       'این روایت‌ها تجربه شخصی افراد هستند؛ مسیر و نتیجه جلسات برای هر فرد می‌تواند متفاوت باشد.',
   },
 
-  // ۸. بخش پرسش‌های متداول (بر اساس FaqSection.vue)
+  // ۸. بخش پرسش‌های متداول (FaqSection)
   faq: {
     badge: 'پیش از شروع',
     title: 'شاید سؤال شما هم همین باشد.',
@@ -216,7 +218,7 @@ export const homeData = {
     notFoundText: 'پاسخ سؤال‌تان را پیدا نکردید؟',
     askQuestionCta: {
       label: 'سؤال خود را مطرح کنید',
-      href: '/#contact',
+      href: '/contact',
     },
     questions: [
       {
@@ -252,7 +254,7 @@ export const homeData = {
     ],
   },
 
-  // ۹. بخش تماس و فرم (بر اساس ContactSection.vue)
+  // ۹. بخش تماس و فرم (ContactSection)
   contact: {
     badge: 'شروع گفت‌وگو',
     title: {
@@ -262,11 +264,12 @@ export const homeData = {
     description:
       'اگر آماده‌اید درباره شرایط خود صحبت کنید، چند خط برای ما بنویسید. لازم نیست همه جزئیات را در پیام اول توضیح دهید.',
     contactInfo: {
-      phone: '۰۲۱-۱۲۳۴۵۶۷۸',
-      phoneHref: 'tel:+982112345678',
-      email: 'hello@example.com',
-      emailHref: 'mailto:hello@example.com',
-      address: 'تهران، خیابان نمونه، ساختمان آرامش',
+      phone: siteConfig.contact.phone,
+      phoneHref: siteConfig.contact.phoneHref,
+      email: siteConfig.contact.email,
+      emailHref: siteConfig.contact.emailHref,
+      address: siteConfig.contact.address,
+      workingHours: siteConfig.contact.workingHours,
     },
     privacyNote:
       'اطلاعاتی که در این فرم وارد می‌کنید فقط برای پاسخ‌گویی به درخواست شما استفاده می‌شود.',
@@ -291,12 +294,10 @@ export const homeData = {
       submittingButton: 'در حال ارسال...',
       notice: 'ارسال فرم به معنی رزرو قطعی جلسه نیست.',
       validationError: 'لطفاً نام، شماره تماس و پیام خود را وارد کنید.',
-      // طبق گزارش فنی، تا زمان اتصال بک‌اند نباید پیام ثبت قطعی نشان داده شود
-      offlineNotice:
-        'بخش ثبت پیام در حال حاضر غیرفعال است؛ لطفاً از طریق تماس تلفنی یا ایمیل ارتباط بگیرید.',
     },
   },
 };
+
 export const heroContent = homeData.hero;
 export const trustBarContent = homeData.trustBar;
 export const concernsContent = homeData.concerns;

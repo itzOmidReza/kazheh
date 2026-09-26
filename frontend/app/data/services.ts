@@ -8,11 +8,10 @@ export interface ServiceItem {
   icon: 'Sparkles' | 'HeartHandshake' | 'UsersRound' | 'Compass' | 'User';
   topics: string[];
   featured?: boolean;
-  // لینک اختصاصی در آینده (/services#individual یا /services/individual)
   href?: string;
 }
 
-// محتوای متنی مختص به سکشن صفحه اصلی (Home)
+// محتوای متنی مختص به بخش خدمات در صفحه اصلی (Home)
 export const servicesHomeContent = {
   badge: 'خدمات و همراهی',
   title: {
@@ -23,8 +22,8 @@ export const servicesHomeContent = {
   description:
     'خدمات بر اساس شرایط و نیاز شما شکل می‌گیرند. لازم نیست پیش از شروع، پاسخ همه سؤال‌ها را بدانید.',
   cardCta: {
-    label: 'اطلاعات بیشتر',
-    href: '/#contact', // بعداً می‌تواند به `/services` تغییر کند
+    label: 'اطلاعات بیشتر و هماهنگی',
+    href: '/contact',
   },
   closingNote: {
     title: 'هنوز مطمئن نیستید کدام مسیر برای شما مناسب است؟',
@@ -32,21 +31,57 @@ export const servicesHomeContent = {
       'در گفت‌وگوی اولیه می‌توانیم با آرامش درباره نیازتان صحبت کنیم.',
     cta: {
       label: 'شروع گفت‌وگو',
-      href: '/#contact',
+      href: '/contact',
     },
   },
 };
 
-// محتوای متنی مختص به صفحه مستقل (/services) در آینده
+// ساختار اصول رویکرد درمانی
+export interface ServicePrinciple {
+  icon: 'Brain' | 'MessageCircle' | 'ShieldCheck';
+  title: string;
+  text: string;
+}
+
+// محتوای متنی مختص به صفحه مستقل خدمات (/services)
 export const servicesPageContent = {
   badge: 'زمینه‌های تخصصی همراهی',
+  headTitle: 'خدمات روان‌شناسی',
   title: 'رویکرد ما در جلسات مشاوره و درمان',
   description:
     'هدف ما ایجاد فضایی امن و بدون قضاوت است تا بر اساس اولویت‌ها و سبک زندگی شما، مسیر تغییرات واقعی و پایدار را هموار کنیم.',
   principlesTitle: 'اصول حاکم بر تمامی جلسات',
+  principlesSubtitle: 'این خدمات چگونه پیش می‌روند؟',
+  cardActionText: 'درباره شروع این مسیر',
+  cta: {
+    title: 'نمی‌دانید کدام خدمت برای شما مناسب‌تر است؟',
+    description:
+      'می‌توانید در پیام اولیه درباره شرایط خود توضیح کوتاهی بدهید تا درباره قدم بعدی گفت‌وگو کنیم.',
+    buttonLabel: 'درخواست مشاوره اولیه',
+    buttonHref: '/#contact',
+  },
 };
 
-// منبع واحد (Single Source of Truth) برای کل خدمات سایت
+// اصول ارائه‌شده در صفحه خدمات
+export const servicePrinciples: ServicePrinciple[] = [
+  {
+    icon: 'Brain',
+    title: 'شناخت پیش از تغییر',
+    text: 'پیش از انتخاب راه‌حل، تلاش می‌کنیم تجربه و نیاز شما را بهتر بشناسیم.',
+  },
+  {
+    icon: 'MessageCircle',
+    title: 'گفت‌وگوی روشن',
+    text: 'سؤال‌ها و نگرانی‌های شما با زبانی ساده و بدون پیچیده‌گویی بررسی می‌شوند.',
+  },
+  {
+    icon: 'ShieldCheck',
+    title: 'احترام به انتخاب شما',
+    text: 'ادامه مسیر با آگاهی و رضایت شما شکل می‌گیرد؛ نه با فشار یا وعده‌های قطعی.',
+  },
+];
+
+// منبع واحد (Single Source of Truth) برای کل خدمات کلینیک
 export const servicesList: ServiceItem[] = [
   {
     id: 'individual',
@@ -60,7 +95,7 @@ export const servicesList: ServiceItem[] = [
     icon: 'Sparkles',
     topics: ['خودشناسی', 'اضطراب و نگرانی', 'تصمیم‌گیری'],
     featured: true,
-    href: '/#contact',
+    href: '/contact',
   },
   {
     id: 'relationship',
@@ -74,7 +109,7 @@ export const servicesList: ServiceItem[] = [
     icon: 'HeartHandshake',
     topics: ['ارتباط مؤثر', 'مرزبندی', 'تعارض‌های رابطه'],
     featured: false,
-    href: '/#contact',
+    href: '/contact',
   },
   {
     id: 'change',
@@ -88,6 +123,6 @@ export const servicesList: ServiceItem[] = [
     icon: 'UsersRound',
     topics: ['تغییر عادت‌ها', 'اعتمادبه‌نفس', 'رشد شخصی'],
     featured: false,
-    href: '/#contact',
+    href: '/contact',
   },
 ];

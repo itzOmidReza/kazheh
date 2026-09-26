@@ -5,10 +5,13 @@ export interface SocialLink {
 }
 
 export interface ContactInfo {
-  phone?: string;
-  displayPhone?: string;
-  email?: string;
-  address?: string;
+  phone: string;
+  phoneHref: string;
+  displayPhone: string;
+  email: string;
+  emailHref: string;
+  address: string;
+  workingHours: string;
 }
 
 export interface SiteConfig {
@@ -28,9 +31,9 @@ export interface SiteConfig {
 }
 
 export const siteConfig: SiteConfig = {
-  name: 'کلینیک آرامش',
-  shortName: 'ک',
-  tagline: 'روان‌شناسی آگاهانه',
+  name: 'کلینیک روان‌شناسی کاژه',
+  shortName: 'کاژه',
+  tagline: 'روان‌شناسی آگاهانه و انسانی',
   description:
     'فضایی امن برای شنیدن، شناختن و ساختن قدم‌های کوچک و ماندگار. لازم نیست این مسیر را تنها طی کنید.',
   footerNote: 'طراحی‌شده با احترام به آرامش و حریم خصوصی شما',
@@ -39,14 +42,17 @@ export const siteConfig: SiteConfig = {
     description:
       'اگر آماده‌اید درباره شرایط خود صحبت کنید، اولین قدم را با ما بردارید.',
     buttonText: 'درخواست مشاوره اولیه',
-    buttonHref: '/#contact',
+    buttonHref: '/contact',
   },
   contact: {
-    // در صورت نبود اطلاعات واقعی، مقادیر undefined می‌مانند تا در فرانت ادعای اشتباهی نمایش داده نشود
-    phone: undefined,
-    displayPhone: undefined,
-    email: undefined,
-    address: undefined,
+    phone: '۰۲۱ - ۸۸۸۸ ۸۸۸۸',
+    phoneHref: 'tel:02188888888',
+    displayPhone: '۰۲۱ - ۸۸۸۸ ۸۸۸۸',
+    email: 'info@kazheh.ir',
+    emailHref: 'mailto:info@kazheh.ir',
+    address:
+      'تهران، خیابان ولیعصر، نرسیده به میدان ونک، پلاک ۱۲، طبقه ۳، واحد ۶',
+    workingHours: 'شنبه تا پنج‌شنبه: ساعت ۹:۰۰ الی ۲۰:۰۰',
   },
   socials: [],
 };

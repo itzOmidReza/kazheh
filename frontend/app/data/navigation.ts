@@ -25,3 +25,17 @@ export const footerSupportLinks: NavItem[] = [
   { label: 'ارتباط با ما', href: '/contact' },
   { label: 'حریم خصوصی', href: '/privacy' },
 ];
+
+export const headerContent = {
+  homeAriaLabel: 'صفحه اصلی',
+  navAriaLabel: 'منوی اصلی',
+  contactText: 'تماس با ما',
+  openMenuAriaLabel: 'باز کردن منو',
+  mobileNavAriaLabel: 'منوی موبایل',
+};
+
+export const footerContent = {
+  homeAriaLabel: 'صفحه اصلی',
+  quickLinksTitle: 'دسترسی سریع',
+  moreInfoTitle: 'اطلاعات بیشتر',
+};
