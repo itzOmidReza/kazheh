@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { User, ShieldCheck } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
+import { adminDashboardData } from '~/data'
 
 defineProps<{
   fullName: string
@@ -24,7 +25,7 @@ defineProps<{
             {{ fullName }}
           </h2>
           <Badge class="rounded-pill bg-primary/10 text-primary border-primary/20 text-[10px]">
-            دسترسی مدیریت
+            {{ adminDashboardData.profileSection.identity.badge }}
           </Badge>
         </div>
         <p class="text-xs text-muted-foreground mt-0.5" dir="ltr">
@@ -36,7 +37,7 @@ defineProps<{
     <div
       class="flex items-center gap-2 border-t border-border/60 pt-3 sm:border-0 sm:pt-0 text-xs text-muted-foreground">
       <ShieldCheck class="size-4 text-emerald-500" />
-      <span>نشست امن و فعال در کاژه</span>
+      <span>{{ adminDashboardData.profileSection.identity.sessionStatus }}</span>
     </div>
   </div>
 </template>

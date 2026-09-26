@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowRight } from '@lucide/vue'
-import { siteConfig } from '~/data'
+import { siteConfig, authLayoutContent } from '~/data'
 </script>
 
 <template>
@@ -18,7 +18,7 @@ import { siteConfig } from '~/data'
         <NuxtLink to="/"
           class="group flex items-center gap-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
           <ArrowRight class="size-4 transition-transform group-hover:translate-x-1" />
-          <span>بازگشت به وب‌سایت</span>
+          <span>{{ authLayoutContent.backToSite }}</span>
         </NuxtLink>
 
         <NuxtLink to="/" class="flex items-center gap-2 font-bold text-foreground">
@@ -39,7 +39,7 @@ import { siteConfig } from '~/data'
     <!-- Footer note -->
     <footer class="relative z-10 border-t border-border/40 py-4 text-center text-xs text-muted-foreground">
       <div class="site-container">
-        <span>تمامی حقوق محفوظ است © {{ new Date().getFullYear() }} {{ siteConfig.name }}</span>
+        <span>{{ authLayoutContent.copyright }}</span>
       </div>
     </footer>
   </div>

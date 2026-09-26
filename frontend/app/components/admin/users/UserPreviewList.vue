@@ -3,15 +3,10 @@ import { Search, RefreshCw, Plus, ChevronRight, Phone } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import type { AdminUserPreviewItem } from '~/data'
+import { adminDashboardData } from '~/data'
 
-export interface UserPreviewItem {
-  id: number
-  name: string
-  role: string
-  username: string
-  phone: string
-  status: string
-}
+export type UserPreviewItem = AdminUserPreviewItem
 
 defineProps<{
   users: UserPreviewItem[]
@@ -24,26 +19,26 @@ defineProps<{
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-5">
       <div class="space-y-1 text-right">
         <div class="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>پنل مدیریت</span>
+          <span>{{ adminDashboardData.usersSection.breadcrumbParent }}</span>
           <ChevronRight class="size-3.5 rotate-180" />
-          <span class="text-foreground font-medium">کاربران و پرسنل</span>
+          <span class="text-foreground font-medium">{{ adminDashboardData.usersSection.breadcrumbCurrent }}</span>
         </div>
         <h1 class="text-2xl font-bold tracking-tight text-foreground">
-          مدیریت دسترسی‌ها و اعضای تیم کلینیک
+          {{ adminDashboardData.usersSection.headerTitle }}
         </h1>
         <p class="text-xs text-muted-foreground">
-          تعریف مشاوران، مدیران سیستم و تعیین دسترسی بخش‌های مختلف
+          {{ adminDashboardData.usersSection.subtitle }}
         </p>
       </div>
 
       <div class="flex items-center gap-2">
         <Button variant="outline" size="sm" class="rounded-pill text-xs h-9 gap-1.5" tabindex="-1">
           <RefreshCw class="size-3.5" />
-          <span>بروزرسانی لیست</span>
+          <span>{{ adminDashboardData.usersSection.refreshButton }}</span>
         </Button>
         <Button class="rounded-pill bg-cta text-cta-foreground text-xs gap-1.5 h-9 px-4" tabindex="-1">
           <Plus class="size-4" />
-          <span>افزودن کاربر جدید</span>
+          <span>{{ adminDashboardData.usersSection.createButton }}</span>
         </Button>
       </div>
     </div>
@@ -52,16 +47,21 @@ defineProps<{
     <div
       class="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
       <div class="relative w-full sm:max-w-md">
-        <Input type="text" placeholder="جست‌وجوی نام، شماره تماس..."
+        <Input type="text" :placeholder="adminDashboardData.usersSection.searchPlaceholder"
           class="pr-10 rounded-xl bg-background/50 h-10 text-xs text-right" tabindex="-1" />
         <Search class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       </div>
 
       <div class="flex items-center gap-1.5">
-        <Button size="sm" variant="default" class="rounded-pill text-xs h-8.5 px-3.5" tabindex="-1">همه ({{ users.length
-          }})</Button>
-        <Button size="sm" variant="outline" class="rounded-pill text-xs h-8.5 px-3.5" tabindex="-1">مشاوران</Button>
-        <Button size="sm" variant="outline" class="rounded-pill text-xs h-8.5 px-3.5" tabindex="-1">پذیرش</Button>
+        <Button size="sm" variant="default" class="rounded-pill text-xs h-8.5 px-3.5" tabindex="-1">
+          {{ adminDashboardData.usersSection.filters.all }} ({{ users.length }})
+        </Button>
+        <Button size="sm" variant="outline" class="rounded-pill text-xs h-8.5 px-3.5" tabindex="-1">
+          {{ adminDashboardData.usersSection.filters.counselors }}
+        </Button>
+        <Button size="sm" variant="outline" class="rounded-pill text-xs h-8.5 px-3.5" tabindex="-1">
+          {{ adminDashboardData.usersSection.filters.reception }}
+        </Button>
       </div>
     </div>
 

@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
+import { siteConfig, adminAuthData } from '~/data'
+
+definePageMeta({ layout: 'auth' })
 
 useHead({
-  title: 'ورود به پنل مدیریت | کلینیک کاژه',
+  title: `${adminAuthData.pageTitle} | ${siteConfig.name}`,
 })
 
 const phone = ref('')
@@ -15,14 +18,14 @@ const isSubmitting = ref(false)
 
 const handleLogin = async () => {
   if (!phone.value.trim() || !password.value) {
-    toast.error('لطفاً شماره تماس و رمز عبور را وارد کنید.')
+    toast.error(adminAuthData.messages.requiredFields)
     return
   }
 
   isSubmitting.value = true
   setTimeout(async () => {
     isSubmitting.value = false
-    toast.success('ورود با موفقیت انجام شد.')
+    toast.success(adminAuthData.messages.loginSuccess)
     await navigateTo('/admin', { replace: true })
   }, 500)
 }
@@ -38,29 +41,35 @@ const handleLogin = async () => {
         </div>
 
         <h1 class="mt-5 text-2xl font-bold text-foreground">
-          ورود به پنل مدیریت
+          {{ adminAuthData.pageTitle }}
         </h1>
 
         <p class="mt-2 text-sm text-muted-foreground">
-          برای دسترسی به پیام‌ها و مقالات وارد شوید.
+          {{ adminAuthData.tagline }}
         </p>
       </div>
 
       <form class="mt-8 space-y-5" @submit.prevent="handleLogin">
         <div class="space-y-2">
-          <Label for="admin-phone">شماره تماس ادمین</Label>
+          <Label :for="adminAuthData.fields.phone.id">
+            {{ adminAuthData.fields.phone.label }}
+          </Label>
           <div class="relative">
-            <Input id="admin-phone" v-model="phone" type="tel" placeholder="09121234567" autocomplete="username"
-              dir="ltr" required class="pl-10" />
+            <Input :id="adminAuthData.fields.phone.id" v-model="phone" type="tel"
+              :placeholder="adminAuthData.fields.phone.placeholder" autocomplete="username" dir="ltr" required
+              class="pl-10" />
             <Phone class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
 
         <div class="space-y-2">
-          <Label for="admin-password">رمز عبور</Label>
+          <Label :for="adminAuthData.fields.password.id">
+            {{ adminAuthData.fields.password.label }}
+          </Label>
           <div class="relative">
-            <Input id="admin-password" v-model="password" type="password" placeholder="••••••••"
-              autocomplete="current-password" dir="ltr" required class="pl-10" />
+            <Input :id="adminAuthData.fields.password.id" v-model="password" type="password"
+              :placeholder="adminAuthData.fields.password.placeholder" autocomplete="current-password" dir="ltr"
+              required class="pl-10" />
             <Lock class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
@@ -69,14 +78,14 @@ const handleLogin = async () => {
           class="mt-6 min-h-12 w-full rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft font-semibold gap-2">
           <Loader2 v-if="isSubmitting" class="size-4 animate-spin" />
           <template v-else>
-            <span>ورود به حساب</span>
+            <span>{{ adminAuthData.submitButtonShort }}</span>
             <ArrowLeft class="size-4 rotate-180" />
           </template>
         </Button>
 
         <div class="pt-2 text-center">
           <NuxtLink to="/" class="text-xs text-muted-foreground hover:text-primary transition-colors">
-            بازگشت به صفحه اصلی
+            {{ adminAuthData.backToHomeText }}
           </NuxtLink>
         </div>
       </form>

@@ -24,16 +24,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { siteConfig } from '~/data'
+import { siteConfig, adminLayoutData, initialAdminProfile } from '~/data'
 
 const route = useRoute()
 
-// وضعیت ماک ادمین بدون وابستگی به کامپوزبل‌های شبکه
-const admin = ref({
-  full_name: 'مدیر کلینیک کاژه',
-  username: 'admin',
-  phone: '09121234567',
-})
+// بارگذاری پروفایل ادمین از لایه متمرکز
+const admin = ref({ ...initialAdminProfile })
 
 const logout = () => {
   navigateTo('/admin/login')
@@ -57,69 +53,27 @@ const toggleTheme = () => {
   }
 }
 
-// ساختار منوی دسته‌بندی‌شده ناوبری
-type NavigationItem = {
-  label: string
-  href: string
-  icon: typeof LayoutDashboard
-  exact?: boolean
-  external?: boolean
+const iconMap: Record<string, any> = {
+  LayoutDashboard,
+  Mail,
+  FileText,
+  Users,
+  User,
+  ExternalLink,
 }
 
-type NavigationGroup = {
-  title: string
-  items: NavigationItem[]
-}
-
-const navigationGroups: NavigationGroup[] = [
-  {
-    title: 'مدیریت و محتوا',
-    items: [
-      {
-        label: 'میز کار و داشبورد',
-        href: '/admin',
-        icon: LayoutDashboard,
-        exact: true,
-      },
-      {
-        label: 'صندوق پیام‌های مراجعین',
-        href: '/admin/messages',
-        icon: Mail,
-      },
-      {
-        label: 'مدیریت مقالات تخصصی',
-        href: '/admin/articles',
-        icon: FileText,
-      },
-    ],
-  },
-  {
-    title: 'سازمان و دسترسی‌ها',
-    items: [
-      {
-        label: 'کاربران و پرسنل',
-        href: '/admin/users',
-        icon: Users,
-      },
-      {
-        label: 'پروفایل و امنیت',
-        href: '/admin/profile',
-        icon: User,
-      },
-    ],
-  },
-  {
-    title: 'دسترسی سریع',
-    items: [
-      {
-        label: 'مشاهده وب‌سایت عمومی',
-        href: '/',
-        icon: ExternalLink,
-        external: true,
-      },
-    ],
-  },
-]
+const navigationGroups = computed(() =>
+  adminLayoutData.navGroups.map((group) => ({
+    title: group.title,
+    items: group.items.map((item) => ({
+      label: item.label,
+      href: item.href,
+      icon: iconMap[item.iconName] || LayoutDashboard,
+      exact: item.exact,
+      external: item.external,
+    })),
+  }))
+)
 
 const isItemActive = (href: string, exact = false) => {
   if (exact) {
@@ -145,7 +99,7 @@ const isItemActive = (href: string, exact = false) => {
               class="relative flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-soft ring-4 ring-primary/10 shrink-0">
               <span class="text-lg font-black tracking-tight">{{ siteConfig.shortName }}</span>
               <span class="absolute -bottom-0.5 -left-0.5 size-3 rounded-full border-2 border-card bg-emerald-500"
-                title="سامانه فعال است" />
+                :title="adminLayoutData.systemActiveBadge" />
             </div>
 
             <div class="flex flex-col text-right min-w-0">
@@ -154,11 +108,11 @@ const isItemActive = (href: string, exact = false) => {
                   {{ siteConfig.name }}
                 </span>
                 <Badge variant="outline" class="px-1.5 py-0 text-[10px] font-semibold text-primary border-primary/30">
-                  مدیریت
+                  {{ adminLayoutData.brandBadge }}
                 </Badge>
               </div>
               <span class="text-xs text-muted-foreground truncate mt-0.5">
-                پنل کنترل و پیام‌های کلینیک
+                {{ adminLayoutData.brandSubtitle }}
               </span>
             </div>
           </div>
@@ -207,7 +161,7 @@ const isItemActive = (href: string, exact = false) => {
           <div class="flex items-center justify-between gap-3 rounded-2xl bg-secondary/40 p-2.5">
             <NuxtLink to="/admin/profile"
               class="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity"
-              title="مشاهده پروفایل کاربری">
+              :title="adminLayoutData.viewProfileTitle">
               <div
                 class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary font-bold text-xs">
                 <ShieldCheck class="size-4.5" />
@@ -223,8 +177,8 @@ const isItemActive = (href: string, exact = false) => {
             </NuxtLink>
 
             <Button variant="ghost" size="icon"
-              class="size-8 rounded-xl text-destructive hover:bg-destructive/10 shrink-0" title="خروج از حساب"
-              @click="logout">
+              class="size-8 rounded-xl text-destructive hover:bg-destructive/10 shrink-0"
+              :title="adminLayoutData.logoutButtonTitle" @click="logout">
               <LogOut class="size-4" />
             </Button>
           </div>
@@ -298,7 +252,7 @@ const isItemActive = (href: string, exact = false) => {
                     <Button variant="destructive" class="w-full justify-center gap-2 rounded-xl text-xs h-10"
                       @click="logout">
                       <LogOut class="size-4" />
-                      <span>خروج از پنل</span>
+                      <span>{{ adminLayoutData.logoutSheetButton }}</span>
                     </Button>
                   </div>
                 </div>
@@ -308,9 +262,9 @@ const isItemActive = (href: string, exact = false) => {
             <!-- Breadcrumb -->
             <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-muted-foreground">
               <Home class="size-3.5" />
-              <span>پنل مدیریت</span>
+              <span>{{ adminLayoutData.breadcrumbHome }}</span>
               <span class="text-border">/</span>
-              <span class="text-foreground font-semibold">میز کار</span>
+              <span class="text-foreground font-semibold">{{ adminLayoutData.breadcrumbCurrent }}</span>
             </div>
           </div>
 
@@ -318,7 +272,7 @@ const isItemActive = (href: string, exact = false) => {
           <div class="flex items-center gap-2 sm:gap-3">
             <Button variant="outline" size="icon"
               class="size-9 rounded-xl border-border/80 text-muted-foreground hover:text-foreground"
-              title="تغییر تم تاریک / روشن" @click="toggleTheme">
+              :title="adminLayoutData.themeToggleTitle" @click="toggleTheme">
               <Sun v-if="isDark" class="size-4 text-amber-500" />
               <Moon v-else class="size-4" />
             </Button>
@@ -326,7 +280,7 @@ const isItemActive = (href: string, exact = false) => {
             <Button variant="outline" size="sm" as-child
               class="hidden sm:inline-flex h-9 rounded-pill gap-1.5 px-3.5 text-xs font-medium">
               <NuxtLink to="/" target="_blank">
-                <span>نمایش وب‌سایت</span>
+                <span>{{ adminLayoutData.viewWebsiteButton }}</span>
                 <ExternalLink class="size-3.5" />
               </NuxtLink>
             </Button>

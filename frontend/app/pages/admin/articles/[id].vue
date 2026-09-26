@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import { siteConfig } from '~/data'
+import {
+  siteConfig,
+  adminDashboardData,
+  initialAdminArticles,
+} from '~/data'
 import type { ArticleFormData } from '~/components/admin/articles/ArticleForm.vue'
 
 definePageMeta({ layout: 'admin' })
 
+const route = useRoute()
 const router = useRouter()
 const isSubmitting = ref(false)
 const isLoading = ref(true)
+
+const articleId = computed(() => Number(route.params.id))
 
 const form = reactive<ArticleFormData>({
   title: '',
@@ -18,36 +25,46 @@ const form = reactive<ArticleFormData>({
 })
 
 useHead({
-  title: computed(() => `ویرایش: ${form.title || 'مقاله'} | ${siteConfig.name}`),
+  title: computed(
+    () =>
+      `${adminDashboardData.articlesPage.edit.headTitlePrefix} ${form.title || adminDashboardData.articlesPage.edit.headTitleFallback
+      } | ${siteConfig.name}`
+  ),
 })
 
 onMounted(() => {
   setTimeout(() => {
-    form.title = 'چگونه اضطراب خود را کنترل کنیم؟'
-    form.slug = 'understanding-anxiety'
-    form.summary = 'راهکارهای علمی و اثبات‌شده برای مدیریت استرس روزمره مراجعین.'
-    form.content = 'متن پیش‌فرض و آزمایشی مقاله کلینیک کاژه جهت تست قالب و فرمت‌بندی.'
-    form.is_published = true
+    // بارگذاری داده اولیه ماک از لایه متمرکز بر اساس ID یا پیش‌فرض اول
+    const found =
+      initialAdminArticles.find((a) => a.id === articleId.value) ||
+      initialAdminArticles[0]
+    if (found) {
+      form.title = found.title
+      form.slug = found.slug
+      form.summary = found.summary || ''
+      form.content = found.content || ''
+      form.is_published = found.is_published
+    }
     isLoading.value = false
   }, 250)
 })
 
 const handleUpdate = () => {
   if (!form.title.trim() || !form.content.trim()) {
-    toast.error('وارد کردن عنوان و متن اصلی مقاله الزامی است.')
+    toast.error(adminDashboardData.articlesPage.edit.toasts.validationError)
     return
   }
   isSubmitting.value = true
   setTimeout(() => {
     isSubmitting.value = false
-    toast.success('تغییرات مقاله با موفقیت ذخیره شد.')
+    toast.success(adminDashboardData.articlesPage.edit.toasts.saveSuccess)
     router.push('/admin/articles')
   }, 350)
 }
 
 const handleDelete = () => {
-  if (!confirm('آیا از حذف این مقاله اطمینان دارید؟')) return
-  toast.success('مقاله حذف شد.')
+  if (!confirm(adminDashboardData.articlesPage.edit.deleteConfirm)) return
+  toast.success(adminDashboardData.articlesPage.edit.toasts.deleteSuccess)
   router.push('/admin/articles')
 }
 </script>

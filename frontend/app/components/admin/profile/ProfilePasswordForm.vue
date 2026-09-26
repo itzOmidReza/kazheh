@@ -32,10 +32,10 @@ const form = computed({
     <div class="border-b border-border/60 pb-3">
       <h3 class="text-sm font-bold text-foreground flex items-center gap-2">
         <KeyRound class="size-4 text-primary" />
-        <span>تغییر کلمه عبور</span>
+        <span>{{ adminDashboardData.profileSection.passwordForm.title }}</span>
       </h3>
       <p class="text-xs text-muted-foreground mt-0.5">
-        جهت حفظ امنیت حساب، کلمه عبور خود را به‌صورت دوره‌ای بروزرسانی کنید.
+        {{ adminDashboardData.profileSection.passwordForm.subtitle }}
       </p>
     </div>
 
@@ -52,16 +52,18 @@ const form = computed({
         <Label for="pass-new" class="text-xs">
           {{ adminDashboardData.profileSection.fields.newPassword }}
         </Label>
-        <Input id="pass-new" v-model="form.new_password" type="password" dir="ltr" placeholder="حداقل ۶ کاراکتر"
-          required class="rounded-xl h-10 text-xs" />
+        <Input id="pass-new" v-model="form.new_password" type="password" dir="ltr"
+          :placeholder="adminDashboardData.profileSection.passwordForm.newPasswordPlaceholder" required
+          class="rounded-xl h-10 text-xs" />
       </div>
 
       <div class="space-y-1.5">
         <Label for="pass-confirm" class="text-xs">
           {{ adminDashboardData.profileSection.fields.confirmPassword }}
         </Label>
-        <Input id="pass-confirm" v-model="form.confirm_password" type="password" dir="ltr" placeholder="تکرار رمز جدید"
-          required class="rounded-xl h-10 text-xs" />
+        <Input id="pass-confirm" v-model="form.confirm_password" type="password" dir="ltr"
+          :placeholder="adminDashboardData.profileSection.passwordForm.confirmPasswordPlaceholder" required
+          class="rounded-xl h-10 text-xs" />
       </div>
 
       <div class="pt-2">

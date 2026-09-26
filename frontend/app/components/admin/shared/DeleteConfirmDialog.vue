@@ -9,6 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { adminDashboardData } from '~/data'
 
 const props = withDefaults(
   defineProps<{
@@ -19,9 +20,9 @@ const props = withDefaults(
     isDeleting?: boolean
   }>(),
   {
-    title: 'تایید عملیات حذف',
-    description: 'آیا از حذف این مورد اطمینان دارید؟ این عمل غیرقابل بازگشت است.',
-    confirmLabel: 'بله، حذف شود',
+    title: adminDashboardData.deleteConfirmModal.defaultTitle,
+    description: adminDashboardData.deleteConfirmModal.description,
+    confirmLabel: adminDashboardData.deleteConfirmModal.confirmButton,
     isDeleting: false,
   }
 )
@@ -47,7 +48,7 @@ const emit = defineEmits<{
 
       <DialogFooter class="mt-6 flex items-center justify-end gap-2">
         <Button variant="outline" size="sm" class="rounded-pill text-xs px-4" @click="emit('update:open', false)">
-          انصراف
+          {{ adminDashboardData.deleteConfirmModal.cancelButton }}
         </Button>
 
         <Button variant="destructive" size="sm" :disabled="isDeleting" class="rounded-pill text-xs px-4 gap-1.5"

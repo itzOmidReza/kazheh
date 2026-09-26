@@ -3,13 +3,10 @@ import { User, Loader2 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import type { AdminProfileData } from '~/data'
 import { adminDashboardData } from '~/data'
 
-export interface ProfileData {
-  full_name: string
-  username: string
-  phone: string
-}
+export type ProfileData = Pick<AdminProfileData, 'full_name' | 'username' | 'phone'>
 
 const props = defineProps<{
   modelValue: ProfileData
@@ -32,10 +29,10 @@ const form = computed({
     <div class="border-b border-border/60 pb-3">
       <h3 class="text-sm font-bold text-foreground flex items-center gap-2">
         <User class="size-4 text-primary" />
-        <span>مشخصات فردی و ارتباطی</span>
+        <span>{{ adminDashboardData.profileSection.infoForm.title }}</span>
       </h3>
       <p class="text-xs text-muted-foreground mt-0.5">
-        نام و شماره تماسی که به عنوان مدیر برای شما نمایش داده می‌شود.
+        {{ adminDashboardData.profileSection.infoForm.subtitle }}
       </p>
     </div>
 
@@ -49,7 +46,7 @@ const form = computed({
         <Label for="p-username" class="text-xs">{{ adminDashboardData.profileSection.fields.username }}</Label>
         <Input id="p-username" v-model="form.username" type="text" disabled dir="ltr"
           class="rounded-xl h-10 text-xs bg-muted/40 cursor-not-allowed" />
-        <p class="text-[11px] text-muted-foreground">نام کاربری سیستمی غیرقابل تغییر است.</p>
+        <p class="text-[11px] text-muted-foreground">{{ adminDashboardData.profileSection.infoForm.usernameHelp }}</p>
       </div>
 
       <div class="space-y-1.5">

@@ -2,15 +2,10 @@
 import { Clock, Edit, ExternalLink, Trash2 } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import type { AdminArticleItem } from '~/data'
+import { adminDashboardData } from '~/data'
 
-export interface ArticleItem {
-  id: number
-  title: string
-  slug: string
-  summary?: string | null
-  is_published: boolean
-  created_at: string
-}
+export type ArticleItem = AdminArticleItem
 
 defineProps<{
   article: ArticleItem
@@ -48,7 +43,8 @@ const formatDate = (isoString: string) => {
             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
             : 'bg-secondary text-secondary-foreground border-transparent',
         ]">
-          {{ article.is_published ? 'منتشر شده' : 'پیش‌نویس' }}
+          {{ article.is_published ? adminDashboardData.articlesSection.badgePublished :
+            adminDashboardData.articlesSection.badgeDraft }}
         </Badge>
 
         <span class="text-[11px] text-muted-foreground font-mono" dir="ltr">
@@ -62,7 +58,7 @@ const formatDate = (isoString: string) => {
 
       <div class="flex items-center gap-2 text-[11px] text-muted-foreground/80 pt-0.5">
         <Clock class="size-3" />
-        <span>ثبت شده در {{ formatDate(article.created_at) }}</span>
+        <span>{{ adminDashboardData.articlesSection.registeredPrefix }} {{ formatDate(article.created_at) }}</span>
       </div>
     </div>
 
@@ -70,7 +66,7 @@ const formatDate = (isoString: string) => {
       <Button v-if="article.is_published" variant="outline" size="sm" as-child
         class="rounded-xl text-xs h-8.5 px-3 gap-1">
         <NuxtLink :to="`/articles/${article.slug}`" target="_blank">
-          <span>نمایش</span>
+          <span>{{ adminDashboardData.articlesSection.viewButton }}</span>
           <ExternalLink class="size-3" />
         </NuxtLink>
       </Button>
@@ -78,7 +74,7 @@ const formatDate = (isoString: string) => {
       <Button variant="outline" size="sm" class="rounded-xl text-xs h-8.5 px-3 gap-1" as-child>
         <NuxtLink :to="`/admin/articles/${article.id}`">
           <Edit class="size-3" />
-          <span>ویرایش</span>
+          <span>{{ adminDashboardData.articlesSection.editButton }}</span>
         </NuxtLink>
       </Button>
 

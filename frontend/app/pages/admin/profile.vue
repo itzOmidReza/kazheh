@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { ChevronRight } from '@lucide/vue'
 import { toast } from 'vue-sonner'
-import { siteConfig, adminDashboardData } from '~/data'
-import type { ProfileData } from '~/components/admin/profile/ProfileInfoForm.vue'
+import { siteConfig, adminDashboardData, initialAdminProfile, type AdminProfileData } from '~/data'
 import type { PasswordData } from '~/components/admin/profile/ProfilePasswordForm.vue'
 
 definePageMeta({ layout: 'admin' })
-useHead({ title: `پروفایل کاربری | ${siteConfig.name}` })
+useHead({ title: `${adminDashboardData.profileSection.headTitle} | ${siteConfig.name}` })
 
-const profileForm = reactive<ProfileData>({
-  full_name: 'مدیر کلینیک کاژه',
-  phone: '09121234567',
-  username: 'admin',
-})
+const profileForm = reactive<AdminProfileData>({ ...initialAdminProfile })
 
 const isUpdatingProfile = ref(false)
 
@@ -46,7 +41,7 @@ const handleChangePassword = () => {
     return
   }
   if (passwordForm.new_password.length < 6) {
-    toast.error('رمز عبور جدید باید حداقل ۶ کاراکتر باشد.')
+    toast.error(adminDashboardData.profileSection.toasts.passwordMinLength)
     return
   }
 
@@ -66,9 +61,13 @@ const handleChangePassword = () => {
     <!-- Breadcrumb -->
     <div class="space-y-1 text-right">
       <div class="flex items-center gap-2 text-xs text-muted-foreground">
-        <NuxtLink to="/admin" class="hover:text-primary transition-colors">پنل مدیریت</NuxtLink>
+        <NuxtLink to="/admin" class="hover:text-primary transition-colors">
+          {{ adminDashboardData.profileSection.breadcrumbParent }}
+        </NuxtLink>
         <ChevronRight class="size-3.5 rotate-180" />
-        <span class="text-foreground font-medium">پروفایل کاربری</span>
+        <span class="text-foreground font-medium">
+          {{ adminDashboardData.profileSection.breadcrumbCurrent }}
+        </span>
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-foreground">
         {{ adminDashboardData.profileSection.pageTitle }}

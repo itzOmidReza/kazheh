@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { BookOpen, CheckCircle, FileEdit } from '@lucide/vue'
+import { adminDashboardData } from '~/data'
 
 defineProps<{
   totalCount: number
@@ -19,7 +20,7 @@ const emit = defineEmits<{
       class="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-4 transition-colors cursor-pointer hover:border-primary/40"
       :class="{ 'border-primary shadow-xs': currentFilter === 'all' }" @click="emit('update:currentFilter', 'all')">
       <div>
-        <p class="text-xs text-muted-foreground font-medium">کل مقالات ثبت‌شده</p>
+        <p class="text-xs text-muted-foreground font-medium">{{ adminDashboardData.articlesPage.stats.total }}</p>
         <p class="mt-1 text-2xl font-bold text-foreground">{{ totalCount }}</p>
       </div>
       <div class="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -32,7 +33,7 @@ const emit = defineEmits<{
       :class="{ 'border-emerald-500/50 shadow-xs': currentFilter === 'published' }"
       @click="emit('update:currentFilter', 'published')">
       <div>
-        <p class="text-xs text-muted-foreground font-medium">منتشر شده در وب‌سایت</p>
+        <p class="text-xs text-muted-foreground font-medium">{{ adminDashboardData.articlesPage.stats.published }}</p>
         <p class="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ publishedCount }}</p>
       </div>
       <div
@@ -46,7 +47,7 @@ const emit = defineEmits<{
       :class="{ 'border-muted-foreground/40 shadow-xs': currentFilter === 'draft' }"
       @click="emit('update:currentFilter', 'draft')">
       <div>
-        <p class="text-xs text-muted-foreground font-medium">پیش‌نویس‌ها</p>
+        <p class="text-xs text-muted-foreground font-medium">{{ adminDashboardData.articlesPage.stats.draft }}</p>
         <p class="mt-1 text-2xl font-bold text-muted-foreground">{{ draftCount }}</p>
       </div>
       <div class="flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">

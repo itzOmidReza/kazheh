@@ -2,6 +2,7 @@
 import { Lock, Sparkles, ArrowRight } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { adminDashboardData } from '~/data'
 </script>
 
 <template>
@@ -25,18 +26,15 @@ import { Button } from '@/components/ui/button'
       <div class="mt-5 space-y-2">
         <Badge variant="outline"
           class="rounded-pill border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
-          فاز ۲ توسعه سامانه
+          {{ adminDashboardData.usersSection.comingSoon.badge }}
         </Badge>
 
         <h2 class="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-          ماژول مدیریت کاربران و پرسنل
+          {{ adminDashboardData.usersSection.comingSoon.title }}
         </h2>
 
         <p class="text-xs sm:text-sm text-muted-foreground leading-relaxed pt-1">
-          این بخش شامل تعیین نقش‌های دسترسی (مدیران، مشاوران کلینیک و منشی نوبت‌دهی)، ثبت پرونده پرسنلی و تفکیک دسترسی
-          صندوق پیام‌ها می‌باشد که در
-          <span class="font-bold text-foreground">فاز بعدی به‌روزرسانی سامانه</span>
-          فعال و در دسترس قرار خواهد گرفت.
+          {{ adminDashboardData.usersSection.comingSoon.description }}
         </p>
       </div>
 
@@ -44,14 +42,14 @@ import { Button } from '@/components/ui/button'
         <Button as-child
           class="w-full sm:w-auto rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft text-xs h-10 px-6 gap-2">
           <NuxtLink to="/admin">
-            <span>بازگشت به میز کار</span>
+            <span>{{ adminDashboardData.usersSection.comingSoon.backButton }}</span>
             <ArrowRight class="size-4 rotate-180" />
           </NuxtLink>
         </Button>
 
         <Button as-child variant="outline" class="w-full sm:w-auto rounded-pill text-xs h-10 px-5 gap-1.5">
           <NuxtLink to="/admin/messages">
-            <span>صندوق پیام‌ها</span>
+            <span>{{ adminDashboardData.usersSection.comingSoon.messagesButton }}</span>
           </NuxtLink>
         </Button>
       </div>
