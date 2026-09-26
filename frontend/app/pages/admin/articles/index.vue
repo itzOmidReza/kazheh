@@ -1,131 +1,114 @@
 <script setup lang="ts">
-import { Search, RefreshCw, Plus, FileText } from '@lucide/vue'
+import { onMounted } from 'vue'
+import { Plus, RefreshCw, Search } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { toast } from 'vue-sonner'
-import {
-  siteConfig,
-  adminDashboardData,
-  initialAdminArticles,
-  type AdminArticleItem,
-} from '~/data'
+import { adminDashboardData } from '~/data/admin'
+import { useArticlesStore, type ArticleItem } from '~/stores/articles'
+import ArticleStats from '~/components/admin/articles/ArticleStats.vue'
+import ArticleCard from '~/components/admin/articles/ArticleCard.vue'
 
-definePageMeta({ layout: 'admin' })
-useHead({ title: `${adminDashboardData.articlesPage.headTitle} | ${siteConfig.name}` })
-
-const articles = ref<AdminArticleItem[]>([...initialAdminArticles])
-
-const filterStatus = ref<'all' | 'published' | 'draft'>('all')
-const searchQuery = ref('')
-
-const publishedCount = computed(() => articles.value.filter((a) => a.is_published).length)
-const draftCount = computed(() => articles.value.filter((a) => !a.is_published).length)
-
-const filteredArticles = computed(() => {
-  let list = articles.value
-  if (filterStatus.value === 'published') list = list.filter((a) => a.is_published)
-  else if (filterStatus.value === 'draft') list = list.filter((a) => !a.is_published)
-
-  if (searchQuery.value.trim()) {
-    const q = searchQuery.value.trim().toLowerCase()
-    list = list.filter((a) => a.title.toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
-  }
-  return list
+definePageMeta({
+  layout: 'admin',
 })
 
-// دیالوگ حذف
-const articleToDelete = ref<AdminArticleItem | null>(null)
-const isDeleteDialogOpen = ref(false)
+const articlesStore = useArticlesStore()
+const pageData = adminDashboardData.articlesPage
 
-const openDeleteModal = (item: AdminArticleItem) => {
-  articleToDelete.value = item
-  isDeleteDialogOpen.value = true
+onMounted(async () => {
+  await articlesStore.fetchAdminArticles()
+})
+
+const handleRefresh = async () => {
+  await articlesStore.fetchAdminArticles()
 }
 
-const handleDeleteConfirm = () => {
-  if (!articleToDelete.value) return
-  articles.value = articles.value.filter((a) => a.id !== articleToDelete.value!.id)
-  isDeleteDialogOpen.value = false
-  toast.success(adminDashboardData.articlesPage.toasts.deleteSuccess)
-  articleToDelete.value = null
+const handleDelete = async (article: ArticleItem) => {
+  if (confirm(adminDashboardData.deleteConfirmModal.articleDescription)) {
+    await articlesStore.deleteArticle(article.id)
+  }
 }
 </script>
 
 <template>
   <div class="space-y-6" dir="rtl">
     <!-- هدر صفحه -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-right">
-      <div class="space-y-1">
-        <h1 class="text-2xl font-bold tracking-tight text-foreground">
-          {{ adminDashboardData.articlesPage.pageTitle }}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold text-foreground">
+          {{ pageData.pageTitle }}
         </h1>
-        <p class="text-xs text-muted-foreground">
-          {{ adminDashboardData.articlesPage.subtitle }}
+        <p class="text-xs text-muted-foreground mt-1">
+          {{ pageData.subtitle }}
         </p>
       </div>
 
-      <div class="flex items-center gap-2.5">
-        <Button variant="outline" size="sm" class="rounded-pill text-xs h-9 gap-1.5"
-          @click="toast.success(adminDashboardData.articlesPage.toasts.refreshed)">
-          <RefreshCw class="size-3.5" />
-          <span>{{ adminDashboardData.articlesPage.refreshButton }}</span>
+      <div class="flex items-center gap-2">
+        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl gap-2" :disabled="articlesStore.isLoading"
+          @click="handleRefresh">
+          <RefreshCw class="size-3.5" :class="{ 'animate-spin': articlesStore.isLoading }" />
+          <span>{{ pageData.refreshButton }}</span>
         </Button>
-        <Button class="rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover text-xs gap-1.5 h-9 px-4" as-child>
-          <NuxtLink to="/admin/articles/create">
-            <Plus class="size-4" />
-            <span>{{ adminDashboardData.articlesPage.createButton }}</span>
-          </NuxtLink>
-        </Button>
+
+        <NuxtLink to="/admin/articles/create">
+          <Button size="sm" class="text-xs h-9 rounded-xl gap-2">
+            <Plus class="size-3.5" />
+            <span>{{ pageData.createButton }}</span>
+          </Button>
+        </NuxtLink>
       </div>
     </div>
 
-    <!-- آمارها -->
-    <AdminArticlesArticleStats v-model:current-filter="filterStatus" :total-count="articles.length"
-      :published-count="publishedCount" :draft-count="draftCount" />
+    <!-- کامپوننت آمار مقالات -->
+    <ArticleStats v-model:current-filter="articlesStore.filter" :total-count="articlesStore.stats.total"
+      :published-count="articlesStore.stats.published" :draft-count="articlesStore.stats.draft"
+      @update:current-filter="articlesStore.fetchAdminArticles()" />
 
-    <!-- فیلتر و جستجو -->
+    <!-- فیلتر و جست‌وجو -->
     <div
-      class="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
-      <div class="relative w-full sm:max-w-md">
-        <Input v-model="searchQuery" type="text" :placeholder="adminDashboardData.articlesPage.searchPlaceholder"
-          class="pr-10 rounded-xl bg-background/50 h-10 text-xs text-right" />
-        <Search class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-3 rounded-2xl border border-border/60">
+      <div class="relative w-full sm:w-72">
+        <Input v-model="articlesStore.searchQuery" :placeholder="pageData.searchPlaceholder"
+          class="h-9 text-xs rounded-xl pe-8 text-right" />
+        <Search class="size-4 absolute end-2.5 top-2.5 text-muted-foreground pointer-events-none" />
       </div>
 
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-        <Button size="sm" :variant="filterStatus === 'all' ? 'default' : 'outline'"
-          class="rounded-pill text-xs h-8.5 px-3.5" @click="filterStatus = 'all'">
-          {{ adminDashboardData.articlesPage.filters.all }}
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl flex-1 sm:flex-initial"
+          :class="{ 'bg-primary text-primary-foreground': articlesStore.filter === 'all' }"
+          @click="articlesStore.filter = 'all'; articlesStore.fetchAdminArticles()">
+          {{ pageData.filters.all }}
         </Button>
-        <Button size="sm" :variant="filterStatus === 'published' ? 'default' : 'outline'"
-          class="rounded-pill text-xs h-8.5 px-3.5" @click="filterStatus = 'published'">
-          {{ adminDashboardData.articlesPage.filters.published }}
+        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl flex-1 sm:flex-initial"
+          :class="{ 'bg-primary text-primary-foreground': articlesStore.filter === 'published' }"
+          @click="articlesStore.filter = 'published'; articlesStore.fetchAdminArticles()">
+          {{ pageData.filters.published }}
         </Button>
-        <Button size="sm" :variant="filterStatus === 'draft' ? 'default' : 'outline'"
-          class="rounded-pill text-xs h-8.5 px-3.5" @click="filterStatus = 'draft'">
-          {{ adminDashboardData.articlesPage.filters.draft }}
+        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl flex-1 sm:flex-initial"
+          :class="{ 'bg-primary text-primary-foreground': articlesStore.filter === 'draft' }"
+          @click="articlesStore.filter = 'draft'; articlesStore.fetchAdminArticles()">
+          {{ pageData.filters.draft }}
         </Button>
       </div>
     </div>
 
-    <!-- لیست کارت‌ها -->
-    <div class="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-xs">
-      <div v-if="filteredArticles.length === 0"
-        class="rounded-2xl border border-dashed border-border/80 bg-muted/10 p-12 text-center">
-        <FileText class="size-8 mx-auto text-muted-foreground" />
-        <p class="mt-3 text-xs text-muted-foreground">
-          {{ adminDashboardData.articlesPage.emptyTitle }}
-        </p>
-      </div>
-      <div v-else class="space-y-3">
-        <AdminArticlesArticleCard v-for="item in filteredArticles" :key="item.id" :article="item"
-          @delete="openDeleteModal" />
-      </div>
+    <!-- وضعیت بارگذاری -->
+    <div v-if="articlesStore.isLoading" class="text-center py-12 text-xs text-muted-foreground">
+      در حال دریافت لیست مقالات...
     </div>
 
-    <!-- دیالوگ حذف -->
-    <AdminSharedDeleteConfirmDialog v-model:open="isDeleteDialogOpen"
-      :title="adminDashboardData.deleteConfirmModal.articleSpecializedTitle"
-      :description="adminDashboardData.deleteConfirmModal.articleDescription" @confirm="handleDeleteConfirm" />
+    <!-- بدون مقاله -->
+    <div v-else-if="articlesStore.filteredArticles.length === 0"
+      class="text-center py-12 border border-dashed rounded-2xl bg-card space-y-2">
+      <p class="text-xs text-muted-foreground">
+        {{ pageData.emptyTitle }}
+      </p>
+    </div>
+
+    <!-- لیست رندر کارت‌ها با کامپوننت بومی -->
+    <div v-else class="grid gap-3">
+      <ArticleCard v-for="article in articlesStore.filteredArticles" :key="article.id" :article="article"
+        @delete="handleDelete(article)" />
+    </div>
   </div>
 </template>

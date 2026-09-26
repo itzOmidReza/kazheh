@@ -1,65 +1,81 @@
 <script setup lang="ts">
-import { siteConfig, articlesPageContent } from '~/data'
-import type { PublicArticleItem } from '~/components/articles/PublicArticleCard.vue'
+import { onMounted } from 'vue'
+import { Calendar, ArrowLeft, BookOpen, Clock } from '@lucide/vue'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { useArticlesStore } from '~/stores/articles'
 
-useHead({
-  title: articlesPageContent.headTitle,
-  meta: [
-    {
-      name: 'description',
-      content: articlesPageContent.headDescription,
-    },
-  ],
-})
+const articlesStore = useArticlesStore()
 
-const { data: articles } = await useAsyncData<PublicArticleItem[]>('articles-list', async () => {
-  try {
-    const list = await (queryCollection('articles') as any).all()
-    return (list || []).map((item: any) => ({
-      id: item.path || item.stem,
-      title: item.title,
-      excerpt: item.description || item.excerpt || '',
-      path: item.path || `/articles/${item.stem}`,
-      category: item.category || articlesPageContent.defaultCategory,
-      readingTime: item.readingTime || 5,
-      cover: item.cover || undefined,
-    }))
-  } catch {
-    return []
-  }
+onMounted(async () => {
+  await articlesStore.fetchPublicArticles()
 })
 </script>
 
 <template>
-  <div dir="rtl">
-    <section class="section-space bg-surface">
-      <div class="site-container">
-        <div class="max-w-2xl text-right">
-          <p class="text-sm font-medium text-primary">
-            {{ articlesPageContent.badge }}
-          </p>
-
-          <h1 class="mt-4 text-heading-xl text-foreground">
-            {{ articlesPageContent.heroTitle }}
-          </h1>
-
-          <p class="mt-5 text-body-lg text-muted-foreground">
-            {{ articlesPageContent.heroSubtitle }}
-          </p>
-        </div>
+  <div class="container max-w-6xl mx-auto px-4 py-12 space-y-10" dir="rtl">
+    <!-- هدر صفحه عمومی مقالات -->
+    <div class="text-center max-w-2xl mx-auto space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+        <BookOpen class="size-3.5" />
+        <span>پایگاه دانش و مقالات تخصصی</span>
       </div>
-    </section>
+      <h1 class="text-3xl font-extrabold text-foreground tracking-tight sm:text-4xl">
+        مطالب و یافته‌های علمی کلینیک کاژه
+      </h1>
+      <p class="text-sm text-muted-foreground leading-relaxed">
+        تازه‌ترین یادداشت‌ها، مقالات روان‌شناسی و راهنماهای کاربردی برای سلامت روان و سبک زندگی
+      </p>
+    </div>
 
-    <section class="section-space bg-background">
-      <div class="site-container">
-        <div v-if="articles && articles.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <ArticlesPublicArticleCard v-for="article in articles" :key="article.path" :article="article" />
+    <!-- حالت در حال بارگذاری -->
+    <div v-if="articlesStore.isLoading" class="text-center py-20 text-muted-foreground text-sm">
+      در حال دریافت مقالات...
+    </div>
+
+    <!-- حالت بدون مقاله -->
+    <div v-else-if="articlesStore.items.length === 0"
+      class="text-center py-20 border border-dashed rounded-3xl bg-card/50 space-y-3">
+      <BookOpen class="size-10 mx-auto text-muted-foreground/50" />
+      <h3 class="text-base font-semibold text-foreground">هنوز مقاله‌ای منتشر نشده است</h3>
+      <p class="text-xs text-muted-foreground max-w-sm mx-auto">
+        به‌زودی مقالات جدید تیم متخصصان کلینیک کاژه در این قسمت در دسترس قرار خواهد گرفت.
+      </p>
+    </div>
+
+    <!-- گرید کارت‌های مقالات -->
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <article v-for="article in articlesStore.items" :key="article.id"
+        class="group bg-card rounded-2xl border border-border/60 hover:border-border hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden p-5">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between text-xs text-muted-foreground">
+            <span class="inline-flex items-center gap-1.5 font-sans">
+              <Calendar class="size-3.5" />
+              {{ new Date(article.created_at).toLocaleDateString('fa-IR') }}
+            </span>
+            <Badge variant="outline" class="text-[10px] rounded-lg">مقاله تخصصی</Badge>
+          </div>
+
+          <h2
+            class="text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+            {{ article.title }}
+          </h2>
+
+          <p v-if="article.summary" class="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+            {{ article.summary }}
+          </p>
         </div>
 
-        <div v-else class="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-          {{ articlesPageContent.emptyTitle }}
+        <div class="pt-5 mt-4 border-t border-border/40 flex items-center justify-between">
+          <NuxtLink :to="`/articles/${article.slug}`" class="w-full">
+            <Button variant="ghost" size="sm"
+              class="w-full justify-between text-xs h-9 rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+              <span>مطالعه کامل مطلب</span>
+              <ArrowLeft class="size-3.5 transition-transform group-hover:-translate-x-1" />
+            </Button>
+          </NuxtLink>
         </div>
-      </div>
-    </section>
+      </article>
+    </div>
   </div>
 </template>

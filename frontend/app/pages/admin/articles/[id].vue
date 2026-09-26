@@ -1,80 +1,83 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
-import {
-  siteConfig,
-  adminDashboardData,
-  initialAdminArticles,
-} from '~/data'
-import type { ArticleFormData } from '~/components/admin/articles/ArticleForm.vue'
+import { useArticlesStore } from '~/stores/articles'
+import ArticleForm, { type ArticleFormData } from '~/components/admin/articles/ArticleForm.vue'
 
-definePageMeta({ layout: 'admin' })
+definePageMeta({
+  layout: 'admin',
+})
 
 const route = useRoute()
 const router = useRouter()
-const isSubmitting = ref(false)
+const articlesStore = useArticlesStore()
+
+const articleId = Number(route.params.id)
+const formData = ref<ArticleFormData | null>(null)
 const isLoading = ref(true)
+const isSubmitting = ref(false)
 
-const articleId = computed(() => Number(route.params.id))
-
-const form = reactive<ArticleFormData>({
-  title: '',
-  slug: '',
-  summary: '',
-  content: '',
-  is_published: false,
-})
-
-useHead({
-  title: computed(
-    () =>
-      `${adminDashboardData.articlesPage.edit.headTitlePrefix} ${form.title || adminDashboardData.articlesPage.edit.headTitleFallback
-      } | ${siteConfig.name}`
-  ),
-})
-
-onMounted(() => {
-  setTimeout(() => {
-    // بارگذاری داده اولیه ماک از لایه متمرکز بر اساس ID یا پیش‌فرض اول
-    const found =
-      initialAdminArticles.find((a) => a.id === articleId.value) ||
-      initialAdminArticles[0]
-    if (found) {
-      form.title = found.title
-      form.slug = found.slug
-      form.summary = found.summary || ''
-      form.content = found.content || ''
-      form.is_published = found.is_published
-    }
-    isLoading.value = false
-  }, 250)
-})
-
-const handleUpdate = () => {
-  if (!form.title.trim() || !form.content.trim()) {
-    toast.error(adminDashboardData.articlesPage.edit.toasts.validationError)
+onMounted(async () => {
+  if (Number.isNaN(articleId)) {
+    router.push('/admin/articles')
     return
   }
-  isSubmitting.value = true
-  setTimeout(() => {
-    isSubmitting.value = false
-    toast.success(adminDashboardData.articlesPage.edit.toasts.saveSuccess)
+
+  isLoading.value = true
+  const found = await articlesStore.getArticleById(articleId)
+  if (!found) {
+    toast.error('مقاله مورد نظر یافت نشد.')
     router.push('/admin/articles')
-  }, 350)
+    return
+  }
+
+  formData.value = {
+    title: found.title,
+    slug: found.slug,
+    summary: found.summary ?? '',
+    content: found.content,
+    is_published: found.is_published,
+  }
+
+  isLoading.value = false
+})
+
+const handleSubmit = async () => {
+  if (!formData.value) return
+
+  isSubmitting.value = true
+  const updated = await articlesStore.updateArticle(articleId, {
+    title: formData.value.title.trim(),
+    slug: formData.value.slug.trim() || undefined,
+    summary: formData.value.summary?.trim() || undefined,
+    content: formData.value.content.trim(),
+    is_published: formData.value.is_published,
+  })
+  isSubmitting.value = false
+
+  if (updated) {
+    router.push('/admin/articles')
+  }
 }
 
-const handleDelete = () => {
-  if (!confirm(adminDashboardData.articlesPage.edit.deleteConfirm)) return
-  toast.success(adminDashboardData.articlesPage.edit.toasts.deleteSuccess)
-  router.push('/admin/articles')
+const handleDelete = async () => {
+  if (confirm('آیا از حذف این مقاله اطمینان دارید؟')) {
+    const success = await articlesStore.deleteArticle(articleId)
+    if (success) {
+      router.push('/admin/articles')
+    }
+  }
 }
 </script>
 
 <template>
-  <div v-if="isLoading" class="space-y-4" dir="rtl">
-    <div class="h-24 animate-pulse rounded-3xl border border-border/60 bg-muted/30" />
-    <div class="h-80 animate-pulse rounded-3xl border border-border/60 bg-muted/30" />
-  </div>
+  <div dir="rtl">
+    <div v-if="isLoading" class="text-center py-20 text-xs text-muted-foreground">
+      در حال دریافت اطلاعات مقاله...
+    </div>
 
-  <AdminArticlesArticleForm v-else v-model="form" mode="edit" :is-submitting="isSubmitting" @submit="handleUpdate"
-    @delete="handleDelete" />
+    <ArticleForm v-else-if="formData" v-model="formData" mode="edit" :is-submitting="isSubmitting"
+      @submit="handleSubmit" @delete="handleDelete" />
+  </div>
 </template>

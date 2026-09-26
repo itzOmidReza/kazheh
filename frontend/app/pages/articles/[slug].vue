@@ -1,99 +1,89 @@
 <script setup lang="ts">
-import { ArrowRight, Clock3 } from '@lucide/vue'
-import { siteConfig, articleDetailContent } from '~/data'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Calendar, ArrowRight, UserCheck, Share2 } from '@lucide/vue'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { useArticlesStore, type ArticleItem } from '~/stores/articles'
 
 const route = useRoute()
-const slug = computed(() => String(route.params.slug))
+const router = useRouter()
+const articlesStore = useArticlesStore()
 
-const { data: article } = await useAsyncData(`article-${slug.value}`, () =>
-  queryCollection('articles')
-    .path(`/articles/${slug.value}`)
-    .first()
-)
+const slug = String(route.params.slug)
+const article = ref<ArticleItem | null>(null)
+const isLoading = ref(true)
 
-if (!article.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: articleDetailContent.notFoundMessage,
-    fatal: true,
-  })
-}
+onMounted(async () => {
+  if (!slug) {
+    router.push('/articles')
+    return
+  }
 
-useHead(() => ({
-  title: `${article.value?.title} | ${siteConfig.name}`,
-  meta: [
-    {
-      name: 'description',
-      content: article.value?.description || article.value?.excerpt || '',
-    },
-    {
-      property: 'og:title',
-      content: `${article.value?.title} | ${siteConfig.name}`,
-    },
-    {
-      property: 'og:description',
-      content: article.value?.description || article.value?.excerpt || '',
-    },
-    { property: 'og:type', content: 'article' },
-    { property: 'og:locale', content: 'fa_IR' },
-  ],
-}))
+  isLoading.value = true
+  const data = await articlesStore.fetchArticleBySlug(slug)
+  if (!data) {
+    router.push('/articles')
+    return
+  }
 
-const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
+  article.value = data
+  isLoading.value = false
+})
 </script>
 
 <template>
-  <div v-if="article" dir="rtl">
-    <article>
-      <header class="section-space bg-surface">
-        <div class="site-container">
-          <NuxtLink to="/articles"
-            class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
-            <ArrowRight class="size-4 rotate-180" />
-            <span>{{ articleDetailContent.backButton }}</span>
-          </NuxtLink>
+  <div class="container max-w-4xl mx-auto px-4 py-12" dir="rtl">
+    <div class="mb-6">
+      <Button variant="ghost" size="sm" class="text-xs h-9 rounded-xl gap-2 text-muted-foreground hover:text-foreground"
+        @click="router.push('/articles')">
+        <ArrowRight class="size-4" />
+        <span>بازگشت به مقالات</span>
+      </Button>
+    </div>
 
-          <div class="mt-8 max-w-3xl text-right">
-            <span class="rounded-pill bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-              {{ (article as any).category || articleDetailContent.defaultCategory }}
-            </span>
+    <div v-if="isLoading" class="text-center py-24 text-muted-foreground text-sm">
+      در حال دریافت محتوای مقاله...
+    </div>
 
-            <h1 class="mt-6 text-heading-xl text-foreground leading-tight">
-              {{ article.title }}
-            </h1>
-
-            <div v-if="(article as any).readingTime" class="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock3 class="size-4" />
-              <span>{{ formatNumber((article as any).readingTime) }} {{ articleDetailContent.minuteReadSuffix }}</span>
-            </div>
-
-            <p v-if="article.description" class="mt-8 text-body-lg text-muted-foreground leading-8">
-              {{ article.description }}
-            </p>
-          </div>
-
-          <div v-if="(article as any).cover"
-            class="mt-10 max-w-4xl overflow-hidden rounded-[1.75rem] border border-border bg-card shadow-card">
-            <img :src="(article as any).cover" :alt="article.title" width="1280" height="720"
-              class="aspect-video w-full object-cover" loading="eager" />
-          </div>
+    <article v-else-if="article" class="space-y-8 bg-card p-6 sm:p-10 rounded-3xl border border-border/60">
+      <header class="space-y-4 border-b border-border/60 pb-6">
+        <div class="flex items-center gap-3">
+          <Badge variant="outline" class="text-xs">پایگاه دانش کلینیک کاژه</Badge>
+          <span class="text-xs text-muted-foreground flex items-center gap-1.5 font-sans">
+            <Calendar class="size-3.5" />
+            {{ new Date(article.created_at).toLocaleDateString('fa-IR') }}
+          </span>
         </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-foreground leading-tight">
+          {{ article.title }}
+        </h1>
+
+        <p v-if="article.summary"
+          class="text-sm text-muted-foreground leading-relaxed bg-muted/40 p-4 rounded-2xl border-r-4 border-primary">
+          {{ article.summary }}
+        </p>
       </header>
 
-      <section class="section-space bg-background">
-        <div class="site-container">
-          <div class="max-w-3xl text-right">
-            <div
-              class="prose prose-neutral dark:prose-invert max-w-none leading-8 text-foreground [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:text-heading-md [&_p]:mb-5 [&_p]:text-body-lg [&_p]:text-muted-foreground">
-              <ContentRenderer :value="article" />
-            </div>
+      <!-- محتوای کامل مقاله -->
+      <div
+        class="prose prose-neutral dark:prose-invert max-w-none text-sm leading-8 text-foreground whitespace-pre-wrap">
+        {{ article.content }}
+      </div>
 
-            <div class="mt-12 border-t border-border pt-6">
-              <ArticlesArticleShareButton :title="article.title" :text="article.description || ''" />
-            </div>
+      <footer class="pt-6 border-t border-border/60 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+            <UserCheck class="size-5" />
+          </div>
+          <div>
+            <div class="text-xs font-bold text-foreground">تیم تخصصی کلینیک کاژه</div>
+            <div class="text-[11px] text-muted-foreground">روان‌شناسی و مشاوره خانواده</div>
           </div>
         </div>
-      </section>
+      </footer>
     </article>
   </div>
 </template>

@@ -12,22 +12,38 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { adminDashboardData } from '~/data/admin'
 import { useMessagesStore } from '~/stores/messages'
+import { useArticlesStore, type ArticleItem } from '~/stores/articles'
 import MessageCard from '~/components/admin/messages/MessageCard.vue'
+import ArticleCard from '~/components/admin/articles/ArticleCard.vue'
 
 definePageMeta({
   layout: 'admin',
 })
 
 const messagesStore = useMessagesStore()
+const articlesStore = useArticlesStore()
 const activeTab = ref<'messages' | 'articles'>('messages')
 const data = adminDashboardData
 
 onMounted(async () => {
-  await messagesStore.fetchMessages()
+  await Promise.all([
+    messagesStore.fetchMessages(),
+    articlesStore.fetchAdminArticles(),
+  ])
 })
 
 const handleRefresh = async () => {
-  await messagesStore.fetchMessages()
+  if (activeTab.value === 'messages') {
+    await messagesStore.fetchMessages()
+  } else {
+    await articlesStore.fetchAdminArticles()
+  }
+}
+
+const handleDeleteArticle = async (article: ArticleItem) => {
+  if (confirm(data.deleteConfirmModal.articleDescription)) {
+    await articlesStore.deleteArticle(article.id)
+  }
 }
 </script>
 
@@ -45,13 +61,13 @@ const handleRefresh = async () => {
       </div>
 
       <div class="flex items-center gap-2">
-        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl gap-2" :disabled="messagesStore.isLoading"
-          @click="handleRefresh">
-          <RefreshCw class="size-3.5" :class="{ 'animate-spin': messagesStore.isLoading }" />
+        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl gap-2"
+          :disabled="messagesStore.isLoading || articlesStore.isLoading" @click="handleRefresh">
+          <RefreshCw class="size-3.5" :class="{ 'animate-spin': messagesStore.isLoading || articlesStore.isLoading }" />
           <span>{{ data.header.refreshButton }}</span>
         </Button>
 
-        <NuxtLink to="/admin/articles">
+        <NuxtLink to="/admin/articles/create">
           <Button size="sm" class="text-xs h-9 rounded-xl gap-2">
             <Plus class="size-3.5" />
             <span>{{ data.header.newArticleButton }}</span>
@@ -62,7 +78,7 @@ const handleRefresh = async () => {
 
     <!-- کارت‌های آمار زنده -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <!-- آمار پیام‌های بررسی‌نشده -->
+      <!-- پیام‌های بررسی‌نشده -->
       <div class="bg-card p-5 rounded-2xl border border-border/60 space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs text-muted-foreground font-medium">
@@ -85,7 +101,7 @@ const handleRefresh = async () => {
         </p>
       </div>
 
-      <!-- آمار مقالات -->
+      <!-- مقالات ثبت‌شده در سیستم -->
       <div class="bg-card p-5 rounded-2xl border border-border/60 space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs text-muted-foreground font-medium">
@@ -97,18 +113,18 @@ const handleRefresh = async () => {
         </div>
         <div class="flex items-baseline gap-2">
           <span class="text-3xl font-bold text-foreground">
-            ۰
+            {{ articlesStore.stats.total }}
           </span>
           <span class="text-xs text-muted-foreground">
             {{ data.stats.articlesSuffix }}
           </span>
         </div>
         <p class="text-[11px] text-muted-foreground">
-          ۰ {{ data.stats.publishedArticlesSuffix }}
+          {{ articlesStore.stats.published }} {{ data.stats.publishedArticlesSuffix }}
         </p>
       </div>
 
-      <!-- وضعیت سیستم -->
+      <!-- وضعیت سرویس -->
       <div class="bg-card p-5 rounded-2xl border border-border/60 space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs text-muted-foreground font-medium">
@@ -146,12 +162,15 @@ const handleRefresh = async () => {
           :class="activeTab === 'articles' ? 'text-primary font-bold' : 'text-muted-foreground'"
           @click="activeTab = 'articles'">
           {{ data.tabs.articles.label }}
+          <span v-if="articlesStore.stats.total > 0"
+            class="ms-2 px-1.5 py-0.5 text-[10px] rounded-full bg-muted text-muted-foreground font-normal">
+            {{ articlesStore.stats.total }}
+          </span>
         </Button>
       </div>
 
-      <!-- بخش پیام‌ها متصل به استور -->
+      <!-- بخش کارتابل پیام‌ها -->
       <div v-if="activeTab === 'messages'" class="space-y-4">
-        <!-- فیلتر و جست‌وجو -->
         <div
           class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-3 rounded-2xl border border-border/60">
           <div class="relative w-full sm:w-72">
@@ -179,12 +198,10 @@ const handleRefresh = async () => {
           </div>
         </div>
 
-        <!-- وضعیت لودینگ -->
         <div v-if="messagesStore.isLoading" class="text-center py-12 text-xs text-muted-foreground">
           در حال بارگذاری پیام‌ها...
         </div>
 
-        <!-- پیام‌ها خالی است -->
         <div v-else-if="messagesStore.filteredMessages.length === 0"
           class="text-center py-12 border border-dashed rounded-2xl bg-card space-y-1">
           <p class="text-sm font-medium text-foreground">
@@ -195,27 +212,54 @@ const handleRefresh = async () => {
           </p>
         </div>
 
-        <!-- لیست کارت‌های واقعی -->
         <div v-else class="grid gap-3">
           <MessageCard v-for="msg in messagesStore.filteredMessages" :key="msg.id" :message="msg"
             @toggle-read="messagesStore.toggleReadStatus(msg.id)" @delete="messagesStore.deleteMessage(msg.id)" />
         </div>
       </div>
 
-      <!-- تب مقالات (به زودی در ماژول مقالات متصل خواهد شد) -->
-      <div v-else-if="activeTab === 'articles'"
-        class="text-center py-12 border border-dashed rounded-2xl bg-card space-y-2">
-        <p class="text-sm font-medium text-foreground">
-          {{ data.articlesSection.emptyTitle }}
-        </p>
-        <p class="text-xs text-muted-foreground">
-          {{ data.articlesSection.emptyDescription }}
-        </p>
-        <NuxtLink to="/admin/articles">
-          <Button size="sm" class="text-xs h-9 rounded-xl mt-2">
-            {{ data.articlesSection.newArticleButton }}
-          </Button>
-        </NuxtLink>
+      <!-- بخش مقالات در داشبورد -->
+      <div v-else-if="activeTab === 'articles'" class="space-y-4">
+        <div
+          class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-3 rounded-2xl border border-border/60">
+          <div class="relative w-full sm:w-72">
+            <Input v-model="articlesStore.searchQuery" :placeholder="data.articlesPage.searchPlaceholder"
+              class="h-9 text-xs rounded-xl pe-8 text-right" />
+            <Search class="size-4 absolute end-2.5 top-2.5 text-muted-foreground pointer-events-none" />
+          </div>
+
+          <NuxtLink to="/admin/articles/create">
+            <Button size="sm" class="text-xs h-9 rounded-xl gap-2">
+              <Plus class="size-3.5" />
+              <span>{{ data.articlesPage.createButton }}</span>
+            </Button>
+          </NuxtLink>
+        </div>
+
+        <div v-if="articlesStore.isLoading" class="text-center py-12 text-xs text-muted-foreground">
+          در حال بارگذاری مقالات...
+        </div>
+
+        <div v-else-if="articlesStore.filteredArticles.length === 0"
+          class="text-center py-12 border border-dashed rounded-2xl bg-card space-y-2">
+          <p class="text-sm font-medium text-foreground">
+            {{ data.articlesSection.emptyTitle }}
+          </p>
+          <p class="text-xs text-muted-foreground">
+            {{ data.articlesSection.emptyDescription }}
+          </p>
+          <NuxtLink to="/admin/articles/create">
+            <Button size="sm" class="text-xs h-9 rounded-xl mt-2 gap-2">
+              <Plus class="size-3.5" />
+              <span>{{ data.articlesSection.newArticleButton }}</span>
+            </Button>
+          </NuxtLink>
+        </div>
+
+        <div v-else class="grid gap-3">
+          <ArticleCard v-for="article in articlesStore.filteredArticles" :key="article.id" :article="article"
+            @delete="handleDeleteArticle(article)" />
+        </div>
       </div>
     </div>
   </div>
