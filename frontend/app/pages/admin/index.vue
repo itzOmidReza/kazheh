@@ -1,229 +1,222 @@
 <script setup lang="ts">
-import { Mail, FileText, Plus, RefreshCw, Search, Inbox, ArrowRight } from '@lucide/vue'
+import { ref, onMounted } from 'vue'
+import {
+  Mail,
+  FileText,
+  Activity,
+  Plus,
+  RefreshCw,
+  Search,
+} from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { toast } from 'vue-sonner'
-import {
-  siteConfig,
-  adminDashboardData,
-  initialAdminMessages,
-  initialAdminArticles,
-  type AdminMessageItem,
-  type AdminArticleItem,
-} from '~/data'
+import { adminDashboardData } from '~/data/admin'
+import { useMessagesStore } from '~/stores/messages'
+import MessageCard from '~/components/admin/messages/MessageCard.vue'
 
-definePageMeta({ layout: 'admin' })
-useHead({ title: `${adminDashboardData.header.title} | ${siteConfig.name}` })
+definePageMeta({
+  layout: 'admin',
+})
 
-const router = useRouter()
+const messagesStore = useMessagesStore()
 const activeTab = ref<'messages' | 'articles'>('messages')
+const data = adminDashboardData
 
-// بارگذاری استیت پیام‌ها و مقالات از منبع داده متمرکز
-const messages = ref<AdminMessageItem[]>([...initialAdminMessages])
-const articles = ref<AdminArticleItem[]>([...initialAdminArticles])
-
-const messageFilter = ref<'all' | 'unread'>('all')
-const messageSearchQuery = ref('')
-const unreadCount = computed(() => messages.value.filter((m) => !m.is_read).length)
-
-const filteredMessages = computed(() => {
-  let list = messages.value
-  if (messageFilter.value === 'unread') list = list.filter((m) => !m.is_read)
-  if (messageSearchQuery.value.trim()) {
-    const q = messageSearchQuery.value.trim().toLowerCase()
-    list = list.filter((m) => m.full_name.toLowerCase().includes(q) || m.phone.includes(q) || m.message.toLowerCase().includes(q))
-  }
-  return list
+onMounted(async () => {
+  await messagesStore.fetchMessages()
 })
 
-const toggleMessageRead = (msg: AdminMessageItem) => {
-  msg.is_read = !msg.is_read
-  toast.success(
-    msg.is_read
-      ? adminDashboardData.messagesSection.toasts.markedRead
-      : adminDashboardData.messagesSection.toasts.markedUnread
-  )
-}
-
-const articleSearchQuery = ref('')
-const publishedArticlesCount = computed(() => articles.value.filter((a) => a.is_published).length)
-
-const filteredArticles = computed(() => {
-  if (!articleSearchQuery.value.trim()) return articles.value
-  const q = articleSearchQuery.value.trim().toLowerCase()
-  return articles.value.filter((a) => a.title.toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
-})
-
-// دیالوگ حذف یکپارچه
-const itemToDelete = ref<{ type: 'message' | 'article'; id: number; title: string } | null>(null)
-const isDeleteDialogOpen = ref(false)
-
-const openDeleteModal = (type: 'message' | 'article', id: number, title: string) => {
-  itemToDelete.value = { type, id, title }
-  isDeleteDialogOpen.value = true
-}
-
-const handleDeleteConfirm = () => {
-  if (!itemToDelete.value) return
-  if (itemToDelete.value.type === 'message') {
-    messages.value = messages.value.filter((m) => m.id !== itemToDelete.value!.id)
-    toast.success(adminDashboardData.messagesSection.toasts.deleteSuccess)
-  } else {
-    articles.value = articles.value.filter((a) => a.id !== itemToDelete.value!.id)
-    toast.success(adminDashboardData.articlesSection.toasts.deleteSuccess)
-  }
-  isDeleteDialogOpen.value = false
-  itemToDelete.value = null
+const handleRefresh = async () => {
+  await messagesStore.fetchMessages()
 }
 </script>
 
 <template>
   <div class="space-y-8" dir="rtl">
-    <!-- هدر بالای داشبورد -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-right">
-      <div class="space-y-1">
-        <h1 class="text-2xl font-bold tracking-tight text-foreground">
-          {{ adminDashboardData.header.title }}
+    <!-- هدر داشبورد -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">
+          {{ data.header.title }}
         </h1>
-        <p class="text-xs text-muted-foreground">
-          {{ adminDashboardData.header.subtitle }}
+        <p class="text-xs text-muted-foreground mt-1">
+          {{ data.header.subtitle }}
         </p>
       </div>
 
-      <div class="flex items-center gap-2.5">
-        <Button variant="outline" size="sm" class="rounded-pill text-xs h-9 gap-1.5"
-          @click="toast.success(adminDashboardData.messagesSection.toasts.refreshed)">
-          <RefreshCw class="size-3.5" />
-          <span>{{ adminDashboardData.header.refreshButton }}</span>
+      <div class="flex items-center gap-2">
+        <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl gap-2" :disabled="messagesStore.isLoading"
+          @click="handleRefresh">
+          <RefreshCw class="size-3.5" :class="{ 'animate-spin': messagesStore.isLoading }" />
+          <span>{{ data.header.refreshButton }}</span>
         </Button>
-        <Button class="rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft text-xs gap-1.5 h-9 px-4"
-          as-child>
-          <NuxtLink to="/admin/articles/create">
-            <Plus class="size-4" />
-            <span>{{ adminDashboardData.header.newArticleButton }}</span>
-          </NuxtLink>
-        </Button>
+
+        <NuxtLink to="/admin/articles">
+          <Button size="sm" class="text-xs h-9 rounded-xl gap-2">
+            <Plus class="size-3.5" />
+            <span>{{ data.header.newArticleButton }}</span>
+          </Button>
+        </NuxtLink>
       </div>
     </div>
 
-    <!-- کارت‌های آمار ماژولار -->
-    <AdminDashboardStats :unread-messages-count="unreadCount" :total-messages-count="messages.length"
-      :total-articles-count="articles.length" :published-articles-count="publishedArticlesCount" />
-
-    <!-- تب‌های مدیریت -->
-    <div class="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-xs">
-      <Tabs v-model="activeTab" class="w-full">
-        <div class="flex flex-col gap-4 border-b border-border/60 pb-5 sm:flex-row sm:items-center sm:justify-between">
-          <TabsList class="grid w-full grid-cols-2 rounded-2xl bg-secondary/60 p-1 sm:w-auto sm:flex h-11">
-            <TabsTrigger value="messages" class="rounded-xl px-4 py-2 text-xs font-semibold gap-2">
-              <Mail class="size-4 shrink-0" />
-              <span>{{ adminDashboardData.tabs.messages.label }}</span>
-              <span v-if="unreadCount > 0"
-                class="inline-flex size-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
-                {{ unreadCount }}
-              </span>
-            </TabsTrigger>
-
-            <TabsTrigger value="articles" class="rounded-xl px-4 py-2 text-xs font-semibold gap-2">
-              <FileText class="size-4 shrink-0" />
-              <span>{{ adminDashboardData.tabs.articles.label }}</span>
-              <span class="text-[11px] text-muted-foreground">({{ articles.length }})</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <Button variant="outline" size="sm" class="rounded-pill text-xs h-9 gap-1.5 w-full sm:w-auto" as-child>
-            <NuxtLink :to="activeTab === 'messages' ? '/admin/messages' : '/admin/articles'">
-              <span>
-                {{
-                  activeTab === 'messages'
-                    ? adminDashboardData.tabs.messages.buttonText
-                    : adminDashboardData.tabs.articles.buttonText
-                }}
-              </span>
-              <ArrowRight class="size-3.5 rotate-180" />
-            </NuxtLink>
-          </Button>
+    <!-- کارت‌های آمار زنده -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- آمار پیام‌های بررسی‌نشده -->
+      <div class="bg-card p-5 rounded-2xl border border-border/60 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-muted-foreground font-medium">
+            {{ data.stats.unreadMessagesLabel }}
+          </span>
+          <div class="size-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <Mail class="size-4" />
+          </div>
         </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-3xl font-bold text-foreground">
+            {{ messagesStore.stats.unread }}
+          </span>
+          <span class="text-xs text-muted-foreground">
+            {{ data.stats.newMessagesSuffix }}
+          </span>
+        </div>
+        <p class="text-[11px] text-muted-foreground">
+          {{ data.stats.totalMessagesPrefix }} {{ messagesStore.stats.total }} {{ data.stats.totalMessagesSuffix }}
+        </p>
+      </div>
 
-        <!-- تب پیام‌ها -->
-        <TabsContent value="messages" class="mt-6 space-y-4">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="relative w-full sm:max-w-md">
-              <Input v-model="messageSearchQuery" type="text"
-                :placeholder="adminDashboardData.messagesSection.searchPlaceholder"
-                class="pr-10 rounded-xl bg-background/50 h-10 text-xs text-right" />
-              <Search
-                class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            </div>
+      <!-- آمار مقالات -->
+      <div class="bg-card p-5 rounded-2xl border border-border/60 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-muted-foreground font-medium">
+            {{ data.stats.articlesLabel }}
+          </span>
+          <div class="size-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <FileText class="size-4" />
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-3xl font-bold text-foreground">
+            ۰
+          </span>
+          <span class="text-xs text-muted-foreground">
+            {{ data.stats.articlesSuffix }}
+          </span>
+        </div>
+        <p class="text-[11px] text-muted-foreground">
+          ۰ {{ data.stats.publishedArticlesSuffix }}
+        </p>
+      </div>
 
-            <div class="flex items-center gap-1.5">
-              <Button size="sm" :variant="messageFilter === 'all' ? 'default' : 'outline'"
-                class="rounded-pill text-xs h-8.5 px-3.5" @click="messageFilter = 'all'">
-                {{ adminDashboardData.messagesSection.filterAll }} ({{ messages.length }})
-              </Button>
-              <Button size="sm" :variant="messageFilter === 'unread' ? 'default' : 'outline'"
-                class="rounded-pill text-xs h-8.5 px-3.5" @click="messageFilter = 'unread'">
-                {{ adminDashboardData.messagesSection.filterUnread }} ({{ unreadCount }})
-              </Button>
-            </div>
+      <!-- وضعیت سیستم -->
+      <div class="bg-card p-5 rounded-2xl border border-border/60 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-muted-foreground font-medium">
+            {{ data.stats.runtimeStatusLabel }}
+          </span>
+          <div class="size-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+            <Activity class="size-4" />
           </div>
-
-          <div v-if="filteredMessages.length === 0"
-            class="rounded-2xl border border-dashed border-border/80 bg-muted/10 p-12 text-center">
-            <Inbox class="size-6 mx-auto text-muted-foreground" />
-            <p class="mt-3 text-xs text-muted-foreground">
-              {{ adminDashboardData.messagesSection.emptyTitle }}
-            </p>
-          </div>
-          <div v-else class="space-y-3 pt-2">
-            <AdminMessagesMessageCard v-for="msg in filteredMessages" :key="msg.id" :message="msg"
-              @select="(id) => router.push(`/admin/messages/${id}`)" @toggle-read="toggleMessageRead"
-              @delete="(item) => openDeleteModal('message', item.id, item.full_name)" />
-          </div>
-        </TabsContent>
-
-        <!-- تب مقالات -->
-        <TabsContent value="articles" class="mt-6 space-y-4">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="relative w-full sm:max-w-md">
-              <Input v-model="articleSearchQuery" type="text"
-                :placeholder="adminDashboardData.articlesSection.searchPlaceholder"
-                class="pr-10 rounded-xl bg-background/50 h-10 text-xs text-right" />
-              <Search
-                class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            </div>
-
-            <Button
-              class="rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft text-xs gap-1.5 h-9 px-4 shrink-0"
-              as-child>
-              <NuxtLink to="/admin/articles/create">
-                <Plus class="size-4" />
-                <span>{{ adminDashboardData.articlesSection.newArticleButton }}</span>
-              </NuxtLink>
-            </Button>
-          </div>
-
-          <div v-if="filteredArticles.length === 0"
-            class="rounded-2xl border border-dashed border-border/80 bg-muted/10 p-12 text-center">
-            <FileText class="size-6 mx-auto text-muted-foreground" />
-            <p class="mt-3 text-xs text-muted-foreground">
-              {{ adminDashboardData.articlesSection.emptyTitle }}
-            </p>
-          </div>
-          <div v-else class="space-y-3 pt-2">
-            <AdminArticlesArticleCard v-for="art in filteredArticles" :key="art.id" :article="art"
-              @delete="(item) => openDeleteModal('article', item.id, item.title)" />
-          </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-sm font-bold text-emerald-500">
+            {{ data.stats.runtimeStatusActive }}
+          </span>
+        </div>
+        <p class="text-[11px] text-muted-foreground">
+          {{ data.stats.runtimeFramework }}
+        </p>
+      </div>
     </div>
 
-    <!-- دیالوگ حذف عمومی -->
-    <AdminSharedDeleteConfirmDialog v-model:open="isDeleteDialogOpen" :title="itemToDelete?.type === 'message'
-      ? adminDashboardData.deleteConfirmModal.messageTitle
-      : adminDashboardData.deleteConfirmModal.articleTitle
-      " :description="adminDashboardData.deleteConfirmModal.deleteItemDescription(itemToDelete?.title || '')"
-      @confirm="handleDeleteConfirm" />
+    <!-- تب‌های ناوبری محتوا -->
+    <div class="space-y-4">
+      <div class="flex items-center gap-2 border-b border-border/60 pb-3">
+        <Button variant="ghost" size="sm" class="text-xs rounded-xl relative"
+          :class="activeTab === 'messages' ? 'text-primary font-bold' : 'text-muted-foreground'"
+          @click="activeTab = 'messages'">
+          {{ data.tabs.messages.label }}
+          <span v-if="messagesStore.stats.unread > 0"
+            class="ms-2 px-1.5 py-0.5 text-[10px] rounded-full bg-primary text-primary-foreground font-normal">
+            {{ messagesStore.stats.unread }}
+          </span>
+        </Button>
+
+        <Button variant="ghost" size="sm" class="text-xs rounded-xl"
+          :class="activeTab === 'articles' ? 'text-primary font-bold' : 'text-muted-foreground'"
+          @click="activeTab = 'articles'">
+          {{ data.tabs.articles.label }}
+        </Button>
+      </div>
+
+      <!-- بخش پیام‌ها متصل به استور -->
+      <div v-if="activeTab === 'messages'" class="space-y-4">
+        <!-- فیلتر و جست‌وجو -->
+        <div
+          class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-3 rounded-2xl border border-border/60">
+          <div class="relative w-full sm:w-72">
+            <Input v-model="messagesStore.searchQuery" :placeholder="data.messagesSection.searchPlaceholder"
+              class="h-9 text-xs rounded-xl pe-8 text-right" />
+            <Search class="size-4 absolute end-2.5 top-2.5 text-muted-foreground pointer-events-none" />
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl flex-1 sm:flex-initial"
+              :class="{ 'bg-primary text-primary-foreground': messagesStore.filter === 'all' }"
+              @click="messagesStore.filter = 'all'; messagesStore.fetchMessages()">
+              {{ data.messagesSection.filterAll }}
+            </Button>
+            <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl flex-1 sm:flex-initial"
+              :class="{ 'bg-primary text-primary-foreground': messagesStore.filter === 'unread' }"
+              @click="messagesStore.filter = 'unread'; messagesStore.fetchMessages()">
+              {{ data.messagesSection.filterUnread }}
+            </Button>
+            <Button variant="outline" size="sm" class="text-xs h-9 rounded-xl flex-1 sm:flex-initial"
+              :class="{ 'bg-primary text-primary-foreground': messagesStore.filter === 'read' }"
+              @click="messagesStore.filter = 'read'; messagesStore.fetchMessages()">
+              {{ data.messagesSection.filterRead }}
+            </Button>
+          </div>
+        </div>
+
+        <!-- وضعیت لودینگ -->
+        <div v-if="messagesStore.isLoading" class="text-center py-12 text-xs text-muted-foreground">
+          در حال بارگذاری پیام‌ها...
+        </div>
+
+        <!-- پیام‌ها خالی است -->
+        <div v-else-if="messagesStore.filteredMessages.length === 0"
+          class="text-center py-12 border border-dashed rounded-2xl bg-card space-y-1">
+          <p class="text-sm font-medium text-foreground">
+            {{ data.messagesSection.emptyTitle }}
+          </p>
+          <p class="text-xs text-muted-foreground">
+            {{ data.messagesSection.emptyDescription }}
+          </p>
+        </div>
+
+        <!-- لیست کارت‌های واقعی -->
+        <div v-else class="grid gap-3">
+          <MessageCard v-for="msg in messagesStore.filteredMessages" :key="msg.id" :message="msg"
+            @toggle-read="messagesStore.toggleReadStatus(msg.id)" @delete="messagesStore.deleteMessage(msg.id)" />
+        </div>
+      </div>
+
+      <!-- تب مقالات (به زودی در ماژول مقالات متصل خواهد شد) -->
+      <div v-else-if="activeTab === 'articles'"
+        class="text-center py-12 border border-dashed rounded-2xl bg-card space-y-2">
+        <p class="text-sm font-medium text-foreground">
+          {{ data.articlesSection.emptyTitle }}
+        </p>
+        <p class="text-xs text-muted-foreground">
+          {{ data.articlesSection.emptyDescription }}
+        </p>
+        <NuxtLink to="/admin/articles">
+          <Button size="sm" class="text-xs h-9 rounded-xl mt-2">
+            {{ data.articlesSection.newArticleButton }}
+          </Button>
+        </NuxtLink>
+      </div>
+    </div>
   </div>
 </template>

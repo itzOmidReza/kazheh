@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { Send, Loader2 } from '@lucide/vue'
+import { ref } from 'vue'
+import { Loader2, Send } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
-import { contactFormData } from '~/data'
+import { contactFormData } from '~/data' // این خط را اضافه کنید
 
-const emit = defineEmits<{
-  (e: 'success'): void
-}>()
-
-const form = reactive({
+const form = ref({
   full_name: '',
   phone: '',
   email: '',
@@ -20,43 +17,44 @@ const form = reactive({
 })
 
 const isSubmitting = ref(false)
-
-const validatePhone = (phone: string) => {
-  const iranPhoneRegex = /^(\+98|0)?9\d{9}$/
-  return iranPhoneRegex.test(phone.trim())
-}
+const isSubmitted = ref(false)
 
 const handleSubmit = async () => {
-  if (!form.full_name.trim() || !form.phone.trim() || !form.message.trim()) {
-    toast.error(contactFormData.toasts.incompleteTitle, {
-      description: contactFormData.toasts.incompleteDescription,
-    })
-    return
-  }
-
-  if (!validatePhone(form.phone)) {
-    toast.error(contactFormData.toasts.invalidPhoneTitle, {
-      description: contactFormData.toasts.invalidPhoneDescription,
-    })
+  if (!form.value.full_name.trim() || !form.value.phone.trim() || !form.value.message.trim()) {
+    toast.error('لطفاً نام، شماره تماس و متن پیام را وارد کنید.')
     return
   }
 
   isSubmitting.value = true
+  const { apiFetch } = useApi()
 
-  setTimeout(() => {
-    isSubmitting.value = false
-    toast.success(contactFormData.toasts.successTitle, {
-      description: contactFormData.toasts.successDescription,
+  try {
+    await apiFetch('/contact', {
+      method: 'POST',
+      body: {
+        full_name: form.value.full_name.trim(),
+        phone: form.value.phone.trim(),
+        email: form.value.email.trim() || null,
+        subject: form.value.subject.trim() || null,
+        message: form.value.message.trim(),
+      },
     })
 
-    form.full_name = ''
-    form.phone = ''
-    form.email = ''
-    form.subject = ''
-    form.message = ''
+    isSubmitted.value = true
+    toast.success('پیام شما با موفقیت ارسال شد. در اسرع وقت با شما تماس می‌گیریم.')
 
-    emit('success')
-  }, 450)
+    form.value = {
+      full_name: '',
+      phone: '',
+      email: '',
+      subject: '',
+      message: '',
+    }
+  } catch {
+    // خطاهای اعتبارسنجی خودکار توسط useApi به کاربر نمایش داده می‌شوند
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 

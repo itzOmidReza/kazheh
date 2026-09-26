@@ -24,12 +24,12 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value);
 
   // ورود به حساب کاربری
+  // ورود به حساب کاربری
   const login = async (phone: string, pass: string) => {
     isLoading.value = true;
     const { apiFetch } = useApi();
 
     try {
-      // طبق مستندات: فرمت x-www-form-urlencoded با کلیدهای username و password
       const body = new URLSearchParams();
       body.append('username', phone.trim());
       body.append('password', pass);
@@ -45,8 +45,10 @@ export const useAuthStore = defineStore('auth', () => {
         },
       );
 
+      // 👇 این دو خط دقیقاً اینجا بعد از دریافت پاسخ res قرار می‌گیرند:
       token.value = res.access_token;
-      await fetchCurrentUser();
+      await fetchCurrentUser(res.access_token);
+
       toast.success('ورود با موفقیت انجام شد.');
       await navigateTo('/admin');
       return true;
@@ -65,19 +67,25 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   // دریافت اطلاعات پروفایل مدیر واردشده
-  const fetchCurrentUser = async () => {
-    if (!token.value) return;
+  // متد fetchCurrentUser را به این شکل تغییر دهید
+  const fetchCurrentUser = async (explicitToken?: string) => {
+    const currentToken = explicitToken || token.value;
+    if (!currentToken) return;
+
     const { apiFetch } = useApi();
 
     try {
-      const profile = await apiFetch<AdminUser>('/auth/me');
+      const profile = await apiFetch<AdminUser>('/auth/me', {
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+        },
+      });
       user.value = profile;
     } catch {
       user.value = null;
       token.value = null;
     }
   };
-
   // خروج از حساب
   const logout = () => {
     token.value = null;
