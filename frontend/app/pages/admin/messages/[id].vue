@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import {
   ArrowRight,
-  User,
   Phone,
   Mail,
-  Calendar,
   Send,
   Trash2,
-  CheckCircle2,
-  Clock,
   MessageSquare,
   Loader2,
   Shield,
@@ -17,58 +13,85 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'vue-sonner'
-import type { ContactMessage } from '~/types/api'
-import { siteConfig } from '~/data'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 const route = useRoute()
 const router = useRouter()
-const { apiFetch } = useApi()
 
-const messageId = computed(() => route.params.id as string)
-const message = ref<ContactMessage | null>(null)
+interface ContactMessage {
+  id: number
+  full_name: string
+  phone: string
+  email?: string
+  subject?: string | null
+  message: string
+  is_read: boolean
+  created_at: string
+}
+
+const messageId = computed(() => Number(route.params.id))
 const isLoading = ref(true)
 
-// پاسخ ادمین
+// داده‌های ماک
+const mockMessages: ContactMessage[] = [
+  {
+    id: 1,
+    full_name: 'سارا احمدی',
+    phone: '09123456789',
+    email: 'sara@example.com',
+    subject: 'درخواست مشاوره فردی',
+    message: 'سلام، می‌خواستم برای روزهای پنجشنبه وقت رزرو کنم. امکانش هست راهنمایی بفرمایید؟',
+    is_read: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    full_name: 'محسن کریمی',
+    phone: '09351112233',
+    subject: 'هماهنگی کارگاه آموزشی',
+    message: 'باسلام، پیرو کارگاه کنترل اضطراب تمایل داشتم اطلاعات ثبت‌نام را دریافت کنم.',
+    is_read: true,
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+]
+
+const message = ref<ContactMessage | null>(null)
 const replyText = ref('')
 const isSendingReply = ref(false)
 
-// تاریخچه پاسخ‌ها (شبیه‌سازی تاریخچه تعاملات کلینیک)
-const messageReplies = ref<Array<{ id: number; text: string; sender: string; created_at: string }>>([])
+const messageReplies = ref<Array<{ id: number; text: string; sender: string; created_at: string }>>([
+  {
+    id: 101,
+    text: 'درود، درخواست شما دریافت گردید. همکاران پذیرش تا ساعاتی دیگر جهت هماهنگی با شما تماس خواهند گرفت.',
+    sender: 'پشتیبانی کلینیک کاژه',
+    created_at: new Date().toISOString(),
+  },
+])
 
-// دریافت پیام جاری
-const fetchCurrentMessage = async () => {
-  isLoading.value = true
-  try {
-    const list = await apiFetch<ContactMessage[]>(`/contact`)
-    const found = list?.find((m) => String(m.id) === messageId.value)
-
+onMounted(() => {
+  setTimeout(() => {
+    const found = mockMessages.find((m) => m.id === messageId.value)
     if (found) {
       message.value = found
-      // اگر خوانده نشده بود، وضعیت را تغییر بده
-      if (!found.is_read) {
-        await apiFetch(`/contact/${found.id}`, {
-          method: 'PATCH',
-          body: { is_read: true },
-        })
-        message.value.is_read = true
-      }
     } else {
-      toast.error('پیام مورد نظر یافت نشد.')
-      router.push('/admin/messages')
+      // فال‌بک پیش‌فرض در صورت نبود آیدی
+      message.value = {
+        id: messageId.value || 1,
+        full_name: 'مراجع کاژه',
+        phone: '09120000000',
+        subject: 'درخواست مشاوره',
+        message: 'متن پیام ثبت‌شده مراجع در سامانه.',
+        is_read: true,
+        created_at: new Date().toISOString(),
+      }
     }
-  } catch {
-    toast.error('خطا در دریافت اطلاعات پیام.')
-  } finally {
     isLoading.value = false
-  }
-}
+  }, 300)
+})
 
-// ارسال پاسخ
 const handleSendReply = async () => {
   if (!replyText.value.trim()) {
     toast.error('لطفاً متن پاسخ را بنویسید.')
@@ -76,9 +99,7 @@ const handleSendReply = async () => {
   }
 
   isSendingReply.value = true
-  try {
-    // شبیه‌سازی ارسال پاسخ به مراجع
-    await new Promise((resolve) => setTimeout(resolve, 600))
+  setTimeout(() => {
     messageReplies.value.push({
       id: Date.now(),
       text: replyText.value.trim(),
@@ -86,25 +107,15 @@ const handleSendReply = async () => {
       created_at: new Date().toISOString(),
     })
     replyText.value = ''
-    toast.success('پاسخ شما با موفقیت ثبت و ارسال شد.')
-  } catch {
-    toast.error('خطا در ثبت پاسخ.')
-  } finally {
     isSendingReply.value = false
-  }
+    toast.success('پاسخ شما با موفقیت ثبت و ارسال شد.')
+  }, 400)
 }
 
-// حذف پیام
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!confirm('آیا از حذف این پیام اطمینان دارید؟')) return
-
-  try {
-    await apiFetch(`/contact/${messageId.value}`, { method: 'DELETE' })
-    toast.success('پیام با موفقیت حذف شد.')
-    router.push('/admin/messages')
-  } catch {
-    toast.error('خطا در حذف پیام.')
-  }
+  toast.success('پیام با موفقیت حذف شد.')
+  router.push('/admin/messages')
 }
 
 const formatDate = (isoString?: string) => {
@@ -118,15 +129,11 @@ const formatDate = (isoString?: string) => {
     return isoString
   }
 }
-
-onMounted(() => {
-  fetchCurrentMessage()
-})
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- بازگشت و عملیات بالای صفحه -->
+  <div class="space-y-6" dir="rtl">
+    <!-- هدر بالای صفحه -->
     <div class="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
       <div class="flex items-center gap-3">
         <Button variant="outline" size="sm" class="rounded-xl gap-1.5 h-9" as-child>
@@ -158,8 +165,8 @@ onMounted(() => {
     </div>
 
     <div v-else-if="message" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- ستون چپ: کارت اطلاعات مراجع -->
-      <div class="space-y-4 lg:col-span-1">
+      <!-- ستون اطلاعات مراجع -->
+      <div class="space-y-4 lg:col-span-1 text-right">
         <div class="rounded-3xl border border-border/80 bg-card p-5 shadow-xs space-y-4">
           <div class="flex items-center gap-3.5 border-b border-border/60 pb-4">
             <div
@@ -207,15 +214,15 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- ستون راست: متن پیام مراجع و فیلد پاسخ -->
-      <div class="space-y-6 lg:col-span-2">
+      <!-- ستون متن پیام و پاسخ -->
+      <div class="space-y-6 lg:col-span-2 text-right">
         <div class="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs space-y-6">
           <h3 class="text-sm font-bold text-foreground flex items-center gap-2 border-b border-border/60 pb-3">
             <MessageSquare class="size-4 text-primary" />
             <span>روند گفتگو و تاریخچه پیام‌ها</span>
           </h3>
 
-          <!-- پیام اصلی مراجع -->
+          <!-- پیام اصلی -->
           <div class="flex gap-3 items-start">
             <div
               class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary font-bold text-xs mt-1">
@@ -227,13 +234,13 @@ onMounted(() => {
                 <span class="text-[11px] text-muted-foreground">{{ formatDate(message.created_at) }}</span>
               </div>
               <div
-                class="rounded-2xl border border-border/80 bg-secondary/30 p-4 text-xs leading-relaxed text-foreground whitespace-pre-line shadow-2xs">
+                class="rounded-2xl border border-border/80 bg-secondary/30 p-4 text-xs leading-relaxed text-foreground whitespace-pre-line shadow-2xs text-right">
                 {{ message.message }}
               </div>
             </div>
           </div>
 
-          <!-- لیست پاسخ‌های ثبت‌شده ادمین -->
+          <!-- پاسخ‌های ادمین -->
           <div v-for="reply in messageReplies" :key="reply.id" class="flex gap-3 items-start flex-row-reverse">
             <div
               class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xs mt-1">
@@ -251,14 +258,13 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- فیلد ارسال پاسخ جدید -->
+          <!-- فرم ارسال پاسخ جدید -->
           <div class="border-t border-border/60 pt-5 space-y-3">
             <label for="reply-box" class="block text-xs font-semibold text-foreground">
               ارسال پاسخ یا ثبت یادداشت داخلی برای مراجع:
             </label>
-            <Textarea id="reply-box" v-model="replyText" rows="4"
-              placeholder="پاسخ خود را بنویسید (مراجع از طریق پیامک یا ایمیل مطلع خواهد شد)..."
-              class="rounded-2xl text-xs leading-relaxed" />
+            <Textarea id="reply-box" v-model="replyText" rows="4" placeholder="پاسخ خود را بنویسید..."
+              class="rounded-2xl text-xs leading-relaxed text-right" />
 
             <div class="flex justify-end">
               <Button :disabled="isSendingReply"
@@ -267,7 +273,7 @@ onMounted(() => {
                 <Loader2 v-if="isSendingReply" class="size-3.5 animate-spin" />
                 <template v-else>
                   <span>ارسال پاسخ</span>
-                  <Send class="size-3.5" />
+                  <Send class="size-3.5 rotate-180" />
                 </template>
               </Button>
             </div>

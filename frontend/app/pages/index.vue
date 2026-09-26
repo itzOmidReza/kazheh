@@ -11,48 +11,47 @@ useHead({
   ],
 })
 
-const { apiFetch } = useApi()
-const { resolveImageUrl } = useImageUrl()
-type ArticleListItem = {
-  id: string | number
-  title: string
-  slug: string
-  summary?: string | null
-  cover_image_url?: string | null
-}
+// دریافت ۳ مقاله آخر مستقیماً از محتوای لوکال Nuxt Content
+// frontend/app/pages/index.vue
 
-const { data: rawArticles } = await useAsyncData<ArticleListItem[]>('home-articles', () =>
-  apiFetch('/articles?limit=3')
-)
+const { data: homeArticles } = await useAsyncData('home-articles', async () => {
+  try {
+    const list = await (queryCollection('articles') as any)
+      .order('id', 'DESC')
+      .limit(3)
+      .all()
 
-const homeArticles = computed(() => {
-  if (!rawArticles.value) return []
-  return rawArticles.value.map((a) => ({
-    id: String(a.id),
-    title: a.title,
-    excerpt: stripMarkdown(a.summary || ''),
-    href: `/articles/${a.slug}`,
-    category: 'روان‌شناسی',
-    readingMinutes: Math.max(2, Math.ceil(((a.summary || '').split(/\s+/).length || 50) / 150)),
-    image: a.cover_image_url
-      ? {
-        src: resolveImageUrl(a.cover_image_url),
-        alt: a.title,
-      }
-      : undefined,
-  }))
+    return list.map((item: any) => ({
+      id: item.path || item.stem || String(item.id || Math.random()),
+      title: item.title,
+      excerpt: item.description || item.summary || '',
+      href: item.path || `/articles/${item.stem}`,
+      category: item.category || 'روان‌شناسی',
+      readingMinutes: 5,
+      image: item.cover || item.cover_image_url
+        ? {
+          src: item.cover || item.cover_image_url,
+          alt: item.title,
+        }
+        : undefined,
+    }))
+  } catch {
+    return []
+  }
 })
 </script>
 
 <template>
-  <HomeHero />
-  <HomeTrustBar />
-  <HomeConcernsSection />
-  <HomeServicesSection />
-  <HomeApproachSection />
-  <HomeProcessSection />
-  <HomeTestimonialsSection />
-  <HomeArticlesSection :items="homeArticles || []" />
-  <HomeFaqSection />
-  <HomeContactSection />
+  <div>
+    <HomeHero />
+    <HomeTrustBar />
+    <HomeConcernsSection />
+    <HomeServicesSection />
+    <HomeApproachSection />
+    <HomeProcessSection />
+    <HomeTestimonialsSection />
+    <HomeArticlesSection :items="homeArticles || []" />
+    <HomeFaqSection />
+    <HomeContactSection />
+  </div>
 </template>

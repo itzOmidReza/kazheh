@@ -27,39 +27,55 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { toast } from 'vue-sonner'
-import type { ArticleListItem } from '~/types/api'
 import { siteConfig, adminDashboardData } from '~/data'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 useHead({
   title: `مدیریت مقالات تخصصی | ${siteConfig.name}`,
 })
 
-const { apiFetch } = useApi()
+interface ArticleListItem {
+  id: number
+  title: string
+  slug: string
+  summary?: string | null
+  is_published: boolean
+  created_at: string
+}
 
-// States
-const articles = ref<ArticleListItem[]>([])
+// داده‌های ماک درون‌برنامه‌ای
+const articles = ref<ArticleListItem[]>([
+  {
+    id: 1,
+    title: 'چگونه اضطراب خود را در موقعیت‌های استرس‌زا کنترل کنیم؟',
+    slug: 'understanding-anxiety',
+    summary: 'راهکارهای عملی برای مهار استرس‌های روزمره و درک بهتر واکنش‌های بدن.',
+    is_published: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    title: 'مرزگذاری سالم در روابط فردی و خانوادگی',
+    slug: 'healthy-boundaries',
+    summary: 'چگونگی تعیین حد و مرزهای احترام‌آمیز بدون ایجاد احساس گناه.',
+    is_published: false,
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+])
+
 const isLoading = ref(false)
 const filterStatus = ref<'all' | 'published' | 'draft'>('all')
 const searchQuery = ref('')
 
-const fetchArticles = async () => {
+const fetchArticles = () => {
   isLoading.value = true
-  try {
-    articles.value = await apiFetch<ArticleListItem[]>(
-      '/articles/admin/all?limit=100&published_only=false'
-    )
-  } catch {
-    toast.error('خطا در دریافت مقالات', {
-      description: 'امکان اتصال به سرور جهت دریافت لیست مقالات وجود ندارد.',
-    })
-  } finally {
+  setTimeout(() => {
     isLoading.value = false
-  }
+    toast.success('فهرست مقالات بروزرسانی شد.')
+  }, 300)
 }
 
 const publishedCount = computed(() => articles.value.filter((a) => a.is_published).length)
@@ -96,25 +112,21 @@ const confirmDelete = (item: ArticleListItem) => {
   isDeleteDialogOpen.value = true
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!articleToDelete.value) return
   isDeleting.value = true
   const item = articleToDelete.value
 
-  try {
-    await apiFetch(`/articles/${item.id}`, { method: 'DELETE' })
+  setTimeout(() => {
     articles.value = articles.value.filter((a) => a.id !== item.id)
     isDeleteDialogOpen.value = false
     articleToDelete.value = null
+    isDeleting.value = false
 
     toast.success('مقاله حذف شد', {
-      description: `مطلب «${item.title}» با موفقیت از پایگاه داده پاک گردید.`,
+      description: `مطلب «${item.title}» با موفقیت پاک گردید.`,
     })
-  } catch {
-    toast.error('خطا در حذف مقاله')
-  } finally {
-    isDeleting.value = false
-  }
+  }, 300)
 }
 
 const formatDate = (isoString: string) => {
@@ -127,22 +139,18 @@ const formatDate = (isoString: string) => {
     return isoString
   }
 }
-
-onMounted(() => {
-  fetchArticles()
-})
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" dir="rtl">
     <!-- بالای صفحه -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="space-y-1">
+      <div class="space-y-1 text-right">
         <div class="flex items-center gap-2 text-xs text-muted-foreground">
           <NuxtLink to="/admin" class="hover:text-primary transition-colors">
             پنل مدیریت
           </NuxtLink>
-          <ChevronRight class="size-3.5" />
+          <ChevronRight class="size-3.5 rotate-180" />
           <span class="text-foreground font-medium">مقالات تخصصی</span>
         </div>
         <h1 class="text-2xl font-bold tracking-tight text-foreground">
@@ -157,7 +165,6 @@ onMounted(() => {
           <span>{{ adminDashboardData.articlesSection.refreshButton }}</span>
         </Button>
 
-        <!-- لینک به صفحه ایجاد جدید -->
         <Button class="rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft text-xs gap-1.5 h-9 px-4"
           as-child>
           <NuxtLink to="/admin/articles/create">
@@ -169,7 +176,7 @@ onMounted(() => {
     </div>
 
     <!-- نوارهای خلاصه آماری -->
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 text-right">
       <div
         class="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-4 transition-colors cursor-pointer hover:border-primary/40"
         @click="filterStatus = 'all'">
@@ -213,8 +220,8 @@ onMounted(() => {
       class="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
       <div class="relative w-full sm:max-w-md">
         <Input v-model="searchQuery" type="text" :placeholder="adminDashboardData.articlesSection.searchPlaceholder"
-          class="pl-10 rounded-xl bg-background/50 h-10 text-xs" />
-        <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          class="pr-10 rounded-xl bg-background/50 h-10 text-xs text-right" />
+        <Search class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       </div>
 
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
@@ -255,7 +262,7 @@ onMounted(() => {
       <div v-else class="space-y-3">
         <div v-for="item in filteredArticles" :key="item.id"
           class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-border/70 bg-card p-4.5 transition-all hover:shadow-xs">
-          <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="space-y-1.5 flex-1 min-w-0 text-right">
             <div class="flex flex-wrap items-center gap-2">
               <NuxtLink :to="`/admin/articles/${item.id}`"
                 class="text-sm font-bold text-foreground hover:text-primary transition-colors">
@@ -277,7 +284,7 @@ onMounted(() => {
               </span>
             </div>
 
-            <p v-if="item.summary" class="line-clamp-1 text-xs text-muted-foreground leading-relaxed">
+            <p v-if="item.summary" class="line-clamp-1 text-xs text-muted-foreground leading-relaxed text-right">
               {{ item.summary }}
             </p>
 
@@ -287,7 +294,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- دکمه‌های عملیات مستقیم بدون مدال -->
           <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
             <Button v-if="item.is_published" variant="outline" size="sm" as-child
               class="rounded-xl text-xs h-8.5 px-3 gap-1">
@@ -297,7 +303,6 @@ onMounted(() => {
               </NuxtLink>
             </Button>
 
-            <!-- لینک به صفحه ویرایش اختصاصی -->
             <Button variant="outline" size="sm" class="rounded-xl text-xs h-8.5 px-3 gap-1" as-child>
               <NuxtLink :to="`/admin/articles/${item.id}`">
                 <Edit class="size-3" />
@@ -316,7 +321,7 @@ onMounted(() => {
 
     <!-- مدال تایید حذف -->
     <Dialog v-model:open="isDeleteDialogOpen">
-      <DialogContent class="w-[min(94vw,28rem)] rounded-3xl bg-card border-border p-5 sm:p-6 text-foreground">
+      <DialogContent class="w-[min(94vw,28rem)] rounded-3xl bg-card border-border p-5 sm:p-6 text-foreground" dir="rtl">
         <DialogHeader class="text-right">
           <DialogTitle class="text-base font-bold text-destructive flex items-center gap-2">
             <AlertCircle class="size-5" />

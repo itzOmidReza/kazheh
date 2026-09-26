@@ -3,45 +3,37 @@ import {
   User,
   ShieldCheck,
   KeyRound,
-  Phone,
   Lock,
   ChevronRight,
-  CheckCircle2,
-  AlertCircle,
   Loader2,
-  Calendar,
 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card'
 import { toast } from 'vue-sonner'
 import { siteConfig, adminDashboardData } from '~/data'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 useHead({
   title: `پروفایل کاربری | ${siteConfig.name}`,
 })
 
-const { admin } = useAuth()
-const { apiFetch } = useApi()
+// اطلاعات ادمین به صورت ماک
+const admin = ref({
+  full_name: 'مدیر کلینیک کاژه',
+  phone: '09121234567',
+  username: 'admin',
+})
 
 // فرم اطلاعات هویتی
 const profileForm = reactive({
-  full_name: admin.value?.full_name || 'مدیر سیستم',
-  phone: admin.value?.phone || '09123456789',
-  username: admin.value?.username || 'admin',
+  full_name: admin.value.full_name,
+  phone: admin.value.phone,
+  username: admin.value.username,
 })
 
 const isUpdatingProfile = ref(false)
@@ -53,17 +45,12 @@ const handleUpdateProfile = async () => {
   }
 
   isUpdatingProfile.value = true
-  try {
-    // شبیه‌سازی / فراخوانی API
-    await new Promise((r) => setTimeout(r, 400))
-    if (admin.value) {
-      admin.value.full_name = profileForm.full_name
-      admin.value.phone = profileForm.phone
-    }
-    toast.success(adminDashboardData.profileSection.toasts.infoUpdated)
-  } finally {
+  setTimeout(() => {
+    admin.value.full_name = profileForm.full_name
+    admin.value.phone = profileForm.phone
     isUpdatingProfile.value = false
-  }
+    toast.success(adminDashboardData.profileSection.toasts.infoUpdated)
+  }, 400)
 }
 
 // فرم تغییر رمز عبور
@@ -92,27 +79,25 @@ const handleChangePassword = async () => {
   }
 
   isUpdatingPassword.value = true
-  try {
-    await new Promise((r) => setTimeout(r, 500))
+  setTimeout(() => {
     passwordForm.current_password = ''
     passwordForm.new_password = ''
     passwordForm.confirm_password = ''
-    toast.success(adminDashboardData.profileSection.toasts.passwordUpdated)
-  } finally {
     isUpdatingPassword.value = false
-  }
+    toast.success(adminDashboardData.profileSection.toasts.passwordUpdated)
+  }, 500)
 }
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" dir="rtl">
     <!-- Breadcrumb -->
-    <div class="space-y-1">
+    <div class="space-y-1 text-right">
       <div class="flex items-center gap-2 text-xs text-muted-foreground">
         <NuxtLink to="/admin" class="hover:text-primary transition-colors">
           پنل مدیریت
         </NuxtLink>
-        <ChevronRight class="size-3.5" />
+        <ChevronRight class="size-3.5 rotate-180" />
         <span class="text-foreground font-medium">پروفایل کاربری</span>
       </div>
       <h1 class="text-2xl font-bold tracking-tight text-foreground">
@@ -125,7 +110,7 @@ const handleChangePassword = async () => {
 
     <!-- Identity Summary Card -->
     <div
-      class="flex flex-col gap-4 rounded-3xl border border-border/80 bg-card p-5 sm:flex-row sm:items-center sm:justify-between shadow-xs">
+      class="flex flex-col gap-4 rounded-3xl border border-border/80 bg-card p-5 sm:flex-row sm:items-center sm:justify-between shadow-xs text-right">
       <div class="flex items-center gap-4">
         <div
           class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary text-xl font-bold shadow-soft">
@@ -134,14 +119,14 @@ const handleChangePassword = async () => {
         <div>
           <div class="flex items-center gap-2">
             <h2 class="text-base font-bold text-foreground">
-              {{ admin?.full_name || 'کاربر سیستم' }}
+              {{ admin.full_name }}
             </h2>
             <Badge class="rounded-pill bg-primary/10 text-primary border-primary/20 text-[10px]">
               دسترسی مدیریت
             </Badge>
           </div>
           <p class="text-xs text-muted-foreground mt-0.5" dir="ltr">
-            @{{ admin?.username || 'admin' }} • {{ admin?.phone }}
+            @{{ admin.username }} • {{ admin.phone }}
           </p>
         </div>
       </div>
@@ -154,7 +139,7 @@ const handleChangePassword = async () => {
     </div>
 
     <!-- Form Cards Grid -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 text-right">
       <!-- Card 1: Profile Information -->
       <div class="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <div class="border-b border-border/60 pb-3">
@@ -212,21 +197,25 @@ const handleChangePassword = async () => {
 
         <form class="space-y-4 text-xs" @submit.prevent="handleChangePassword">
           <div class="space-y-1.5">
-            <Label for="pass-current" class="text-xs">{{ adminDashboardData.profileSection.fields.currentPassword
-              }}</Label>
+            <Label for="pass-current" class="text-xs">
+              {{ adminDashboardData.profileSection.fields.currentPassword }}
+            </Label>
             <Input id="pass-current" v-model="passwordForm.current_password" type="password" dir="ltr"
               placeholder="••••••••" required class="rounded-xl h-10 text-xs" />
           </div>
 
           <div class="space-y-1.5">
-            <Label for="pass-new" class="text-xs">{{ adminDashboardData.profileSection.fields.newPassword }}</Label>
+            <Label for="pass-new" class="text-xs">
+              {{ adminDashboardData.profileSection.fields.newPassword }}
+            </Label>
             <Input id="pass-new" v-model="passwordForm.new_password" type="password" dir="ltr"
               placeholder="حداقل ۶ کاراکتر" required class="rounded-xl h-10 text-xs" />
           </div>
 
           <div class="space-y-1.5">
-            <Label for="pass-confirm" class="text-xs">{{ adminDashboardData.profileSection.fields.confirmPassword
-              }}</Label>
+            <Label for="pass-confirm" class="text-xs">
+              {{ adminDashboardData.profileSection.fields.confirmPassword }}
+            </Label>
             <Input id="pass-confirm" v-model="passwordForm.confirm_password" type="password" dir="ltr"
               placeholder="تکرار رمز جدید" required class="rounded-xl h-10 text-xs" />
           </div>

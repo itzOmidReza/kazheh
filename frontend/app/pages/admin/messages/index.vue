@@ -11,8 +11,6 @@ import {
   ChevronRight,
   AlertCircle,
   Loader2,
-  Check,
-  Undo2,
 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,12 +24,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { toast } from 'vue-sonner'
-import type { ContactMessage } from '~/types/api'
 import { siteConfig, adminDashboardData } from '~/data'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 useHead({
@@ -39,29 +35,58 @@ useHead({
 })
 
 const router = useRouter()
-const { apiFetch } = useApi()
 
-// وضعیت‌ها
-const messages = ref<ContactMessage[]>([])
+interface ContactMessage {
+  id: number
+  full_name: string
+  phone: string
+  subject?: string | null
+  message: string
+  is_read: boolean
+  created_at: string
+}
+
+// داده‌های اولیه ماک
+const messages = ref<ContactMessage[]>([
+  {
+    id: 1,
+    full_name: 'سارا احمدی',
+    phone: '09123456789',
+    subject: 'درخواست مشاوره فردی',
+    message: 'سلام، می‌خواستم برای روزهای پنجشنبه وقت رزرو کنم. امکانش هست راهنمایی بفرمایید؟',
+    is_read: false,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    full_name: 'محسن کریمی',
+    phone: '09351112233',
+    subject: 'هماهنگی کارگاه آموزشی',
+    message: 'باسلام، پیرو کارگاه کنترل اضطراب تمایل داشتم اطلاعات ثبت‌نام را دریافت کنم.',
+    is_read: true,
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 3,
+    full_name: 'نگین شجاعی',
+    phone: '09197778899',
+    subject: 'مشاوره آنلاین',
+    message: 'درود، من ساکن تهران نیستم. آیا جلسات شما به شکل آنلاین و تصویری هم برگزار می‌شود؟',
+    is_read: false,
+    created_at: new Date(Date.now() - 172800000).toISOString(),
+  },
+])
+
 const isLoading = ref(false)
 const filterType = ref<'all' | 'unread' | 'read'>('all')
 const searchQuery = ref('')
 
-// دریافت پیام‌ها
-const fetchMessages = async () => {
+const fetchMessages = () => {
   isLoading.value = true
-  try {
-    const unreadOnly = filterType.value === 'unread'
-    messages.value = await apiFetch<ContactMessage[]>(
-      `/contact?limit=100&unread_only=${unreadOnly}`
-    )
-  } catch {
-    toast.error('خطا در بارگذاری', {
-      description: 'امکان دریافت پیام‌های جدید از سرور فراهم نشد.',
-    })
-  } finally {
+  setTimeout(() => {
     isLoading.value = false
-  }
+    toast.success('پیام‌ها به‌روزرسانی شدند.')
+  }, 300)
 }
 
 // محاسبات و فیلترها
@@ -90,49 +115,34 @@ const filteredMessages = computed(() => {
   return list
 })
 
-// هدایت به صفحه اختصاصی گفتگو
 const openConversation = (msgId: number) => {
   router.push(`/admin/messages/${msgId}`)
 }
 
-// تغییر وضعیت پیام با Toast حرفه‌ای و دکمه Undo
-const toggleReadStatus = async (msg: ContactMessage, targetStatus: boolean) => {
-  const previousStatus = msg.is_read
+// تغییر وضعیت خوانده‌شده
+const toggleReadStatus = (msg: ContactMessage, targetStatus: boolean) => {
   msg.is_read = targetStatus
 
-  try {
-    await apiFetch<ContactMessage>(`/contact/${msg.id}`, {
-      method: 'PATCH',
-      body: { is_read: targetStatus },
+  if (targetStatus) {
+    toast.success('پیام خوانده شد', {
+      description: `پیام ${msg.full_name} به بخش بررسی‌شده‌ها منتقل گردید.`,
+      action: {
+        label: 'بازگردانی',
+        onClick: () => toggleReadStatus(msg, false),
+      },
     })
-
-    if (targetStatus) {
-      toast.success('پیام خوانده شد', {
-        description: `پیام ${msg.full_name} به بخش بررسی‌شده‌ها منتقل گردید.`,
-        action: {
-          label: 'بازگردانی',
-          onClick: () => toggleReadStatus(msg, false),
-        },
-      })
-    } else {
-      toast.info('بازگشت به وضعیت بررسی نشده', {
-        description: `پیام ${msg.full_name} به عنوان جدید نشانه‌گذاری شد.`,
-        action: {
-          label: 'خوانده شد',
-          onClick: () => toggleReadStatus(msg, true),
-        },
-      })
-    }
-  } catch {
-    // برگشت وضعیت در صورت بروز خطا
-    msg.is_read = previousStatus
-    toast.error('خطا در تغییر وضعیت', {
-      description: 'ارتباط با سرور برقرار نشد، وضعیت پیام تغییر نکرد.',
+  } else {
+    toast.info('بازگشت به وضعیت بررسی نشده', {
+      description: `پیام ${msg.full_name} به عنوان جدید نشانه‌گذاری شد.`,
+      action: {
+        label: 'خوانده شد',
+        onClick: () => toggleReadStatus(msg, true),
+      },
     })
   }
 }
 
-// تایید و حذف پیام
+// حذف پیام
 const messageToDelete = ref<ContactMessage | null>(null)
 const isDeleteDialogOpen = ref(false)
 const isDeleting = ref(false)
@@ -142,27 +152,21 @@ const confirmDelete = (msg: ContactMessage) => {
   isDeleteDialogOpen.value = true
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!messageToDelete.value) return
   isDeleting.value = true
   const deletedItem = messageToDelete.value
 
-  try {
-    await apiFetch(`/contact/${deletedItem.id}`, { method: 'DELETE' })
+  setTimeout(() => {
     messages.value = messages.value.filter((m) => m.id !== deletedItem.id)
     isDeleteDialogOpen.value = false
     messageToDelete.value = null
+    isDeleting.value = false
 
     toast.success('پیام حذف شد', {
       description: `پیام ارسالی از طرف ${deletedItem.full_name} با موفقیت پاک شد.`,
     })
-  } catch {
-    toast.error('خطا در حذف پیام', {
-      description: 'عملیات حذف با خطا مواجه شد. لطفاً دوباره تلاش کنید.',
-    })
-  } finally {
-    isDeleting.value = false
-  }
+  }, 300)
 }
 
 const formatDate = (isoString: string) => {
@@ -175,22 +179,18 @@ const formatDate = (isoString: string) => {
     return isoString
   }
 }
-
-onMounted(() => {
-  fetchMessages()
-})
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Breadcrumb & بالای صفحه -->
+  <div class="space-y-6" dir="rtl">
+    <!-- بالای صفحه -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="space-y-1">
+      <div class="space-y-1 text-right">
         <div class="flex items-center gap-2 text-xs text-muted-foreground">
           <NuxtLink to="/admin" class="hover:text-primary transition-colors">
             پنل مدیریت
           </NuxtLink>
-          <ChevronRight class="size-3.5" />
+          <ChevronRight class="size-3.5 rotate-180" />
           <span class="text-foreground font-medium">صندوق پیام‌ها</span>
         </div>
         <h1 class="text-2xl font-bold tracking-tight text-foreground">
@@ -208,7 +208,7 @@ onMounted(() => {
     </div>
 
     <!-- نوارهای خلاصه آماری -->
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 text-right">
       <div
         class="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-4 transition-colors cursor-pointer hover:border-primary/40"
         @click="filterType = 'all'">
@@ -252,8 +252,8 @@ onMounted(() => {
       class="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
       <div class="relative w-full sm:max-w-md">
         <Input v-model="searchQuery" type="text" :placeholder="adminDashboardData.messagesSection.searchPlaceholder"
-          class="pl-10 rounded-xl bg-background/50 h-10 text-xs" />
-        <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          class="pr-10 rounded-xl bg-background/50 h-10 text-xs text-right" />
+        <Search class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       </div>
 
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
@@ -274,12 +274,10 @@ onMounted(() => {
 
     <!-- کانتینر لیست پیام‌ها -->
     <div class="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-xs">
-      <!-- لودینگ -->
       <div v-if="isLoading" class="space-y-3">
         <div v-for="i in 4" :key="i" class="h-24 animate-pulse rounded-2xl border border-border/60 bg-muted/30 p-4" />
       </div>
 
-      <!-- وضعیت خالی -->
       <div v-else-if="filteredMessages.length === 0"
         class="rounded-2xl border border-dashed border-border/80 bg-muted/10 p-12 text-center">
         <div class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-secondary text-primary">
@@ -293,7 +291,6 @@ onMounted(() => {
         </p>
       </div>
 
-      <!-- کارت‌های پیام -->
       <div v-else class="space-y-3">
         <div v-for="msg in filteredMessages" :key="msg.id" :class="[
           'flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border p-4.5 transition-all duration-200 hover:shadow-xs',
@@ -301,8 +298,7 @@ onMounted(() => {
             ? 'border-border/60 bg-card/60 text-muted-foreground'
             : 'border-primary/30 bg-primary/5 text-foreground shadow-xs',
         ]">
-          <!-- متن پیام که با کلیک روی آن مستقیم به صفحه گفتگو می‌رود -->
-          <div class="flex-1 space-y-1.5 cursor-pointer min-w-0" @click="openConversation(msg.id)">
+          <div class="flex-1 space-y-1.5 cursor-pointer min-w-0 text-right" @click="openConversation(msg.id)">
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-sm font-bold text-foreground">
                 {{ msg.full_name }}
@@ -321,7 +317,7 @@ onMounted(() => {
               </span>
             </div>
 
-            <p class="line-clamp-2 text-xs text-muted-foreground leading-relaxed">
+            <p class="line-clamp-2 text-xs text-muted-foreground leading-relaxed text-right">
               {{ msg.message }}
             </p>
 
@@ -331,7 +327,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- دکمه‌های اقدام سریع -->
           <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
             <Button size="sm" variant="outline" class="rounded-xl text-xs h-8.5 px-3 gap-1" as-child>
               <NuxtLink :to="`/admin/messages/${msg.id}`">
@@ -357,7 +352,7 @@ onMounted(() => {
 
     <!-- مودال تایید حذف -->
     <Dialog v-model:open="isDeleteDialogOpen">
-      <DialogContent class="w-[min(94vw,28rem)] rounded-3xl bg-card border-border p-5 sm:p-6 text-foreground">
+      <DialogContent class="w-[min(94vw,28rem)] rounded-3xl bg-card border-border p-5 sm:p-6 text-foreground" dir="rtl">
         <DialogHeader class="text-right">
           <DialogTitle class="text-base font-bold text-destructive flex items-center gap-2">
             <AlertCircle class="size-5" />

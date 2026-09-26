@@ -1,15 +1,12 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 import {
-  Users,
   Search,
   RefreshCw,
   Plus,
-  ShieldAlert,
   Sparkles,
   Lock,
   ArrowRight,
@@ -25,7 +22,6 @@ useHead({
   title: `مدیریت پرسنل و دسترسی‌ها | ${siteConfig.name}`,
 })
 
-// داده‌های پیش‌نمایش پس‌زمینه (Mocked)
 const previewUsers = [
   {
     id: 1,
@@ -55,19 +51,15 @@ const previewUsers = [
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-10rem)] w-full">
-    <!-- ============================================== -->
-    <!-- لایه بلور شیشه‌ای و کارت پیام فاز بعدی           -->
-    <!-- ============================================== -->
+  <div class="relative min-h-[calc(100vh-10rem)] w-full" dir="rtl">
+    <!-- لایه بلور شیشه‌ای -->
     <div
       class="absolute inset-0 z-20 flex items-center justify-center p-4 backdrop-blur-md bg-background/50 transition-all rounded-3xl">
       <div
         class="relative mx-auto w-full max-w-lg overflow-hidden rounded-3xl border border-border/80 bg-card/95 p-6 sm:p-8 text-center shadow-floating backdrop-blur-xl animate-in fade-in zoom-in-95 duration-300">
-        <!-- افکت نوری پس‌زمینه کارت -->
         <div class="pointer-events-none absolute -top-16 -right-16 size-36 rounded-full bg-primary/10 blur-2xl" />
         <div class="pointer-events-none absolute -bottom-16 -left-16 size-36 rounded-full bg-cta/15 blur-2xl" />
 
-        <!-- آیکون نشانگر فاز بعد -->
         <div
           class="relative mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-soft ring-8 ring-primary/5">
           <Lock class="size-8" />
@@ -77,7 +69,6 @@ const previewUsers = [
           </span>
         </div>
 
-        <!-- عناوین و توضیحات -->
         <div class="mt-5 space-y-2">
           <Badge variant="outline"
             class="rounded-pill border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
@@ -96,7 +87,6 @@ const previewUsers = [
           </p>
         </div>
 
-        <!-- دکمه بازگشت به داشبورد اصلی -->
         <div class="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button as-child
             class="w-full sm:w-auto rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft text-xs h-10 px-6 gap-2">
@@ -115,16 +105,13 @@ const previewUsers = [
       </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- محتوای پس‌زمینه (غیرفعال و مات‌شده)            -->
-    <!-- ============================================== -->
+    <!-- محتوای مات پس‌زمینه -->
     <div class="pointer-events-none select-none opacity-40 filter blur-[1.5px] space-y-6">
-      <!-- هدر بالای صفحه -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-5">
         <div class="space-y-1 text-right">
           <div class="flex items-center gap-2 text-xs text-muted-foreground">
             <span>پنل مدیریت</span>
-            <ChevronRight class="size-3.5" />
+            <ChevronRight class="size-3.5 rotate-180" />
             <span class="text-foreground font-medium">کاربران و پرسنل</span>
           </div>
           <h1 class="text-2xl font-bold tracking-tight text-foreground">
@@ -147,7 +134,6 @@ const previewUsers = [
         </div>
       </div>
 
-      <!-- نوار جستجو و فیلتر -->
       <div
         class="flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
         <div class="relative w-full sm:max-w-md">
@@ -163,7 +149,6 @@ const previewUsers = [
         </div>
       </div>
 
-      <!-- کارت‌های کاربران در پس‌زمینه -->
       <div class="rounded-3xl border border-border/80 bg-card p-5 space-y-3">
         <div v-for="u in previewUsers" :key="u.id"
           class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-border/70 p-4">

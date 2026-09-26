@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import {
   ArrowRight,
-  FileText,
   Save,
   Loader2,
   Sparkles,
-  Eye,
-  CheckCircle2,
 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
-import type { ArticleResponse } from '~/types/api'
 import { siteConfig } from '~/data'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 useHead({
@@ -26,8 +21,6 @@ useHead({
 })
 
 const router = useRouter()
-const { apiFetch } = useApi()
-
 const isSubmitting = ref(false)
 
 const form = reactive({
@@ -57,42 +50,21 @@ const handleSubmit = async () => {
   }
 
   isSubmitting.value = true
-  try {
-    const payload = {
-      title: form.title.trim(),
-      slug: form.slug.trim() || null,
-      summary: form.summary.trim() || null,
-      content: form.content.trim(),
-      is_published: form.is_published,
-    }
-
-    await apiFetch<ArticleResponse>('/articles', {
-      method: 'POST',
-      body: payload,
-    })
-
-    toast.success('مقاله منتشر شد', {
+  setTimeout(() => {
+    isSubmitting.value = false
+    toast.success('مقاله ثبت شد', {
       description: `مقاله «${form.title}» با موفقیت ذخیره گردید.`,
     })
-
     router.push('/admin/articles')
-  } catch (err: any) {
-    const detail = err?.data?.detail
-    const msg = typeof detail === 'string' ? detail : 'خطا در ثبت مقاله.'
-    toast.error('خطای ذخیره‌سازی', {
-      description: msg,
-    })
-  } finally {
-    isSubmitting.value = false
-  }
+  }, 400)
 }
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" dir="rtl">
     <!-- هدر و دکمه بازگشت -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-5">
-      <div class="space-y-1">
+      <div class="space-y-1 text-right">
         <div class="flex items-center gap-2 text-xs text-muted-foreground">
           <NuxtLink to="/admin/articles" class="flex items-center gap-1 hover:text-primary transition-colors">
             <ArrowRight class="size-3.5" />
@@ -126,37 +98,34 @@ const handleSubmit = async () => {
     </div>
 
     <!-- فرم ایجاد مقاله -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- ستون اصلی فرم (عنوان، محتوا و خلاصه) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-right">
+      <!-- ستون اصلی فرم -->
       <div class="space-y-6 lg:col-span-2">
         <div class="rounded-3xl border border-border/80 bg-card p-5 sm:p-7 shadow-xs space-y-5">
           <div class="space-y-2">
             <Label for="art-title" class="text-xs font-semibold">عنوان اصلی مقاله *</Label>
-            <Input id="art-title" v-model="form.title" type="text"
-              placeholder="مثلاً: راهکارهای نوین کنترل نشخوار فکری و اضطراب"
+            <Input id="art-title" v-model="form.title" type="text" placeholder="مثلاً: راهکارهای نوین کنترل اضطراب"
               class="rounded-2xl h-11 text-sm font-medium" @blur="generateSlug" />
           </div>
 
           <div class="space-y-2">
             <Label for="art-summary" class="text-xs font-semibold">چکیده / خلاصه کوتاه</Label>
-            <Textarea id="art-summary" v-model="form.summary" rows="3"
-              placeholder="یک یا دو جمله برای معرفی کلی در کارت‌های صفحه اصلی و نتایج جستجوی گوگل..."
+            <Textarea id="art-summary" v-model="form.summary" rows="3" placeholder="یک یا دو جمله برای معرفی کلی..."
               class="rounded-2xl text-xs leading-relaxed" />
           </div>
 
           <div class="space-y-2">
             <div class="flex items-center justify-between">
               <Label for="art-content" class="text-xs font-semibold">متن کامل مقاله (پشتیبانی از Markdown) *</Label>
-              <span class="text-[11px] text-muted-foreground">می‌توانید از تیترهای # و ## و لیست‌ها استفاده کنید</span>
+              <span class="text-[11px] text-muted-foreground">می‌توانید از تیترهای # و ## استفاده کنید</span>
             </div>
-            <Textarea id="art-content" v-model="form.content" rows="16"
-              placeholder="متن مقاله را به همراه پاراگراف‌بندی دقیق در اینجا بنویسید..."
+            <Textarea id="art-content" v-model="form.content" rows="16" placeholder="متن مقاله را اینجا بنویسید..."
               class="rounded-2xl text-xs leading-relaxed font-sans" />
           </div>
         </div>
       </div>
 
-      <!-- ستون کناری تنظیمات و سئو -->
+      <!-- ستون تنظیمات جانبی -->
       <div class="space-y-6 lg:col-span-1">
         <div class="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs space-y-5">
           <h2 class="text-sm font-bold text-foreground border-b border-border/60 pb-3 flex items-center gap-2">
@@ -182,7 +151,7 @@ const handleSubmit = async () => {
               </Label>
             </div>
             <p class="text-[11px] text-muted-foreground leading-relaxed">
-              {{ form.is_published ? 'این مطلب بلافاصله در وب‌سایت عمومی برای مراجعین نمایش داده خواهد شد.' : 'این مقاله به عنوان پیش‌نویس ذخیره می‌شود و فقط ادمین به آن دسترسی دارد.' }}
+              {{ form.is_published ? 'این مطلب بلافاصله در وب‌سایت عمومی نمایش داده خواهد شد.' : 'این مقاله به عنوان پیش‌نویس ذخیره می‌شود.' }}
             </p>
           </div>
 

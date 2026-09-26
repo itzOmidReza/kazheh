@@ -12,17 +12,14 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
-import type { ArticleResponse } from '~/types/api'
 import { siteConfig } from '~/data'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 const route = useRoute()
 const router = useRouter()
-const { apiFetch } = useApi()
 
 const articleId = computed(() => route.params.id as string)
 
@@ -41,25 +38,17 @@ useHead({
   title: computed(() => `ویرایش: ${form.title || 'مقاله'} | ${siteConfig.name}`),
 })
 
-const fetchArticle = async () => {
+const fetchArticle = () => {
   isLoading.value = true
-  try {
-    const data = await apiFetch<ArticleResponse>(`/articles/admin/${articleId.value}`)
-    if (data) {
-      form.title = data.title
-      form.slug = data.slug
-      form.summary = data.summary || ''
-      form.content = data.content
-      form.is_published = data.is_published
-    }
-  } catch {
-    toast.error('خطا در بارگذاری', {
-      description: 'امکان بارگذاری محتوای مقاله وجود ندارد.',
-    })
-    router.push('/admin/articles')
-  } finally {
+  setTimeout(() => {
+    // داده‌های نمونه موقت برای توسعه
+    form.title = 'چگونه اضطراب خود را کنترل کنیم؟'
+    form.slug = 'understanding-anxiety'
+    form.summary = 'راهکارهای علمی و اثبات‌شده برای مدیریت استرس روزمره مراجعین.'
+    form.content = 'متن پیش‌فرض و آزمایشی مقاله کلینیک کاژه جهت تست قالب و فرمت‌بندی.'
+    form.is_published = true
     isLoading.value = false
-  }
+  }, 350)
 }
 
 const handleSubmit = async () => {
@@ -71,42 +60,20 @@ const handleSubmit = async () => {
   }
 
   isSubmitting.value = true
-  try {
-    const payload = {
-      title: form.title.trim(),
-      slug: form.slug.trim() || null,
-      summary: form.summary.trim() || null,
-      content: form.content.trim(),
-      is_published: form.is_published,
-    }
-
-    await apiFetch<ArticleResponse>(`/articles/${articleId.value}`, {
-      method: 'PATCH',
-      body: payload,
-    })
-
+  setTimeout(() => {
+    isSubmitting.value = false
     toast.success('مقاله بروزرسانی شد', {
       description: `تغییرات مقاله «${form.title}» با موفقیت ذخیره گردید.`,
     })
-
     router.push('/admin/articles')
-  } catch (err: any) {
-    toast.error('خطا در ذخیره‌سازی')
-  } finally {
-    isSubmitting.value = false
-  }
+  }, 400)
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!confirm('آیا از حذف این مقاله اطمینان دارید؟')) return
 
-  try {
-    await apiFetch(`/articles/${articleId.value}`, { method: 'DELETE' })
-    toast.success('مقاله حذف شد')
-    router.push('/admin/articles')
-  } catch {
-    toast.error('خطا در حذف مقاله')
-  }
+  toast.success('مقاله حذف شد')
+  router.push('/admin/articles')
 }
 
 onMounted(() => {
@@ -115,13 +82,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" dir="rtl">
     <!-- هدر بالا -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-5">
-      <div class="space-y-1">
+      <div class="space-y-1 text-right">
         <div class="flex items-center gap-2 text-xs text-muted-foreground">
           <NuxtLink to="/admin/articles" class="flex items-center gap-1 hover:text-primary transition-colors">
-            <ArrowRight class="size-3.5" />
+            <ArrowRight class="size-3.5 rotate-180" />
             <span>مدیریت مقالات</span>
           </NuxtLink>
           <span>/</span>
@@ -164,7 +131,7 @@ onMounted(() => {
       <div class="h-80 animate-pulse rounded-3xl border border-border/60 bg-muted/30" />
     </div>
 
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-right">
       <div class="space-y-6 lg:col-span-2">
         <div class="rounded-3xl border border-border/80 bg-card p-5 sm:p-7 shadow-xs space-y-5">
           <div class="space-y-2">

@@ -27,7 +27,17 @@ import {
 import { siteConfig } from '~/data'
 
 const route = useRoute()
-const { admin, logout } = useAuth()
+
+// وضعیت ماک ادمین بدون وابستگی به کامپوزبل‌های شبکه
+const admin = ref({
+  full_name: 'مدیر کلینیک کاژه',
+  username: 'admin',
+  phone: '09121234567',
+})
+
+const logout = () => {
+  navigateTo('/admin/login')
+}
 
 const isMobileSidebarOpen = ref(false)
 const isDark = ref(false)
@@ -204,10 +214,10 @@ const isItemActive = (href: string, exact = false) => {
               </div>
               <div class="min-w-0 text-right">
                 <p class="truncate text-xs font-bold text-foreground">
-                  {{ admin?.full_name || admin?.username || 'مدیر سیستم' }}
+                  {{ admin.full_name }}
                 </p>
                 <p class="truncate text-[11px] text-muted-foreground font-mono" dir="ltr">
-                  {{ admin?.phone || '09123456789' }}
+                  {{ admin.phone }}
                 </p>
               </div>
             </NuxtLink>
@@ -228,7 +238,6 @@ const isItemActive = (href: string, exact = false) => {
         <!-- Top App Bar -->
         <header
           class="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border/60 bg-card/85 px-4 backdrop-blur-xl sm:px-8">
-          <!-- بخش راست هدر (منوی موبایل + مسیر صفحه) -->
           <div class="flex items-center gap-3">
             <!-- Mobile Menu Sheet -->
             <Sheet v-model:open="isMobileSidebarOpen">
@@ -251,7 +260,6 @@ const isItemActive = (href: string, exact = false) => {
 
                 <div class="flex flex-col justify-between h-[calc(100vh-5.5rem)] p-4">
                   <div class="space-y-5 overflow-y-auto">
-                    <!-- کارت هویت موبایل -->
                     <NuxtLink to="/admin/profile"
                       class="flex items-center gap-3 rounded-2xl bg-secondary/50 p-3 hover:bg-secondary transition-colors"
                       @click="isMobileSidebarOpen = false">
@@ -260,15 +268,14 @@ const isItemActive = (href: string, exact = false) => {
                       </div>
                       <div class="min-w-0 flex-1 text-right">
                         <p class="truncate text-sm font-bold text-foreground">
-                          {{ admin?.full_name || admin?.username || 'مدیر سیستم' }}
+                          {{ admin.full_name }}
                         </p>
                         <p class="truncate text-xs text-muted-foreground font-mono" dir="ltr">
-                          {{ admin?.phone || '09123456789' }}
+                          {{ admin.phone }}
                         </p>
                       </div>
                     </NuxtLink>
 
-                    <!-- لیست لینک‌های موبایل -->
                     <div v-for="group in navigationGroups" :key="group.title" class="space-y-1">
                       <p class="px-2 text-[11px] font-semibold text-muted-foreground">
                         {{ group.title }}
@@ -298,7 +305,7 @@ const isItemActive = (href: string, exact = false) => {
               </SheetContent>
             </Sheet>
 
-            <!-- Breadcrumb مسیر جاری -->
+            <!-- Breadcrumb -->
             <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-muted-foreground">
               <Home class="size-3.5" />
               <span>پنل مدیریت</span>
@@ -307,7 +314,7 @@ const isItemActive = (href: string, exact = false) => {
             </div>
           </div>
 
-          <!-- بخش چپ هدر (تغییر تم + نمایش وب‌سایت) -->
+          <!-- Actions -->
           <div class="flex items-center gap-2 sm:gap-3">
             <Button variant="outline" size="icon"
               class="size-9 rounded-xl border-border/80 text-muted-foreground hover:text-foreground"

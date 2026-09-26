@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'admin',
-  middleware: 'admin-auth',
 })
 
 import {
@@ -43,7 +42,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { toast } from 'vue-sonner'
-import type { ContactMessage, ArticleListItem } from '~/types/api'
 import { siteConfig, adminDashboardData } from '~/data'
 
 useHead({
@@ -51,31 +49,62 @@ useHead({
 })
 
 const router = useRouter()
-const { apiFetch } = useApi()
+
+// تایپ‌های لوکال مستقل برای اجتناب از ارور تایپ‌اسکریپت
+interface ContactMessage {
+  id: number
+  full_name: string
+  phone: string
+  subject?: string | null
+  message: string
+  is_read: boolean
+  created_at: string
+}
+
+interface ArticleListItem {
+  id: number
+  title: string
+  slug: string
+  summary?: string | null
+  is_published: boolean
+  created_at: string
+}
 
 // Active Tab State
 const activeTab = ref<'messages' | 'articles'>('messages')
 
-// Messages State
-const messages = ref<ContactMessage[]>([])
+// Messages State (داده‌های اولیه ماک)
+const messages = ref<ContactMessage[]>([
+  {
+    id: 1,
+    full_name: 'سارا احمدی',
+    phone: '09123456789',
+    subject: 'درخواست مشاوره فردی',
+    message: 'سلام، می‌خواستم برای روزهای پنجشنبه وقت رزرو کنم.',
+    is_read: false,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    full_name: 'محسن کریمی',
+    phone: '09351112233',
+    subject: 'هماهنگی کارگاه',
+    message: 'درود، تمایل داشتم اطلاعات مربوط به کارگاه را دریافت کنم.',
+    is_read: true,
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+])
+
 const isMessagesLoading = ref(false)
 const messageFilter = ref<'all' | 'unread'>('all')
 const messageSearchQuery = ref('')
 
-const fetchMessages = async () => {
+const fetchMessages = () => {
   isMessagesLoading.value = true
-  try {
-    const unreadOnly = messageFilter.value === 'unread'
-    messages.value = await apiFetch<ContactMessage[]>(
-      `/contact?limit=100&unread_only=${unreadOnly}`
-    )
-  } catch {
-    toast.error('خطا در دریافت پیام‌ها', {
-      description: adminDashboardData.messagesSection.toasts.fetchError,
-    })
-  } finally {
+  setTimeout(() => {
     isMessagesLoading.value = false
-  }
+    toast.success('پیام‌ها به‌روزرسانی شدند.')
+  }, 350)
 }
 
 const unreadCount = computed(() => messages.value.filter((m) => !m.is_read).length)
@@ -98,45 +127,29 @@ const filteredMessages = computed(() => {
   return list
 })
 
-// Toggle Read Status with Sonner & Undo Action
-const toggleMessageRead = async (
-  msg: ContactMessage,
-  targetStatus: boolean
-) => {
-  const previousStatus = msg.is_read
+// تغییر وضعیت خوانده‌شده
+const toggleMessageRead = (msg: ContactMessage, targetStatus: boolean) => {
   msg.is_read = targetStatus
-
-  try {
-    const updated = await apiFetch<ContactMessage>(`/contact/${msg.id}`, {
-      method: 'PATCH',
-      body: { is_read: targetStatus },
+  if (targetStatus) {
+    toast.success('پیام بررسی شد', {
+      description: `پیام دریافتی از ${msg.full_name} به بخش بررسی‌شده‌ها منتقل شد.`,
+      action: {
+        label: 'بازگردانی',
+        onClick: () => toggleMessageRead(msg, false),
+      },
     })
-    msg.is_read = updated.is_read
-
-    if (targetStatus) {
-      toast.success('پیام بررسی شد', {
-        description: `پیام دریافتی از ${msg.full_name} به بخش بررسی‌شده‌ها منتقل شد.`,
-        action: {
-          label: 'بازگردانی',
-          onClick: () => toggleMessageRead(msg, false),
-        },
-      })
-    } else {
-      toast.info('بازگشت به وضعیت بررسی‌نشده', {
-        description: `پیام ${msg.full_name} به عنوان نیازمند اقدام علامت‌گذاری شد.`,
-        action: {
-          label: 'خوانده شد',
-          onClick: () => toggleMessageRead(msg, true),
-        },
-      })
-    }
-  } catch {
-    msg.is_read = previousStatus
-    toast.error('خطا در تغییر وضعیت پیام')
+  } else {
+    toast.info('بازگشت به وضعیت بررسی‌نشده', {
+      description: `پیام ${msg.full_name} به عنوان نیازمند اقدام علامت‌گذاری شد.`,
+      action: {
+        label: 'خوانده شد',
+        onClick: () => toggleMessageRead(msg, true),
+      },
+    })
   }
 }
 
-// Delete Message Dialog State
+// وضعیت دیالوگ حذف پیام
 const messageToDelete = ref<ContactMessage | null>(null)
 const isDeleteMsgDialogOpen = ref(false)
 const isDeletingMsg = ref(false)
@@ -146,50 +159,46 @@ const confirmDeleteMessage = (msg: ContactMessage) => {
   isDeleteMsgDialogOpen.value = true
 }
 
-const handleDeleteMessage = async () => {
+const handleDeleteMessage = () => {
   if (!messageToDelete.value) return
   isDeletingMsg.value = true
   const deleted = messageToDelete.value
-  try {
-    await apiFetch(`/contact/${deleted.id}`, { method: 'DELETE' })
+  setTimeout(() => {
     messages.value = messages.value.filter((m) => m.id !== deleted.id)
     isDeleteMsgDialogOpen.value = false
     messageToDelete.value = null
+    isDeletingMsg.value = false
     toast.success('پیام حذف شد', {
       description: `پیام ارسالی از ${deleted.full_name} با موفقیت پاک شد.`,
     })
-  } catch {
-    toast.error('خطا در حذف پیام', {
-      description: adminDashboardData.messagesSection.toasts.deleteError,
-    })
-  } finally {
-    isDeletingMsg.value = false
-  }
+  }, 300)
 }
 
-// Direct routing to message chat
 const openConversation = (msgId: number) => {
   router.push(`/admin/messages/${msgId}`)
 }
 
-// Articles State
-const articles = ref<ArticleListItem[]>([])
+// Articles State (داده‌های اولیه ماک)
+const articles = ref<ArticleListItem[]>([
+  {
+    id: 1,
+    title: 'چگونه اضطراب خود را در موقعیت‌های استرس‌زا کنترل کنیم؟',
+    slug: 'understanding-anxiety',
+    summary: 'راهکارهای عملی برای مهار استرس‌های روزمره.',
+    is_published: true,
+    created_at: new Date().toISOString(),
+  },
+])
+
 const isArticlesLoading = ref(false)
 const articleSearchQuery = ref('')
 
-const fetchArticles = async () => {
+const fetchArticles = () => {
   isArticlesLoading.value = true
-  try {
-    articles.value = await apiFetch<ArticleListItem[]>(
-      '/articles/admin/all?limit=100&published_only=false'
-    )
-  } catch {
-    toast.error('خطا در دریافت مقالات', {
-      description: adminDashboardData.articlesSection.toasts.fetchError,
-    })
-  } finally {
+  setTimeout(() => {
     isArticlesLoading.value = false
-  }
+    toast.success('لیست مقالات به‌روزرسانی شد.')
+  }, 350)
 }
 
 const publishedArticlesCount = computed(
@@ -207,7 +216,7 @@ const filteredArticles = computed(() => {
   )
 })
 
-// Delete Article Dialog State
+// وضعیت دیالوگ حذف مقاله
 const articleToDelete = ref<ArticleListItem | null>(null)
 const isDeleteArticleDialogOpen = ref(false)
 const isDeletingArticle = ref(false)
@@ -217,25 +226,19 @@ const confirmDeleteArticle = (item: ArticleListItem) => {
   isDeleteArticleDialogOpen.value = true
 }
 
-const handleDeleteArticle = async () => {
+const handleDeleteArticle = () => {
   if (!articleToDelete.value) return
   isDeletingArticle.value = true
   const item = articleToDelete.value
-  try {
-    await apiFetch(`/articles/${item.id}`, { method: 'DELETE' })
+  setTimeout(() => {
     articles.value = articles.value.filter((a) => a.id !== item.id)
     isDeleteArticleDialogOpen.value = false
     articleToDelete.value = null
+    isDeletingArticle.value = false
     toast.success('مقاله حذف شد', {
       description: `مطلب «${item.title}» با موفقیت حذف گردید.`,
     })
-  } catch {
-    toast.error('خطا در حذف مقاله', {
-      description: adminDashboardData.articlesSection.toasts.deleteError,
-    })
-  } finally {
-    isDeletingArticle.value = false
-  }
+  }, 300)
 }
 
 const formatDate = (isoString: string) => {
@@ -248,23 +251,18 @@ const formatDate = (isoString: string) => {
     return isoString
   }
 }
-
-onMounted(() => {
-  fetchMessages()
-  fetchArticles()
-})
 </script>
 
 <template>
   <div class="space-y-8" dir="rtl">
-    <!-- هدر بالای داشبورد: عنوان در راست، دکمه‌ها در چپ -->
+    <!-- هدر بالای داشبورد -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="space-y-1 text-right">
         <h1 class="text-2xl font-bold tracking-tight text-foreground">
           میز کار و داشبورد مدیریتی
         </h1>
         <p class="text-xs text-muted-foreground">
-          گزارش و مدیریت کلیه پیام‌های دریافتی مراجعین و مقالات تخصصی کلینیک آرامش
+          گزارش و مدیریت کلیه پیام‌های دریافتی مراجعین و مقالات تخصصی کلینیک کاژه
         </p>
       </div>
 
@@ -285,9 +283,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- کارت‌های آمار و سنجه‌های تحلیلی -->
+    <!-- کارت‌های آمار -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- کارت ۱: پیام‌های منتظر پاسخ -->
       <NuxtLink to="/admin/messages"
         class="group relative overflow-hidden rounded-3xl border border-border/80 bg-card p-5 shadow-xs transition-all hover:border-primary/50 hover:shadow-card text-right">
         <div class="flex items-center justify-between">
@@ -310,7 +307,6 @@ onMounted(() => {
         </div>
       </NuxtLink>
 
-      <!-- کارت ۲: مقالات سایت -->
       <NuxtLink to="/admin/articles"
         class="group relative overflow-hidden rounded-3xl border border-border/80 bg-card p-5 shadow-xs transition-all hover:border-primary/50 hover:shadow-card text-right">
         <div class="flex items-center justify-between">
@@ -333,7 +329,6 @@ onMounted(() => {
         </div>
       </NuxtLink>
 
-      <!-- کارت ۳: پایداری ران‌تایم سیستم -->
       <div
         class="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-5 shadow-xs sm:col-span-2 lg:col-span-1 text-right">
         <div class="flex items-center justify-between">
@@ -345,10 +340,10 @@ onMounted(() => {
         </div>
         <div class="mt-4 flex items-center gap-2">
           <span class="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span class="text-base font-bold text-foreground">فعال و آماده دریافت</span>
+          <span class="text-base font-bold text-foreground">آماده دریافت و توسعه</span>
         </div>
         <div class="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <span>هسته فرانت‌اند Nuxt 4 با موتور بهینه‌ساز Bun</span>
+          <span>هسته فرانت‌اند Nuxt 4 با موتور Bun</span>
         </div>
       </div>
     </div>
@@ -356,7 +351,6 @@ onMounted(() => {
     <!-- کانتینر اصلی تب‌های مدیریت -->
     <div class="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-xs">
       <Tabs v-model="activeTab" class="w-full">
-        <!-- نوار تب‌ها: تب‌ها در راست، دکمه ورود به صفحه مستقل در چپ -->
         <div class="flex flex-col gap-4 border-b border-border/60 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <TabsList class="grid w-full grid-cols-2 rounded-2xl bg-secondary/60 p-1 sm:w-auto sm:flex h-11">
             <TabsTrigger value="messages"
@@ -387,11 +381,8 @@ onMounted(() => {
           </Button>
         </div>
 
-        <!-- ============================================== -->
-        <!-- TAB 1: MESSAGES                                -->
-        <!-- ============================================== -->
+        <!-- تب پیام‌ها -->
         <TabsContent value="messages" class="mt-6 space-y-4">
-          <!-- جستجو در راست و فیلترها در چپ -->
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="relative w-full sm:max-w-md">
               <Input v-model="messageSearchQuery" type="text"
@@ -403,23 +394,21 @@ onMounted(() => {
 
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
               <Button size="sm" :variant="messageFilter === 'all' ? 'default' : 'outline'"
-                class="rounded-pill text-xs h-8.5 px-3.5" @click="messageFilter = 'all'; fetchMessages()">
+                class="rounded-pill text-xs h-8.5 px-3.5" @click="messageFilter = 'all'">
                 {{ adminDashboardData.messagesSection.filterAll }} ({{ messages.length }})
               </Button>
               <Button size="sm" :variant="messageFilter === 'unread' ? 'default' : 'outline'"
-                class="rounded-pill text-xs h-8.5 px-3.5" @click="messageFilter = 'unread'; fetchMessages()">
+                class="rounded-pill text-xs h-8.5 px-3.5" @click="messageFilter = 'unread'">
                 {{ adminDashboardData.messagesSection.filterUnread }} ({{ unreadCount }})
               </Button>
             </div>
           </div>
 
-          <!-- اسکلتون لودینگ -->
           <div v-if="isMessagesLoading" class="space-y-3 pt-2">
             <div v-for="i in 3" :key="i"
               class="h-24 animate-pulse rounded-2xl border border-border/60 bg-muted/40 p-4" />
           </div>
 
-          <!-- حالت خالی -->
           <div v-else-if="filteredMessages.length === 0"
             class="rounded-2xl border border-dashed border-border/80 bg-muted/10 p-12 text-center">
             <div class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-secondary text-primary">
@@ -433,7 +422,6 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- لیست کارت‌های پیام -->
           <div v-else class="space-y-3 pt-2">
             <div v-for="msg in filteredMessages" :key="msg.id" :class="[
               'flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border p-4.5 transition-all duration-200 hover:shadow-xs',
@@ -441,7 +429,6 @@ onMounted(() => {
                 ? 'border-border/60 bg-card/60 text-muted-foreground'
                 : 'border-primary/30 bg-primary/5 text-foreground shadow-xs',
             ]">
-              <!-- اطلاعات پیام در سمت راست (فرزند اول) -->
               <div class="flex-1 space-y-1.5 cursor-pointer min-w-0 text-right" @click="openConversation(msg.id)">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="text-sm font-bold text-foreground">
@@ -471,7 +458,6 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- دکمه‌های عملیات در سمت چپ (فرزند دوم) -->
               <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                 <Button size="sm" variant="outline" class="rounded-xl text-xs h-8.5 px-3 gap-1.5" as-child>
                   <NuxtLink :to="`/admin/messages/${msg.id}`">
@@ -495,11 +481,8 @@ onMounted(() => {
           </div>
         </TabsContent>
 
-        <!-- ============================================== -->
-        <!-- TAB 2: ARTICLES                                -->
-        <!-- ============================================== -->
+        <!-- تب مقالات -->
         <TabsContent value="articles" class="mt-6 space-y-4">
-          <!-- جستجو در راست و دکمه افزودن مقاله در چپ -->
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="relative w-full sm:max-w-md">
               <Input v-model="articleSearchQuery" type="text"
@@ -519,13 +502,11 @@ onMounted(() => {
             </Button>
           </div>
 
-          <!-- اسکلتون لودینگ -->
           <div v-if="isArticlesLoading" class="space-y-3 pt-2">
             <div v-for="i in 3" :key="i"
               class="h-20 animate-pulse rounded-2xl border border-border/60 bg-muted/40 p-4" />
           </div>
 
-          <!-- حالت خالی مقالات -->
           <div v-else-if="filteredArticles.length === 0"
             class="rounded-2xl border border-dashed border-border/80 bg-muted/10 p-12 text-center">
             <div class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-secondary text-primary">
@@ -539,7 +520,6 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- لیست مقالات -->
           <div v-else class="space-y-3 pt-2">
             <div v-for="item in filteredArticles" :key="item.id"
               class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-border/70 bg-card p-4.5 transition-all hover:shadow-xs">
@@ -576,7 +556,6 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- دکمه‌های اقدام مقاله در سمت چپ -->
               <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                 <Button v-if="item.is_published" variant="outline" size="sm" as-child
                   class="rounded-xl text-xs h-8.5 px-3 gap-1.5">
@@ -604,7 +583,7 @@ onMounted(() => {
       </Tabs>
     </div>
 
-    <!-- دیالوگ‌های تایید حذف -->
+    <!-- مودال تایید حذف -->
     <Dialog :open="isDeleteMsgDialogOpen || isDeleteArticleDialogOpen"
       @update:open="(val) => { if (!val) { isDeleteMsgDialogOpen = false; isDeleteArticleDialogOpen = false; } }">
       <DialogContent class="w-[min(94vw,28rem)] rounded-3xl bg-card border-border p-5 sm:p-6 text-foreground" dir="rtl">
