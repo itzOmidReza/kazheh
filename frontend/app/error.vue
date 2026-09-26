@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ArrowRight, Home, RefreshCw } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
+import { siteConfig, errorPageContent } from '~/data'
 
 const props = defineProps<{
   error: {
@@ -16,14 +17,14 @@ const isNotFound = computed(() => statusCode.value === 404)
 
 const title = computed(() =>
   isNotFound.value
-    ? 'این صفحه پیدا نشد'
-    : 'مشکلی در نمایش این صفحه پیش آمد',
+    ? errorPageContent.notFoundTitle
+    : errorPageContent.serverErrorTitle,
 )
 
 const description = computed(() =>
   isNotFound.value
-    ? 'ممکن است نشانی صفحه تغییر کرده باشد یا صفحه‌ای که دنبال آن هستید وجود نداشته باشد.'
-    : 'لطفاً دوباره تلاش کنید. اگر مشکل ادامه داشت، بعداً دوباره به سایت سر بزنید.',
+    ? errorPageContent.notFoundDescription
+    : errorPageContent.serverErrorDescription,
 )
 
 const clearErrorAndGoHome = async () => {
@@ -48,12 +49,12 @@ const reloadPage = () => {
 
       <div class="relative">
         <div
-          class="mx-auto flex size-20 items-center justify-center rounded-[1.5rem] bg-primary-900 text-3xl font-bold text-white shadow-floating">
+          class="mx-auto flex size-20 items-center justify-center rounded-3xl bg-primary-900 text-3xl font-bold text-white shadow-floating">
           {{ statusCode }}
         </div>
 
         <p class="mt-8 text-sm font-medium text-primary">
-          کلینیک آرامش
+          {{ siteConfig.name }}
         </p>
 
         <h1 class="mt-4 text-heading-xl text-primary-900">
@@ -67,19 +68,19 @@ const reloadPage = () => {
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Button class="rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover" @click="clearErrorAndGoHome">
             <Home class="size-4" />
-            بازگشت به صفحه اصلی
+            {{ errorPageContent.backHomeButton }}
           </Button>
 
           <Button variant="outline" class="rounded-pill px-6" @click="reloadPage">
             <RefreshCw class="size-4" />
-            تلاش دوباره
+            {{ errorPageContent.retryButton }}
           </Button>
         </div>
 
         <NuxtLink to="/" class="mt-8 inline-flex items-center gap-2 text-sm text-primary hover:text-primary-700"
           @click="clearErrorAndGoHome">
           <ArrowRight class="size-4" />
-          رفتن به خانه
+          {{ errorPageContent.goHomeLink }}
         </NuxtLink>
       </div>
     </div>

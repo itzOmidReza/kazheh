@@ -2,14 +2,13 @@
 import { ArrowLeft, Brain, MessageCircle, ShieldCheck } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { siteConfig } from '~/data/site'
-import { servicesList, servicesPageContent } from '~/data/services'
+import { siteConfig, servicesList, servicesPageContent, servicePrinciples } from '~/data'
 
 useHead({
-  title: `خدمات روان‌شناسی | ${siteConfig.name}`,
+  title: `${servicesPageContent.headTitle} | ${siteConfig.name}`,
   meta: [
     { name: 'description', content: servicesPageContent.description },
-    { property: 'og:title', content: `خدمات روان‌شناسی | ${siteConfig.name}` },
+    { property: 'og:title', content: `${servicesPageContent.headTitle} | ${siteConfig.name}` },
     { property: 'og:description', content: servicesPageContent.description },
     { property: 'og:type', content: 'website' },
     { property: 'og:locale', content: 'fa_IR' },
@@ -17,23 +16,11 @@ useHead({
   link: [{ rel: 'canonical', href: '/services' }],
 })
 
-const principles = [
-  {
-    icon: Brain,
-    title: 'شناخت پیش از تغییر',
-    text: 'پیش از انتخاب راه‌حل، تلاش می‌کنیم تجربه و نیاز شما را بهتر بشناسیم.',
-  },
-  {
-    icon: MessageCircle,
-    title: 'گفت‌وگوی روشن',
-    text: 'سؤال‌ها و نگرانی‌های شما با زبانی ساده و بدون پیچیده‌گویی بررسی می‌شوند.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'احترام به انتخاب شما',
-    text: 'ادامه مسیر با آگاهی و رضایت شما شکل می‌گیرد؛ نه با فشار یا وعده‌های قطعی.',
-  },
-]
+const principleIconMap = {
+  Brain,
+  MessageCircle,
+  ShieldCheck,
+}
 </script>
 
 <template>
@@ -73,7 +60,7 @@ const principles = [
       <div class="site-container">
         <div class="max-w-2xl text-right">
           <p class="text-sm font-medium text-primary">
-            این خدمات چگونه پیش می‌روند؟
+            {{ servicesPageContent.principlesSubtitle }}
           </p>
 
           <h2 class="mt-4 text-heading-lg text-foreground">
@@ -82,8 +69,8 @@ const principles = [
         </div>
 
         <div class="mt-10 grid gap-5 md:grid-cols-3">
-          <ServicesPrincipleCard v-for="principle in principles" :key="principle.title" :title="principle.title"
-            :text="principle.text" :icon="principle.icon" />
+          <ServicesPrincipleCard v-for="principle in servicePrinciples" :key="principle.title" :title="principle.title"
+            :text="principle.text" :icon="principleIconMap[principle.icon]" />
         </div>
       </div>
     </section>
@@ -93,17 +80,17 @@ const principles = [
       <div class="site-container">
         <div class="rounded-3xl bg-primary-900 p-6 text-center text-white sm:p-12">
           <h2 class="text-heading-lg text-white">
-            نمی‌دانید کدام خدمت برای شما مناسب‌تر است؟
+            {{ servicesPageContent.cta.title }}
           </h2>
 
           <p class="mx-auto mt-4 max-w-2xl text-sm leading-8 text-sage-200/80">
-            می‌توانید در پیام اولیه درباره شرایط خود توضیح کوتاهی بدهید تا درباره قدم بعدی گفت‌وگو کنیم.
+            {{ servicesPageContent.cta.description }}
           </p>
 
           <Button as-child
             class="mt-7 min-h-12 w-full rounded-pill bg-cta px-6 text-cta-foreground hover:bg-cta-hover sm:w-auto">
-            <NuxtLink to="/#contact">
-              <span>درخواست مشاوره اولیه</span>
+            <NuxtLink :to="servicesPageContent.cta.buttonHref">
+              <span>{{ servicesPageContent.cta.buttonLabel }}</span>
               <ArrowLeft class="size-4" />
             </NuxtLink>
           </Button>
