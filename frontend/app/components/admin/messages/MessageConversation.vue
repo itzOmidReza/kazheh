@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { MessageSquare, Clock, Phone, User } from '@lucide/vue'
+import { adminDashboardData } from '~/data'
 
 defineProps<{
   senderName: string
@@ -27,7 +28,7 @@ const formatDate = (isoString?: string) => {
     <div class="flex items-center justify-between border-b border-border/60 pb-4">
       <h3 class="text-sm font-bold text-foreground flex items-center gap-2">
         <MessageSquare class="size-4 text-primary" />
-        <span>متن کامل درخواست مراجع</span>
+        <span>{{ adminDashboardData.messagesPage.detail.conversation.title }}</span>
       </h3>
       <span class="flex items-center gap-1.5 text-xs text-muted-foreground">
         <Clock class="size-3.5" />
@@ -46,14 +47,17 @@ const formatDate = (isoString?: string) => {
       class="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4 bg-muted/20 -mx-6 -mb-6 p-4 rounded-b-3xl">
       <div class="flex items-center gap-2 text-xs text-muted-foreground">
         <User class="size-4" />
-        <span>فرستنده: <strong class="text-foreground">{{ senderName }}</strong></span>
+        <span>
+          {{ adminDashboardData.messagesPage.detail.conversation.senderLabel }}
+          <strong class="text-foreground">{{ senderName }}</strong>
+        </span>
       </div>
 
       <a :href="`tel:${phone}`"
         class="inline-flex items-center gap-2 rounded-pill bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 transition-colors"
         dir="ltr">
         <Phone class="size-3.5" />
-        <span>تماس با مراجع ({{ phone }})</span>
+        <span>{{ adminDashboardData.messagesPage.detail.conversation.callButtonPrefix }} ({{ phone }})</span>
       </a>
     </div>
   </div>

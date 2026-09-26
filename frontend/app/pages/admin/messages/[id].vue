@@ -2,7 +2,11 @@
 import { ArrowRight, Trash2, CheckCircle2 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
-import type { MessageDetail } from '~/components/admin/messages/MessageContactInfo.vue'
+import {
+  adminDashboardData,
+  mockMessageDetail,
+  type AdminMessageItem,
+} from '~/data'
 
 definePageMeta({ layout: 'admin' })
 
@@ -11,15 +15,10 @@ const router = useRouter()
 const messageId = computed(() => Number(route.params.id))
 const isLoading = ref(true)
 
-const message = ref<MessageDetail>({
-  id: messageId.value,
-  full_name: 'سارا احمدی',
-  phone: '09123456789',
-  email: 'sara@example.com',
-  subject: 'درخواست مشاوره فردی',
-  message: 'سلام، می‌خواستم برای روزهای پنجشنبه وقت رزرو کنم. امکانش هست راهنمایی بفرمایید که چه ساعاتی خالی هست؟ ممنون.',
-  is_read: true,
-  created_at: new Date().toISOString(),
+// بارگذاری جزئیات ماک پیام از لایه متمرکز داده
+const message = ref<AdminMessageItem>({
+  ...mockMessageDetail,
+  id: messageId.value || mockMessageDetail.id,
 })
 
 onMounted(() => {
@@ -30,12 +29,16 @@ onMounted(() => {
 
 const toggleRead = () => {
   message.value.is_read = !message.value.is_read
-  toast.success(message.value.is_read ? 'پیام به عنوان بررسی‌شده علامت خورد.' : 'پیام به وضعیت جدید تغییر یافت.')
+  toast.success(
+    message.value.is_read
+      ? adminDashboardData.messagesPage.detail.markedReadToast
+      : adminDashboardData.messagesPage.detail.markedUnreadToast
+  )
 }
 
 const handleDelete = () => {
-  if (!confirm('آیا از حذف این پیام اطمینان دارید؟')) return
-  toast.success('پیام با موفقیت حذف شد.')
+  if (!confirm(adminDashboardData.messagesPage.detail.deleteConfirm)) return
+  toast.success(adminDashboardData.messagesPage.detail.deleteSuccessToast)
   router.push('/admin/messages')
 }
 </script>
@@ -48,24 +51,30 @@ const handleDelete = () => {
         <Button variant="outline" size="sm" class="rounded-xl gap-1.5 h-9 text-xs" as-child>
           <NuxtLink to="/admin/messages">
             <ArrowRight class="size-4 rotate-180" />
-            <span>بازگشت به صندوق پیام‌ها</span>
+            <span>{{ adminDashboardData.messagesPage.detail.backButton }}</span>
           </NuxtLink>
         </Button>
         <span class="text-xs text-muted-foreground hidden sm:inline">/</span>
         <span class="text-xs font-semibold text-foreground hidden sm:inline">
-          پیام دریافتی از {{ message.full_name }}
+          {{ adminDashboardData.messagesPage.detail.senderPrefix }} {{ message.full_name }}
         </span>
       </div>
 
       <div class="flex items-center gap-2">
         <Button variant="outline" size="sm" class="rounded-pill text-xs gap-1.5 h-9" @click="toggleRead">
           <CheckCircle2 :class="['size-3.5', message.is_read ? 'text-primary' : 'text-muted-foreground']" />
-          <span>{{ message.is_read ? 'علامت به عنوان بررسی‌نشده' : 'علامت به عنوان بررسی‌شده' }}</span>
+          <span>
+            {{
+              message.is_read
+                ? adminDashboardData.messagesPage.detail.markAsUnread
+                : adminDashboardData.messagesPage.detail.markAsRead
+            }}
+          </span>
         </Button>
 
         <Button variant="destructive" size="sm" class="rounded-pill text-xs gap-1.5 h-9" @click="handleDelete">
           <Trash2 class="size-3.5" />
-          <span>حذف پیام</span>
+          <span>{{ adminDashboardData.messagesPage.detail.deleteButton }}</span>
         </Button>
       </div>
     </div>

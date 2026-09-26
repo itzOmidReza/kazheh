@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Mail, Clock, CheckCircle2 } from '@lucide/vue'
+import { adminDashboardData } from '~/data'
 
 defineProps<{
   totalCount: number
@@ -19,7 +20,9 @@ const emit = defineEmits<{
       class="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-4 transition-colors cursor-pointer hover:border-primary/40"
       :class="{ 'border-primary shadow-xs': currentFilter === 'all' }" @click="emit('update:currentFilter', 'all')">
       <div>
-        <p class="text-xs text-muted-foreground font-medium">کل پیام‌ها</p>
+        <p class="text-xs text-muted-foreground font-medium">
+          {{ adminDashboardData.messagesPage.stats.total }}
+        </p>
         <p class="mt-1 text-2xl font-bold text-foreground">{{ totalCount }}</p>
       </div>
       <div class="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -32,7 +35,9 @@ const emit = defineEmits<{
       :class="{ 'border-amber-500/50 shadow-xs': currentFilter === 'unread' }"
       @click="emit('update:currentFilter', 'unread')">
       <div>
-        <p class="text-xs text-muted-foreground font-medium">خوانده‌نشده (اقدام فوری)</p>
+        <p class="text-xs text-muted-foreground font-medium">
+          {{ adminDashboardData.messagesPage.stats.unread }}
+        </p>
         <p class="mt-1 text-2xl font-bold text-amber-500">{{ unreadCount }}</p>
       </div>
       <div class="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
@@ -45,7 +50,9 @@ const emit = defineEmits<{
       :class="{ 'border-emerald-500/50 shadow-xs': currentFilter === 'read' }"
       @click="emit('update:currentFilter', 'read')">
       <div>
-        <p class="text-xs text-muted-foreground font-medium">بررسی شده</p>
+        <p class="text-xs text-muted-foreground font-medium">
+          {{ adminDashboardData.messagesPage.stats.read }}
+        </p>
         <p class="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ readCount }}</p>
       </div>
       <div
