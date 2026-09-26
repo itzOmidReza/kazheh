@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { siteConfig, mainNavigation } from '~/data'
+import { siteConfig, mainNavigation, headerContent } from '~/data'
 
 const route = useRoute()
 const isMobileMenuOpen = ref(false)
@@ -37,7 +37,7 @@ const closeMobileMenu = () => {
     <div class="site-container">
       <div class="flex h-20 items-center justify-between gap-6">
         <!-- Brand -->
-        <NuxtLink to="/" class="group flex shrink-0 items-center gap-3" aria-label="صفحه اصلی">
+        <NuxtLink to="/" class="group flex shrink-0 items-center gap-3" :aria-label="headerContent.homeAriaLabel">
           <span
             class="flex size-11 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-primary-foreground shadow-soft transition-transform duration-200 group-hover:-rotate-3">
             {{ siteConfig.shortName }}
@@ -55,7 +55,7 @@ const closeMobileMenu = () => {
         </NuxtLink>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden items-center gap-1 lg:flex" aria-label="منوی اصلی">
+        <nav class="hidden items-center gap-1 lg:flex" :aria-label="headerContent.navAriaLabel">
           <NuxtLink v-for="item in mainNavigation" :key="item.href" :to="item.href" :class="[
             'rounded-pill px-4 py-2 text-sm font-medium transition-colors',
             isActive(item.href)
@@ -70,7 +70,7 @@ const closeMobileMenu = () => {
         <div class="hidden items-center gap-3 lg:flex">
           <NuxtLink :to="siteConfig.contactCta.buttonHref"
             class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary dark:hover:text-foreground">
-            تماس با ما
+            {{ headerContent.contactText }}
           </NuxtLink>
 
           <Button as-child class="rounded-pill bg-cta px-5 text-cta-foreground shadow-soft hover:bg-cta-hover">
@@ -84,7 +84,8 @@ const closeMobileMenu = () => {
         <!-- Mobile Menu Trigger & Sheet -->
         <Sheet v-model:open="isMobileMenuOpen">
           <SheetTrigger as-child>
-            <Button variant="outline" size="icon" class="rounded-xl lg:hidden" aria-label="باز کردن منو">
+            <Button variant="outline" size="icon" class="rounded-xl lg:hidden"
+              :aria-label="headerContent.openMenuAriaLabel">
               <Menu class="size-5" />
             </Button>
           </SheetTrigger>
@@ -96,7 +97,7 @@ const closeMobileMenu = () => {
               </SheetTitle>
             </SheetHeader>
 
-            <nav class="mt-8 flex flex-col gap-2" aria-label="منوی موبایل">
+            <nav class="mt-8 flex flex-col gap-2" :aria-label="headerContent.mobileNavAriaLabel">
               <SheetClose v-for="item in mainNavigation" :key="item.href" as-child>
                 <NuxtLink :to="item.href" :class="[
                   'rounded-xl px-4 py-3 text-right text-base font-medium transition-colors',

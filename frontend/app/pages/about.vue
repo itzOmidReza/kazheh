@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { siteConfig, aboutPageContent } from '~/data'
 
 useHead({
-  title: `درباره کلینیک | ${siteConfig.name}`,
+  title: `${aboutPageContent.headTitle} | ${siteConfig.name}`,
   meta: [
     { name: 'description', content: aboutPageContent.hero.description },
   ],

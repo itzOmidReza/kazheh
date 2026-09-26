@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowRight, Clock3 } from '@lucide/vue'
-import { siteConfig } from '~/data'
+import { siteConfig, articleDetailContent } from '~/data'
 
 const route = useRoute()
 const slug = computed(() => String(route.params.slug))
@@ -14,7 +14,7 @@ const { data: article } = await useAsyncData(`article-${slug.value}`, () =>
 if (!article.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: 'مقاله مورد نظر پیدا نشد',
+    statusMessage: articleDetailContent.notFoundMessage,
     fatal: true,
   })
 }
@@ -50,12 +50,12 @@ const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
           <NuxtLink to="/articles"
             class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
             <ArrowRight class="size-4 rotate-180" />
-            <span>بازگشت به مقالات</span>
+            <span>{{ articleDetailContent.backButton }}</span>
           </NuxtLink>
 
           <div class="mt-8 max-w-3xl text-right">
             <span class="rounded-pill bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-              {{ (article as any).category || 'روان‌شناسی' }}
+              {{ (article as any).category || articleDetailContent.defaultCategory }}
             </span>
 
             <h1 class="mt-6 text-heading-xl text-foreground leading-tight">
@@ -64,7 +64,7 @@ const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 
             <div v-if="(article as any).readingTime" class="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
               <Clock3 class="size-4" />
-              <span>{{ formatNumber((article as any).readingTime) }} دقیقه مطالعه</span>
+              <span>{{ formatNumber((article as any).readingTime) }} {{ articleDetailContent.minuteReadSuffix }}</span>
             </div>
 
             <p v-if="article.description" class="mt-8 text-body-lg text-muted-foreground leading-8">

@@ -3,7 +3,7 @@ import { ArrowRight, LockKeyhole } from '@lucide/vue'
 import { siteConfig, privacyPageContent } from '~/data'
 
 useHead({
-  title: `حریم خصوصی | ${siteConfig.name}`,
+  title: `${privacyPageContent.headTitle} | ${siteConfig.name}`,
   meta: [
     {
       name: 'description',
@@ -20,7 +20,7 @@ useHead({
         <NuxtLink to="/"
           class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
           <ArrowRight class="size-4" />
-          بازگشت به صفحه اصلی
+          {{ privacyPageContent.backToHome }}
         </NuxtLink>
 
         <div class="mt-10 max-w-3xl">

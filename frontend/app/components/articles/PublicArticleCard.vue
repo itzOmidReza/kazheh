@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeft, Clock3 } from '@lucide/vue'
+import { articleDetailContent } from '~/data'
 
 export interface PublicArticleItem {
   id: string | number
@@ -34,7 +35,7 @@ const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 
       <span v-if="article.readingTime" class="flex items-center gap-1 text-xs text-muted-foreground">
         <Clock3 class="size-3.5" />
-        {{ formatNumber(article.readingTime) }} دقیقه
+        {{ formatNumber(article.readingTime) }} {{ articleDetailContent.minuteReadSuffix }}
       </span>
     </div>
 
@@ -48,7 +49,7 @@ const formatNumber = (val: number) => new Intl.NumberFormat('fa-IR').format(val)
 
     <NuxtLink :to="article.path"
       class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-700 dark:hover:text-primary-foreground">
-      <span>مطالعه مقاله</span>
+      <span>{{ articleDetailContent.cardReadButton }}</span>
       <ArrowLeft class="size-4" />
     </NuxtLink>
   </article>

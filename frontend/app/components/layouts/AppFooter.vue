@@ -10,6 +10,7 @@ import {
   siteConfig,
   footerQuickLinks,
   footerSupportLinks,
+  footerContent,
 } from '~/data'
 
 const currentYear = new Date().getFullYear()
@@ -27,10 +28,9 @@ const hasContactInfo = computed(() => {
       <div class="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1.2fr]">
         <!-- Brand & Description -->
         <div class="max-w-sm">
-          <NuxtLink to="/" class="inline-flex items-center gap-3" aria-label="صفحه اصلی">
+          <NuxtLink to="/" class="inline-flex items-center gap-3" :aria-label="footerContent.homeAriaLabel">
             <span
-              class="flex size-11 items-center justify-center rounded-2xl bg-sage-200 text-lg font-bold text-primary-900"
-            >
+              class="flex size-11 items-center justify-center rounded-2xl bg-sage-200 text-lg font-bold text-primary-900">
               {{ siteConfig.shortName }}
             </span>
 
@@ -51,15 +51,9 @@ const hasContactInfo = computed(() => {
 
           <!-- Social Links (Conditional) -->
           <div v-if="siteConfig.socials && siteConfig.socials.length > 0" class="mt-6 flex items-center gap-3">
-            <a
-              v-for="social in siteConfig.socials"
-              :key="social.name"
-              :href="social.href"
-              target="_blank"
-              rel="noreferrer"
-              :aria-label="social.name"
-              class="flex size-10 items-center justify-center rounded-full border border-sage-300/30 text-sage-200 transition-colors hover:border-warm-300 hover:bg-warm-300 hover:text-primary-900"
-            >
+            <a v-for="social in siteConfig.socials" :key="social.name" :href="social.href" target="_blank"
+              rel="noreferrer" :aria-label="social.name"
+              class="flex size-10 items-center justify-center rounded-full border border-sage-300/30 text-sage-200 transition-colors hover:border-warm-300 hover:bg-warm-300 hover:text-primary-900">
               <Camera v-if="social.icon === 'camera'" class="size-4" />
             </a>
           </div>
@@ -68,16 +62,12 @@ const hasContactInfo = computed(() => {
         <!-- Quick Links -->
         <div>
           <h2 class="text-sm font-bold text-white">
-            دسترسی سریع
+            {{ footerContent.quickLinksTitle }}
           </h2>
 
           <nav class="mt-5 flex flex-col items-start gap-3">
-            <NuxtLink
-              v-for="link in footerQuickLinks"
-              :key="link.href"
-              :to="link.href"
-              class="text-sm text-sage-200/75 transition-colors hover:text-warm-300"
-            >
+            <NuxtLink v-for="link in footerQuickLinks" :key="link.href" :to="link.href"
+              class="text-sm text-sage-200/75 transition-colors hover:text-warm-300">
               {{ link.label }}
             </NuxtLink>
           </nav>
@@ -86,16 +76,12 @@ const hasContactInfo = computed(() => {
         <!-- Support / More Info Links -->
         <div>
           <h2 class="text-sm font-bold text-white">
-            اطلاعات بیشتر
+            {{ footerContent.moreInfoTitle }}
           </h2>
 
           <nav class="mt-5 flex flex-col items-start gap-3">
-            <NuxtLink
-              v-for="link in footerSupportLinks"
-              :key="link.href"
-              :to="link.href"
-              class="text-sm text-sage-200/75 transition-colors hover:text-warm-300"
-            >
+            <NuxtLink v-for="link in footerSupportLinks" :key="link.href" :to="link.href"
+              class="text-sm text-sage-200/75 transition-colors hover:text-warm-300">
               {{ link.label }}
             </NuxtLink>
           </nav>
@@ -111,30 +97,22 @@ const hasContactInfo = computed(() => {
             {{ siteConfig.contactCta.description }}
           </p>
 
-          <NuxtLink
-            :to="siteConfig.contactCta.buttonHref"
-            class="mt-5 inline-flex items-center gap-2 rounded-pill bg-cta px-5 py-3 text-sm font-bold text-cta-foreground transition-colors hover:bg-cta-hover"
-          >
+          <NuxtLink :to="siteConfig.contactCta.buttonHref"
+            class="mt-5 inline-flex items-center gap-2 rounded-pill bg-cta px-5 py-3 text-sm font-bold text-cta-foreground transition-colors hover:bg-cta-hover">
             {{ siteConfig.contactCta.buttonText }}
             <ArrowLeft class="size-4" />
           </NuxtLink>
 
           <!-- Contact items (Only rendered if actual values are present) -->
           <div v-if="hasContactInfo" class="mt-6 space-y-3 text-sm text-sage-200/75">
-            <a
-              v-if="siteConfig.contact.phone"
-              :href="`tel:${siteConfig.contact.phone}`"
-              class="flex items-center gap-2 transition-colors hover:text-warm-300"
-            >
+            <a v-if="siteConfig.contact.phone" :href="`tel:${siteConfig.contact.phone}`"
+              class="flex items-center gap-2 transition-colors hover:text-warm-300">
               <Phone class="size-4" />
               <span>{{ siteConfig.contact.displayPhone || siteConfig.contact.phone }}</span>
             </a>
 
-            <a
-              v-if="siteConfig.contact.email"
-              :href="`mailto:${siteConfig.contact.email}`"
-              class="flex items-center gap-2 transition-colors hover:text-warm-300"
-            >
+            <a v-if="siteConfig.contact.email" :href="`mailto:${siteConfig.contact.email}`"
+              class="flex items-center gap-2 transition-colors hover:text-warm-300">
               <Mail class="size-4" />
               <span>{{ siteConfig.contact.email }}</span>
             </a>
@@ -151,8 +129,7 @@ const hasContactInfo = computed(() => {
     <!-- Copyright Bar -->
     <div class="border-t border-white/10">
       <div
-        class="site-container flex flex-col gap-3 py-5 text-center text-xs text-sage-200/60 sm:flex-row sm:items-center sm:justify-between sm:text-right"
-      >
+        class="site-container flex flex-col gap-3 py-5 text-center text-xs text-sage-200/60 sm:flex-row sm:items-center sm:justify-between sm:text-right">
         <p>
           © {{ currentYear }} {{ siteConfig.name }}
         </p>

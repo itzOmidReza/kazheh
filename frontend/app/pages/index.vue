@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { siteConfig } from '~/data'
+import { siteConfig, articlesPageContent } from '~/data'
 
 useHead({
   title: `${siteConfig.name} | ${siteConfig.tagline}`,
@@ -26,7 +26,7 @@ const { data: homeArticles } = await useAsyncData('home-articles', async () => {
       title: item.title,
       excerpt: item.description || item.summary || '',
       href: item.path || `/articles/${item.stem}`,
-      category: item.category || 'روان‌شناسی',
+      category: item.category || articlesPageContent.defaultCategory,
       readingMinutes: 5,
       image: item.cover || item.cover_image_url
         ? {

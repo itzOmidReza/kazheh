@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { servicesPageContent } from '~/data'
 
 const iconMap: Record<string, any> = {
   Sparkles,
@@ -74,7 +75,7 @@ defineProps<{
           : 'text-primary hover:bg-transparent hover:text-primary-700 dark:hover:text-primary-foreground',
       ]">
         <NuxtLink to="/#contact">
-          <span>درباره شروع این مسیر</span>
+          <span>{{ servicesPageContent.cardActionText }}</span>
           <ArrowLeft class="size-4" />
         </NuxtLink>
       </Button>

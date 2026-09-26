@@ -2,6 +2,7 @@
 import { Share2 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
+import { articleDetailContent } from '~/data'
 
 const props = defineProps<{
   title?: string
@@ -22,7 +23,7 @@ const shareArticle = async () => {
       await navigator.share(shareData)
     } else {
       await navigator.clipboard.writeText(window.location.href)
-      toast.success('پیوند مقاله در کلیپ‌بورد کپی شد.')
+      toast.success(articleDetailContent.share.successToast)
     }
   } catch {
     // صرف‌نظر از انصراف کاربر
@@ -33,6 +34,6 @@ const shareArticle = async () => {
 <template>
   <Button type="button" variant="outline" class="rounded-pill gap-2 text-xs" @click="shareArticle">
     <Share2 class="size-4" />
-    <span>اشتراک‌گذاری مقاله</span>
+    <span>{{ articleDetailContent.share.buttonLabel }}</span>
   </Button>
 </template>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { siteConfig } from '~/data'
+import { siteConfig, articlesPageContent } from '~/data'
 import type { PublicArticleItem } from '~/components/articles/PublicArticleCard.vue'
 
 useHead({
-  title: `مجله و مقالات | ${siteConfig.name}`,
+  title: articlesPageContent.headTitle,
   meta: [
     {
       name: 'description',
-      content: 'یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.',
+      content: articlesPageContent.headDescription,
     },
   ],
 })
@@ -20,7 +20,7 @@ const { data: articles } = await useAsyncData<PublicArticleItem[]>('articles-lis
       title: item.title,
       excerpt: item.description || item.excerpt || '',
       path: item.path || `/articles/${item.stem}`,
-      category: item.category || 'روان‌شناسی',
+      category: item.category || articlesPageContent.defaultCategory,
       readingTime: item.readingTime || 5,
       cover: item.cover || undefined,
     }))
@@ -36,15 +36,15 @@ const { data: articles } = await useAsyncData<PublicArticleItem[]>('articles-lis
       <div class="site-container">
         <div class="max-w-2xl text-right">
           <p class="text-sm font-medium text-primary">
-            مجله {{ siteConfig.name }}
+            {{ articlesPageContent.badge }}
           </p>
 
           <h1 class="mt-4 text-heading-xl text-foreground">
-            برای شناخت بیشتر خودتان
+            {{ articlesPageContent.heroTitle }}
           </h1>
 
           <p class="mt-5 text-body-lg text-muted-foreground">
-            یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.
+            {{ articlesPageContent.heroSubtitle }}
           </p>
         </div>
       </div>
@@ -57,7 +57,7 @@ const { data: articles } = await useAsyncData<PublicArticleItem[]>('articles-lis
         </div>
 
         <div v-else class="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-          هنوز مقاله‌ای منتشر نشده است.
+          {{ articlesPageContent.emptyTitle }}
         </div>
       </div>
     </section>
