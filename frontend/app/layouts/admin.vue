@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth',
+})
 import {
   LayoutDashboard,
   Mail,
@@ -69,8 +72,8 @@ const navigationGroups = computed(() =>
       label: item.label,
       href: item.href,
       icon: iconMap[item.iconName] || LayoutDashboard,
-      exact: item.exact,
-      external: item.external,
+      exact: 'exact' in item ? item.exact : false,
+      external: 'external' in item ? item.external : false,
     })),
   }))
 )

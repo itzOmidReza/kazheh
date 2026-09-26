@@ -1,94 +1,85 @@
 <script setup lang="ts">
-import { Lock, Phone, ArrowLeft, ShieldCheck, Loader2 } from '@lucide/vue'
+import { ArrowRight, Loader2, Lock, Phone } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
-import { siteConfig, adminAuthData } from '~/data'
+import { adminAuthData } from '~/data/admin'
+import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({ layout: 'auth' })
-
-useHead({
-  title: `${adminAuthData.pageTitle} | ${siteConfig.name}`,
+// اعمال لایه‌بندی ایزوله برای لاگین
+definePageMeta({
+  layout: 'auth',
 })
+
+const authStore = useAuthStore()
 
 const phone = ref('')
 const password = ref('')
-const isSubmitting = ref(false)
 
 const handleLogin = async () => {
-  if (!phone.value.trim() || !password.value) {
+  if (!phone.value.trim() || !password.value.trim()) {
     toast.error(adminAuthData.messages.requiredFields)
     return
   }
 
-  isSubmitting.value = true
-  setTimeout(async () => {
-    isSubmitting.value = false
-    toast.success(adminAuthData.messages.loginSuccess)
-    await navigateTo('/admin', { replace: true })
-  }, 500)
+  // فراخوانی اکشن لاگین از استور Pinia که مستقیماً به بک‌اند وصل است
+  await authStore.login(phone.value, password.value)
 }
 </script>
 
 <template>
-  <main class="flex min-h-[calc(100vh-5rem)] items-center justify-center bg-background px-4 py-12" dir="rtl">
-    <div class="w-full max-w-md rounded-[2rem] border border-border bg-card p-6 shadow-floating sm:p-10 text-right">
-      <div class="text-center">
-        <div
-          class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-soft">
-          <ShieldCheck class="size-7" />
+  <div class="space-y-6" dir="rtl">
+    <div class="text-right space-y-2">
+      <h1 class="text-xl font-bold text-foreground">
+        {{ adminAuthData.pageTitle }}
+      </h1>
+      <p class="text-xs text-muted-foreground leading-relaxed">
+        {{ adminAuthData.subtitle }}
+      </p>
+    </div>
+
+    <form class="space-y-4" @submit.prevent="handleLogin">
+      <!-- فیلد شماره تماس -->
+      <div class="space-y-1.5 text-right">
+        <Label :for="adminAuthData.fields.phone.id" class="text-xs font-medium text-foreground">
+          {{ adminAuthData.fields.phone.label }}
+        </Label>
+        <div class="relative">
+          <Input :id="adminAuthData.fields.phone.id" v-model="phone" type="tel"
+            :placeholder="adminAuthData.fields.phone.placeholder" class="h-10 text-xs rounded-xl pe-9 font-mono"
+            dir="ltr" required :disabled="authStore.isLoading" />
+          <Phone class="size-4 absolute end-3 top-3 text-muted-foreground pointer-events-none" />
         </div>
-
-        <h1 class="mt-5 text-2xl font-bold text-foreground">
-          {{ adminAuthData.pageTitle }}
-        </h1>
-
-        <p class="mt-2 text-sm text-muted-foreground">
-          {{ adminAuthData.tagline }}
-        </p>
       </div>
 
-      <form class="mt-8 space-y-5" @submit.prevent="handleLogin">
-        <div class="space-y-2">
-          <Label :for="adminAuthData.fields.phone.id">
-            {{ adminAuthData.fields.phone.label }}
-          </Label>
-          <div class="relative">
-            <Input :id="adminAuthData.fields.phone.id" v-model="phone" type="tel"
-              :placeholder="adminAuthData.fields.phone.placeholder" autocomplete="username" dir="ltr" required
-              class="pl-10" />
-            <Phone class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          </div>
+      <!-- فیلد رمز عبور -->
+      <div class="space-y-1.5 text-right">
+        <Label :for="adminAuthData.fields.password.id" class="text-xs font-medium text-foreground">
+          {{ adminAuthData.fields.password.label }}
+        </Label>
+        <div class="relative">
+          <Input :id="adminAuthData.fields.password.id" v-model="password" type="password"
+            :placeholder="adminAuthData.fields.password.placeholder" class="h-10 text-xs rounded-xl pe-9 font-mono"
+            dir="ltr" required :disabled="authStore.isLoading" />
+          <Lock class="size-4 absolute end-3 top-3 text-muted-foreground pointer-events-none" />
         </div>
+      </div>
 
-        <div class="space-y-2">
-          <Label :for="adminAuthData.fields.password.id">
-            {{ adminAuthData.fields.password.label }}
-          </Label>
-          <div class="relative">
-            <Input :id="adminAuthData.fields.password.id" v-model="password" type="password"
-              :placeholder="adminAuthData.fields.password.placeholder" autocomplete="current-password" dir="ltr"
-              required class="pl-10" />
-            <Lock class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          </div>
-        </div>
+      <!-- دکمه ورود -->
+      <Button type="submit" class="w-full h-10 rounded-xl text-xs font-semibold gap-2 mt-2"
+        :disabled="authStore.isLoading">
+        <Loader2 v-if="authStore.isLoading" class="size-4 animate-spin" />
+        <span>{{ authStore.isLoading ? 'در حال بررسی...' : adminAuthData.submitButtonText }}</span>
+      </Button>
+    </form>
 
-        <Button type="submit" size="lg" :disabled="isSubmitting"
-          class="mt-6 min-h-12 w-full rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover shadow-soft font-semibold gap-2">
-          <Loader2 v-if="isSubmitting" class="size-4 animate-spin" />
-          <template v-else>
-            <span>{{ adminAuthData.submitButtonShort }}</span>
-            <ArrowLeft class="size-4 rotate-180" />
-          </template>
-        </Button>
-
-        <div class="pt-2 text-center">
-          <NuxtLink to="/" class="text-xs text-muted-foreground hover:text-primary transition-colors">
-            {{ adminAuthData.backToHomeText }}
-          </NuxtLink>
-        </div>
-      </form>
+    <div class="text-center pt-2 border-t border-border/60">
+      <NuxtLink to="/"
+        class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowRight class="size-3.5 rotate-180" />
+        <span>{{ adminAuthData.backToHomeText }}</span>
+      </NuxtLink>
     </div>
-  </main>
+  </div>
 </template>

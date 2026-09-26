@@ -10,7 +10,26 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['shadcn-nuxt', 'nuxt-lucide-icons', '@nuxt/content'],
+  modules: ['shadcn-nuxt', 'nuxt-lucide-icons', '@nuxt/content', '@pinia/nuxt'],
+
+  runtimeConfig: {
+    public: {
+      apiBaseUrl:
+        process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1',
+    },
+  },
+
+  nitro: {
+    routeRules: {
+      '/static/**': {
+        proxy:
+          `${process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/static/**`.replace(
+            /\/api\/v1\/static\/\*\*/,
+            '/static/**',
+          ),
+      },
+    },
+  },
 
   shadcn: {
     prefix: '',
