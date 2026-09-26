@@ -94,6 +94,39 @@ export const useAuthStore = defineStore('auth', () => {
     navigateTo('/admin/login');
   };
 
+  // دریافت مشخصات کاربر ادمین جاری
+  const fetchProfile = async () => {
+    const { apiFetch } = useApi();
+    try {
+      const data = await apiFetch<AdminUser>('/auth/me', {
+        method: 'GET',
+      });
+      user.value = data;
+      return data;
+    } catch {
+      return null;
+    }
+  };
+
+  // تغییر کلمه عبور ادمین
+  const changePassword = async (payload: {
+    current_password: string;
+    new_password: string;
+  }) => {
+    const { apiFetch } = useApi();
+    try {
+      await apiFetch('/auth/change-password', {
+        method: 'POST',
+        body: payload,
+      });
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err.data?.detail || 'خطا در تغییر کلمه عبور',
+      };
+    }
+  };
   return {
     token,
     user,
@@ -102,5 +135,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     fetchCurrentUser,
     logout,
+    fetchProfile,
+    changePassword,
   };
 });
