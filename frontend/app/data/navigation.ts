@@ -8,6 +8,7 @@ export const mainNavigation: NavItem[] = [
   { label: 'خدمات', href: '/services' },
   { label: 'مقالات', href: '/articles' },
   { label: 'درباره ما', href: '/about' },
+  { label: 'تماس با ما', href: '/contact' },
 ];
 
 export const footerQuickLinks: NavItem[] = [
@@ -15,10 +16,12 @@ export const footerQuickLinks: NavItem[] = [
   { label: 'خدمات تخصصی', href: '/services' },
   { label: 'مجله و مقالات', href: '/articles' },
   { label: 'درباره کلینیک', href: '/about' },
+  { label: 'ارتباط مستقیم', href: '/contact' },
 ];
 
 export const footerSupportLinks: NavItem[] = [
   { label: 'سؤالات متداول', href: '/#faq' },
   { label: 'شروع گفتگو', href: '/#contact' },
+  { label: 'ارتباط با ما', href: '/contact' },
   { label: 'حریم خصوصی', href: '/privacy' },
 ];
