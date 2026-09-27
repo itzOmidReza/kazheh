@@ -13,6 +13,13 @@ from app.services.auth_service import AuthService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
+# Optional variant of the same scheme (auto_error=False) so that public read
+# endpoints can detect an already-authenticated admin without forcing auth.
+oauth2_scheme_optional = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_STR}/auth/login",
+    auto_error=False,
+)
+
 
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
@@ -53,4 +60,34 @@ def get_current_admin(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive admin account",
         )
+    return user
+
+
+def get_optional_admin(
+    db: Session = Depends(get_db),
+    token: str | None = Depends(oauth2_scheme_optional),
+) -> AdminUser | None:
+    """
+    Same validation as `get_current_admin`, but never raises: a missing,
+    malformed or expired token simply resolves to `None`.
+
+    Used by public read endpoints (e.g. listing articles) that must stay
+    accessible without a token, while additionally exposing draft content to
+    an already-authenticated admin.
+    """
+    if not token:
+        return None
+
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        phone: str = payload.get("sub")
+    except JWTError:
+        return None
+
+    if not phone or not str(phone).strip():
+        return None
+
+    user = AuthService.get_by_phone(db, phone=str(phone).strip())
+    if user is None or not user.is_active:
+        return None
     return user

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_admin, get_db
+from app.core.dependencies import get_current_admin, get_db, get_optional_admin
 from app.models.admin_user import AdminUser
 from app.schemas.article import (
     ArticleCreate,
@@ -30,19 +30,37 @@ async def upload_article_image(
     return {"url": url}
 
 
-# 1. PUBLIC: List published articles
+# 1. PUBLIC (+ admin aware): List articles
 @router.get(
     "",
     response_model=list[ArticleListItem],
     status_code=status.HTTP_200_OK,
-    summary="List published articles (Public)",
+    summary="List articles (published only, unless explicitly requested by an admin)",
 )
-def list_published_articles(
+def list_articles(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
+    published_only: bool = Query(
+        default=True,
+        description=(
+            "Public default is true (published articles only). Sending false "
+            "requires a valid admin Bearer token and returns drafts too."
+        ),
+    ),
     db: Session = Depends(get_db),
+    current_admin: AdminUser | None = Depends(get_optional_admin),
 ):
-    return ArticleService.get_articles(db=db, skip=skip, limit=limit, published_only=True)
+    # Drafts must never leak to anonymous callers, so `published_only=false`
+    # is only honoured for an authenticated admin.
+    if not published_only and current_admin is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Admin authentication is required to list unpublished articles.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return ArticleService.get_articles(
+        db=db, skip=skip, limit=limit, published_only=published_only
+    )
 
 
 # 2. ADMIN ONLY: List all articles (including drafts)
@@ -85,18 +103,24 @@ def get_article_by_id_admin(
     return article
 
 
-# 4. PUBLIC: Read single article by slug
+# 4. PUBLIC (+ admin aware): Read single article by slug
 @router.get(
     "/{slug}",
     response_model=ArticleResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get published article by slug (Public)",
+    summary="Get article by slug (drafts are only visible to authenticated admins)",
 )
 def get_article_by_slug(
     slug: str,
     db: Session = Depends(get_db),
+    current_admin: AdminUser | None = Depends(get_optional_admin),
 ):
-    article = ArticleService.get_by_slug(db=db, slug=slug, published_only=True)
+    article = ArticleService.get_by_slug(
+        db=db,
+        slug=slug,
+        # Anonymous visitors only see published articles; admins also get drafts.
+        published_only=current_admin is None,
+    )
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
