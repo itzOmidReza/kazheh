@@ -15,12 +15,14 @@ const emit = defineEmits<{
   (e: 'delete', item: ArticleItem): void
 }>()
 
+const dateFormatter = new Intl.DateTimeFormat('fa-IR', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+})
+
 const formatDate = (isoString: string) => {
   try {
-    return new Intl.DateTimeFormat('fa-IR', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(isoString))
+    return dateFormatter.format(new Date(isoString))
   } catch {
     return isoString
   }

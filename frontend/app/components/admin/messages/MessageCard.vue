@@ -73,8 +73,8 @@ const formatDate = (isoString: string) => {
       </Button>
 
       <Button size="icon" variant="ghost" class="size-8.5 rounded-xl" :title="message.is_read
-          ? adminDashboardData.messagesSection.markAsUnreadTitle
-          : adminDashboardData.messagesSection.markAsReadTitle
+        ? adminDashboardData.messagesSection.markAsUnreadTitle
+        : adminDashboardData.messagesSection.markAsReadTitle
         " @click="emit('toggle-read', message)">
         <CheckCircle2 :class="['size-4', message.is_read ? 'text-primary' : 'text-muted-foreground/50']" />
       </Button>
