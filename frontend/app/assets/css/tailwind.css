@@ -4,51 +4,57 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ========================================
-   Conscious Calm — Light theme
+   Kazheh Palette — Light Theme (Client Exact Spec)
    ======================================== */
 
 :root {
   color-scheme: light;
 
-  --background: #f8faf8;
-  --foreground: #18393c;
+  /* پس‌زمینه اصلی: سفید گرم (#FAFBFC) */
+  --background: #fafbfc;
+  /* رنگ متون اصلی: خاکستری متنی تیره (#2D3748) برای خوانایی کامل روی پس‌زمینه روشن */
+  --foreground: #173f5f;
 
-  --surface: #f1f6f3;
-
+  /* پس‌زمینه کارت‌ها */
   --card: #ffffff;
-  --card-foreground: #18393c;
+  --card-foreground: #173f5f;
 
   --popover: #ffffff;
-  --popover-foreground: #18393c;
+  --popover-foreground: #173f5f;
 
-  --primary: #16484a;
+  /* رنگ اصلی برند (دکمه‌ها و عناصر شاخص): فیروزه‌ای ملایم (#5BB8B0) */
+  --primary: #5bb8b0;
+  /* متن روی فیروزه‌ای: سفید با کنتراست بالا */
   --primary-foreground: #ffffff;
 
-  --secondary: #e8f2ed;
-  --secondary-foreground: #16484a;
+  /* رنگ مکمل آرامش: سبز خیلی ملایم (#DCEFEA) */
+  --secondary: #dcefea;
+  --secondary-foreground: #173f5f;
 
-  --muted: #f1f6f3;
-  /* Slightly darker than the original token for readable small text. */
-  --muted-foreground: #596e6e;
+  /* سطوح کم‌رنگ و جداکننده‌ها: خاکستری روشن (#EEF1F3) */
+  --surface: #eef1f3;
+  --muted: #eef1f3;
+  /* رنگ متن‌های فرعی */
+  --muted-foreground: #4b5563;
 
-  /* Interactive highlights: menus, tabs, calendar, etc. */
-  --accent: #d6e9e0;
-  --accent-foreground: #102f35;
+  /* هایلایت‌ها */
+  --accent: #dcefea;
+  --accent-foreground: #173f5f;
 
-  /* Warm emphasis reserved for the main call to action. */
-  --cta: #dda075;
-  --cta-hover: #f0c3a2;
-  --cta-foreground: #102f35;
+  /* رنگ اقدام و دکمه‌های اصلی (CTA) */
+  --cta: #5bb8b0;
+  --cta-hover: #4ea69e;
+  --cta-foreground: #ffffff;
 
-  --destructive: #b42332;
+  --destructive: #e11d48;
   --destructive-foreground: #ffffff;
 
-  --success: #216447;
+  --success: #10b981;
   --success-foreground: #ffffff;
 
-  --border: #d9e5df;
-  --input: #849b90;
-  --ring: #1d625d;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #5bb8b0;
 
   --radius: 0.875rem;
 
@@ -58,48 +64,47 @@
 }
 
 /* ========================================
-   Dark theme — proposed extension
+   Dark Theme
    ======================================== */
 
 .dark {
   color-scheme: dark;
 
-  --background: #0d2024;
-  --foreground: #e8f2ed;
+  --background: #0d1e2e;
+  --foreground: #eef1f3;
 
-  --surface: #132c30;
+  --surface: #12263a;
+  --card: #152c42;
+  --card-foreground: #eef1f3;
 
-  --card: #163035;
-  --card-foreground: #e8f2ed;
+  --popover: #152c42;
+  --popover-foreground: #eef1f3;
 
-  --popover: #163035;
-  --popover-foreground: #e8f2ed;
+  --primary: #5bb8b0;
+  --primary-foreground: #0d1e2e;
 
-  --primary: #bcd8cc;
-  --primary-foreground: #102f35;
+  --secondary: #1e394d;
+  --secondary-foreground: #dcefea;
 
-  --secondary: #203e40;
-  --secondary-foreground: #e8f2ed;
+  --muted: #162f44;
+  --muted-foreground: #94a3b8;
 
-  --muted: #193338;
-  --muted-foreground: #b0c4bc;
+  --accent: #23435c;
+  --accent-foreground: #eef1f3;
 
-  --accent: #294b48;
-  --accent-foreground: #e8f2ed;
+  --cta: #5bb8b0;
+  --cta-hover: #6ec4bd;
+  --cta-foreground: #0d1e2e;
 
-  --cta: #dda075;
-  --cta-hover: #f0c3a2;
-  --cta-foreground: #102f35;
+  --destructive: #fb7185;
+  --destructive-foreground: #4c0519;
 
-  --destructive: #ffabb3;
-  --destructive-foreground: #440c16;
+  --success: #6ee7b7;
+  --success-foreground: #022c22;
 
-  --success: #a4d9b9;
-  --success-foreground: #102f25;
-
-  --border: #355153;
-  --input: #68867c;
-  --ring: #bcd8cc;
+  --border: #24425a;
+  --input: #33536f;
+  --ring: #5bb8b0;
 }
 
 /* ========================================
@@ -153,20 +158,29 @@
   --font-sans: 'Vazirmatn', Tahoma, sans-serif;
   --font-heading: 'Vazirmatn', Tahoma, sans-serif;
 
-  --color-primary-900: #102f35;
-  --color-primary-800: #16484a;
-  --color-primary-700: #1d625d;
-  --color-primary-500: #3d8a7d;
+  /* توکن‌های مستقل رنگی برای استفاده در بخش‌های اختصاصی */
+  --color-brand-petrol: #173f5f;
+  --color-brand-turquoise: #5bb8b0;
+  --color-brand-mint: #dcefea;
+  --color-brand-gray-light: #eef1f3;
+  --color-brand-gray-text: #4b5563;
+  --color-brand-warm-white: #fafbfc;
 
-  --color-sage-100: #e8f2ed;
-  --color-sage-200: #d6e9e0;
-  --color-sage-300: #bcd8cc;
+  /* تطبیق شیدهای سازمانی با نام‌های پیشین جهت سازگاری کامپوننت‌ها */
+  --color-primary-900: #173f5f;
+  --color-primary-800: #1f4f77;
+  --color-primary-700: #29608f;
+  --color-primary-500: #5bb8b0;
 
-  --color-warm-300: #f0c3a2;
-  --color-warm-500: #dda075;
-  --color-warm-700: #b8754e;
+  --color-sage-100: #dcefea;
+  --color-sage-200: #c2e5dc;
+  --color-sage-300: #5bb8b0;
 
-  /* Fluid headings: mobile → desktop */
+  --color-warm-300: #5bb8b0;
+  --color-warm-500: #5bb8b0;
+  --color-warm-700: #173f5f;
+
+  /* Fluid typography */
   --text-display: clamp(2.125rem, 1.5rem + 2.5vw, 3.5rem);
   --text-display--line-height: 1.45;
   --text-display--font-weight: 800;
@@ -189,7 +203,6 @@
   --text-body: 0.9375rem;
   --text-body--line-height: 2;
 
-  /* Minimum 14px for supporting text */
   --text-body-sm: 0.875rem;
   --text-body-sm--line-height: 1.9;
 
@@ -202,20 +215,18 @@
   --radius-xl: 2rem;
   --radius-pill: 999px;
 
-  --shadow-soft: 0 8px 24px rgb(16 47 53 / 7%);
-  --shadow-card: 0 16px 32px rgb(16 47 53 / 11%);
-  --shadow-floating: 0 24px 55px rgb(7 29 37 / 22%);
+  --shadow-soft: 0 8px 24px rgb(23 63 95 / 6%);
+  --shadow-card: 0 16px 32px rgb(23 63 95 / 9%);
+  --shadow-floating: 0 24px 55px rgb(23 63 95 / 16%);
 
   --container-site: 75rem;
-
   --spacing-section: clamp(3rem, 1.5rem + 6vw, 6rem);
   --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2rem);
-
   --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ========================================
-   Base styles
+   Base styles (بدون اورراید اجباری رنگ متون)
    ======================================== */
 
 @layer base {
