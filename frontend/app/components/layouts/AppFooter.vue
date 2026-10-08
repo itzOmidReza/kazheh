@@ -131,11 +131,11 @@ const hasContactInfo = computed(() => {
       <div
         class="site-container flex flex-col gap-3 py-5 text-center text-xs text-sage-200/60 sm:flex-row sm:items-center sm:justify-between sm:text-right">
         <p>
-          © {{ currentYear }} {{ siteConfig.name }}
+          {{ siteConfig.footerNote }}
         </p>
 
         <p>
-          {{ siteConfig.footerNote }}
+          © {{ currentYear }} {{ siteConfig.shortName }}
         </p>
       </div>
     </div>

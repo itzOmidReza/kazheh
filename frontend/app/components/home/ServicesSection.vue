@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import {
   ArrowLeft,
+  BookOpen,
+  Compass,
   HeartHandshake,
   Sparkles,
   UsersRound,
+  Video,
 } from '@lucide/vue'
 
 import { Badge } from '@/components/ui/badge'
@@ -21,6 +24,9 @@ const iconMap: Record<string, any> = {
   Sparkles,
   HeartHandshake,
   UsersRound,
+  Compass,
+  BookOpen,
+  Video,
 }
 </script>
 
@@ -131,7 +137,7 @@ const iconMap: Record<string, any> = {
 
       <!-- Closing note -->
       <div
-        class="mt-10 flex flex-col items-start justify-between gap-5 rounded-[1.375rem] border border-border/80 bg-surface px-6 py-6 sm:flex-row sm:items-center sm:px-8">
+        class="mt-10 flex flex-col items-start justify-between gap-5 rounded-[1.375rem] border border-secondary bg-secondary/40 px-6 py-6 sm:flex-row sm:items-center sm:px-8 dark:border-border dark:bg-card">
         <div>
           <p class="font-semibold text-foreground">
             {{ servicesHomeContent.closingNote.title }}
@@ -142,7 +148,7 @@ const iconMap: Record<string, any> = {
           </p>
         </div>
 
-        <Button as-child class="shrink-0 rounded-pill bg-primary px-5 text-primary-foreground hover:bg-primary-700">
+        <Button as-child class="shrink-0 rounded-pill bg-primary px-5 text-primary-foreground hover:bg-primary/90">
           <NuxtLink :to="servicesHomeContent.closingNote.cta.href">
             {{ servicesHomeContent.closingNote.cta.label }}
             <ArrowLeft class="size-4" />

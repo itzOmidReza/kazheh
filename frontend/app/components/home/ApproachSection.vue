@@ -3,14 +3,15 @@ import {
   ArrowLeft,
   Brain,
   HeartHandshake,
-  Sprout,
+  LockKeyhole,
+  UsersRound,
 } from '@lucide/vue'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { approachContent } from '~/data'
 
-const icons = [HeartHandshake, Brain, Sprout]
+const icons = [Brain, LockKeyhole, UsersRound, HeartHandshake]
 </script>
 
 <template>
@@ -52,14 +53,14 @@ const icons = [HeartHandshake, Brain, Sprout]
               class="group relative flex gap-6">
               <div class="relative z-10 shrink-0">
                 <span
-                  class="flex size-14 items-center justify-center rounded-2xl border border-sage-300/30 bg-primary-800 text-sage-200 transition-colors duration-300 group-hover:border-warm-300 group-hover:bg-warm-300 group-hover:text-primary-900">
+                  class="flex size-14 items-center justify-center rounded-2xl border border-sage-300/30 bg-primary-800 text-sage-200 transition-colors duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
                   <component :is="icons[index % icons.length]" class="size-6" />
                 </span>
               </div>
 
               <div class="pb-2">
                 <div class="flex items-center gap-3">
-                  <span class="text-xs font-semibold text-warm-300">
+                  <span class="text-xs font-semibold text-primary">
                     {{ principle.number }}
                   </span>
 

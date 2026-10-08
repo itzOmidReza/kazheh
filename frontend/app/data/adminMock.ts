@@ -40,9 +40,9 @@ export const initialAdminMessages: AdminMessageItem[] = [
     full_name: 'سارا احمدی',
     phone: '09123456789',
     email: 'sara@example.com',
-    subject: 'درخواست مشاوره فردی',
+    subject: 'درخواست پیش‌مشاوره رایگان',
     message:
-      'سلام، می‌خواستم برای روزهای پنجشنبه وقت رزرو کنم. امکانش هست راهنمایی بفرمایید که چه ساعاتی خالی هست؟ ممنون.',
+      'سلام، برای دریافت پیش‌مشاوره رایگان و بررسی جلسات روان‌درمانی تمایل به هماهنگی نوبت دارم.',
     is_read: false,
     created_at: '2026-09-23T10:30:00.000Z',
   },
@@ -51,9 +51,9 @@ export const initialAdminMessages: AdminMessageItem[] = [
     full_name: 'محسن کریمی',
     phone: '09351112233',
     email: 'm.karimi@example.com',
-    subject: 'هماهنگی کارگاه آموزشی',
+    subject: 'کارگاه تخصصی طرحواره درمانی',
     message:
-      'باسلام، پیرو کارگاه کنترل اضطراب تمایل داشتم اطلاعات مربوط به ثبت‌نام و سرفصل‌ها را دریافت کنم.',
+      'باسلام، پیرو کارگاه تخصصی طرحواره درمانی تمایل داشتم اطلاعات مربوط به ثبت‌نام و سرفصل‌ها را دریافت کنم.',
     is_read: true,
     created_at: '2026-09-22T14:15:00.000Z',
   },
@@ -62,9 +62,9 @@ export const initialAdminMessages: AdminMessageItem[] = [
     full_name: 'نگین شجاعی',
     phone: '09197778899',
     email: 'negin.sh@example.com',
-    subject: 'مشاوره آنلاین',
+    subject: 'کارگاه عمومی مدیریت استرس و اضطراب',
     message:
-      'درود، من ساکن تهران نیستم. آیا جلسات شما به شکل آنلاین و تصویری هم برگزار می‌شود؟',
+      'درود، شرایط شرکت در کارگاه عمومی مدیریت استرس و اضطراب به صورت آنلاین چگونه است؟',
     is_read: false,
     created_at: '2026-09-21T08:45:00.000Z',
   },
@@ -75,9 +75,9 @@ export const mockMessageDetail: AdminMessageItem = {
   full_name: 'سارا احمدی',
   phone: '09123456789',
   email: 'sara@example.com',
-  subject: 'درخواست مشاوره فردی',
+  subject: 'درخواست پیش‌مشاوره رایگان',
   message:
-    'سلام، می‌خواستم برای روزهای پنجشنبه وقت رزرو کنم. امکانش هست راهنمایی بفرمایید که چه ساعاتی خالی هست؟ ممنون.',
+    'سلام، برای دریافت پیش‌مشاوره رایگان و بررسی جلسات روان‌درمانی تمایل به هماهنگی نوبت دارم.',
   is_read: true,
   created_at: '2026-09-23T10:30:00.000Z',
 };
@@ -85,24 +85,47 @@ export const mockMessageDetail: AdminMessageItem = {
 export const initialAdminArticles: AdminArticleItem[] = [
   {
     id: 1,
-    title: 'چگونه اضطراب خود را در موقعیت‌های استرس‌زا کنترل کنیم؟',
-    slug: 'understanding-anxiety',
+    title: 'تأثیر ذهن‌آگاهی در کاهش اضطراب',
+    slug: 'mindfulness-anxiety',
     summary:
-      'راهکارهای عملی برای مهار استرس‌های روزمره و درک بهتر واکنش‌های بدن.',
+      'بررسی نقش تمرینات ذهن‌آگاهی در تنظیم هیجان و کاهش پایدار استرس و اضطراب روزمره.',
     content:
-      'متن پیش‌فرض و آزمایشی مقاله کلینیک کاژه جهت تست قالب و فرمت‌بندی.',
+      'متن مقاله تخصصی درباره اثرات علمی ذهن‌آگاهی در کاهش اضطراب و آرام‌سازی ذهن.',
     is_published: true,
     created_at: '2026-09-20T12:00:00.000Z',
   },
   {
     id: 2,
-    title: 'مرزگذاری سالم در روابط فردی و خانوادگی',
-    slug: 'healthy-boundaries',
-    summary: 'چگونگی تعیین حد و مرزهای احترام‌آمیز بدون ایجاد احساس گناه.',
+    title: 'رویکرد شناختی رفتاری (CBT) و کاربردهای آن',
+    slug: 'cbt-approach',
+    summary:
+      'آشنایی با مبانی علمی رویکرد شناختی رفتاری (CBT) و کاربرد آن در درمان اختلالات خلقی.',
     content:
-      'مرزبندی سالم به معنای فاصله گرفتن از دیگران نیست، بلکه شفاف‌سازی نیازها و حریم روانی است.',
-    is_published: false,
+      'رویکرد شناختی رفتاری یکی از معتبرترین متدهای بالینی مبتنی بر شواهد است.',
+    is_published: true,
     created_at: '2026-09-18T16:20:00.000Z',
+  },
+  {
+    id: 3,
+    title: 'چگونه متوجه شویم روان‌درمانگر مناسبی انتخاب کرده‌ایم؟',
+    slug: 'choosing-therapist',
+    summary:
+      'راهنمای مهارت انتخاب مشاور و شناسایی ویژگی‌های روان‌درمانگر متخصص و با صلاحیت.',
+    content:
+      'شناخت تفاوت بین روان‌درمانگران صلاحیت‌دار و افراد غیرمتخصص برای شروع درمان ضروری است.',
+    is_published: true,
+    created_at: '2026-09-15T10:00:00.000Z',
+  },
+  {
+    id: 4,
+    title: 'نشانه‌های افسردگی و راه‌های درمان',
+    slug: 'depression-symptoms',
+    summary:
+      'شناخت نشانه‌های بالینی افسردگی اساسی و رویکردهای درمانی روان‌شناسی و روان‌پزشکی.',
+    content:
+      'علائم افسردگی و گام‌های موثر برای خروج از رخوت و بهبود کیفیت زندگی فردی.',
+    is_published: false,
+    created_at: '2026-09-12T09:30:00.000Z',
   },
 ];
 
@@ -110,7 +133,7 @@ export const initialAdminUsers: AdminUserPreviewItem[] = [
   {
     id: 1,
     name: 'دکتر علیرضا کاژه',
-    role: 'مدیر ارشد و روان‌پزشک',
+    role: 'روان‌پزشک و درمانگر ارشد',
     username: 'dr_kazheh',
     phone: '09121112233',
     status: 'فعال',
@@ -118,7 +141,7 @@ export const initialAdminUsers: AdminUserPreviewItem[] = [
   {
     id: 2,
     name: 'سارا مهام',
-    role: 'روان‌شناس بالینی و مشاور',
+    role: 'روان‌شناس بالینی و مدرس کارگاه',
     username: 's_maham',
     phone: '09359876543',
     status: 'فعال',
@@ -126,15 +149,15 @@ export const initialAdminUsers: AdminUserPreviewItem[] = [
   {
     id: 3,
     name: 'پذیرش و نوبت‌دهی مرکزی',
-    role: 'منشی و هماهنگی مراجعین',
+    role: 'هماهنگی مراجعین و پیش‌مشاوره',
     username: 'reception',
     phone: '09190001122',
-    status: 'غیرفعال',
+    status: 'فعال',
   },
 ];
 
 export const initialAdminProfile: AdminProfileData = {
-  full_name: 'مدیر کلینیک کاژه',
+  full_name: 'سارا احمدی',
   phone: '09121234567',
-  username: 'admin',
+  username: 'sara_ahmadi',
 };

@@ -68,14 +68,14 @@ const closeMobileMenu = () => {
 
         <!-- Desktop CTA -->
         <div class="hidden items-center gap-3 lg:flex">
-          <NuxtLink :to="siteConfig.contactCta.buttonHref"
+          <NuxtLink to="/admin/login"
             class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary dark:hover:text-foreground">
             {{ headerContent.contactText }}
           </NuxtLink>
 
           <Button as-child class="rounded-pill bg-cta px-5 text-cta-foreground shadow-soft hover:bg-cta-hover">
             <NuxtLink :to="siteConfig.contactCta.buttonHref">
-              {{ siteConfig.contactCta.buttonText || siteConfig.contactCta.title }}
+              پیش‌مشاوره رایگان
               <ArrowLeft class="size-4" />
             </NuxtLink>
           </Button>
@@ -110,15 +110,23 @@ const closeMobileMenu = () => {
               </SheetClose>
             </nav>
 
-            <div class="mt-8">
+            <div class="mt-8 space-y-3">
               <SheetClose as-child>
                 <Button as-child class="w-full rounded-pill bg-cta text-cta-foreground hover:bg-cta-hover"
                   @click="closeMobileMenu">
                   <NuxtLink :to="siteConfig.contactCta.buttonHref">
-                    {{ siteConfig.contactCta.buttonText || siteConfig.contactCta.title }}
+                    پیش‌مشاوره رایگان
                     <ArrowLeft class="size-4" />
                   </NuxtLink>
                 </Button>
+              </SheetClose>
+
+              <SheetClose as-child>
+                <NuxtLink to="/admin/login"
+                  class="block w-full text-center py-2 text-sm font-medium text-muted-foreground hover:text-primary"
+                  @click="closeMobileMenu">
+                  {{ headerContent.contactText }}
+                </NuxtLink>
               </SheetClose>
             </div>
           </SheetContent>

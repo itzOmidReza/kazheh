@@ -58,7 +58,7 @@ const icons = [MessageCircle, Phone, Signpost]
               {{ step.description }}
             </p>
 
-            <p class="mt-5 border-s-2 border-warm-500 ps-4 text-sm leading-7 text-foreground">
+            <p class="mt-5 border-s-2 border-primary ps-4 text-sm leading-7 text-foreground">
               {{ step.note }}
             </p>
           </div>
@@ -67,9 +67,13 @@ const icons = [MessageCircle, Phone, Signpost]
 
       <!-- Contact invitation -->
       <div
-        class="mt-12 flex flex-col items-start justify-between gap-6 rounded-xl border border-border bg-surface p-6 sm:p-8 lg:mt-16 lg:flex-row lg:items-center">
+        class="mt-12 flex flex-col items-start justify-between gap-6 rounded-2xl border border-secondary bg-secondary/30 p-6 sm:p-8 lg:mt-16 lg:flex-row lg:items-center dark:border-border dark:bg-card">
         <div class="max-w-xl">
-          <h3 class="text-lg font-semibold text-foreground">
+          <div class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-primary dark:text-foreground">
+            <span>همیشه کنار شما هستیم - در هر مرحله از مسیر سلامت روان</span>
+          </div>
+
+          <h3 class="text-xl font-bold text-foreground">
             {{ processContent.invitation.title }}
           </h3>
 

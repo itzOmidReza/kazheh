@@ -1,25 +1,34 @@
 import { siteConfig } from './site';
 
 export const articlesPageContent = {
-  headTitle: `مجله و مقالات | ${siteConfig.name}`,
+  headTitle: `مقالات و آموزش‌ها | ${siteConfig.name}`,
   headDescription:
-    'یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.',
-  defaultCategory: 'همه موضوعات',
-  badge: `مجله ${siteConfig.name}`,
-  heroTitle: 'برای شناخت بیشتر خودتان',
+    'یادداشت‌ها و آموزش‌های علمی و تخصصی روان‌شناسی برای بهبود کیفیت زندگی.',
+  defaultCategory: 'همه دسته‌ها',
+  badge: 'مقالات و آموزش‌ها',
+  heroTitle: 'مقالات و آموزش‌ها',
   heroSubtitle:
-    'یادداشت‌هایی ساده و قابل فهم درباره احساسات، رابطه‌ها و تجربه‌های روزمره.',
+    'تازه‌ترین مقالات تخصصی و عمومی روان‌شناسی برای ارتقای سلامت روان و سبک زندگی آگاهانه.',
+  tabs: {
+    general: 'مقالات عمومی',
+    specialized: 'مقالات تخصصی',
+  },
+  filters: {
+    allCategories: 'همه دسته‌ها',
+    sortLatest: 'مرتب‌سازی (جدیدترین)',
+    searchPlaceholder: 'جستجوی مقاله...',
+  },
   emptyTitle: 'هنوز مقاله‌ای منتشر نشده است.',
   emptyDescription:
-    'به‌زودی یادداشت‌ها و مقالات تخصصی جدید در این بخش قرار خواهند گرفت.',
+    'به‌زودی مقالات جدید تیم متخصصان کلینیک کاژه در این قسمت در دسترس قرار خواهد گرفت.',
 };
 
 export const articleDetailContent = {
   backButton: 'بازگشت به مقالات',
   notFoundMessage: 'مقاله مورد نظر پیدا نشد',
-  defaultCategory: 'روان‌شناسی',
+  defaultCategory: 'مقاله تخصصی',
   minuteReadSuffix: 'دقیقه مطالعه',
-  cardReadButton: 'مطالعه مقاله',
+  cardReadButton: 'مشاهده مقاله',
   share: {
     buttonLabel: 'اشتراک‌گذاری مقاله',
     successToast: 'پیوند مقاله در کلیپ‌بورد کپی شد.',

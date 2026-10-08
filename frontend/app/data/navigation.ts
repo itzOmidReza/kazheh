@@ -5,37 +5,42 @@ export interface NavItem {
 
 export const mainNavigation: NavItem[] = [
   { label: 'خانه', href: '/' },
-  { label: 'خدمات', href: '/services' },
+  { label: 'خدمات ما', href: '/services' },
   { label: 'مقالات', href: '/articles' },
+  { label: 'کارگاه‌ها', href: '/#workshops' },
   { label: 'درباره ما', href: '/about' },
   { label: 'تماس با ما', href: '/contact' },
 ];
 
 export const footerQuickLinks: NavItem[] = [
   { label: 'خانه', href: '/' },
-  { label: 'خدمات تخصصی', href: '/services' },
-  { label: 'مجله و مقالات', href: '/articles' },
-  { label: 'درباره کلینیک', href: '/about' },
-  { label: 'ارتباط مستقیم', href: '/contact' },
+  { label: 'خدمات ما', href: '/services' },
+  { label: 'مقالات', href: '/articles' },
+  { label: 'کارگاه‌ها', href: '/#workshops' },
+  { label: 'درباره ما', href: '/about' },
+  { label: 'تماس با ما', href: '/contact' },
 ];
 
 export const footerSupportLinks: NavItem[] = [
-  { label: 'سؤالات متداول', href: '/#faq' },
-  { label: 'شروع گفتگو', href: '/#contact' },
-  { label: 'ارتباط با ما', href: '/contact' },
-  { label: 'حریم خصوصی', href: '/privacy' },
+  { label: 'جلسات روان‌درمانی', href: '/services' },
+  { label: 'روان‌پزشکی', href: '/services' },
+  { label: 'کتابخوانی', href: '/services' },
+  { label: 'دورهمی روان‌شناسی', href: '/services' },
+  { label: 'تورهای روان‌شناسی', href: '/services' },
+  { label: 'تحلیل یا اکران فیلم', href: '/services' },
 ];
 
 export const headerContent = {
-  homeAriaLabel: 'صفحه اصلی',
+  homeAriaLabel: 'کاژه (پناهگاه امن روان)',
   navAriaLabel: 'منوی اصلی',
-  contactText: 'تماس با ما',
+  contactText: 'پروفایل کاربری / ورود',
+  searchLabel: 'جستجو',
   openMenuAriaLabel: 'باز کردن منو',
   mobileNavAriaLabel: 'منوی موبایل',
 };
 
 export const footerContent = {
-  homeAriaLabel: 'صفحه اصلی',
+  homeAriaLabel: 'کاژه (پناهگاه امن روان)',
   quickLinksTitle: 'دسترسی سریع',
-  moreInfoTitle: 'اطلاعات بیشتر',
+  moreInfoTitle: 'خدمات ما',
 };
