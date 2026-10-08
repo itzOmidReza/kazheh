@@ -27,7 +27,7 @@ import { contactContent } from '~/data'
 
           <div class="space-y-4 pt-2">
             <a v-if="contactContent.contactInfo.phone" :href="contactContent.contactInfo.phoneHref"
-              class="flex items-center gap-3 text-sm text-sage-200/90 transition-colors hover:text-primary">
+              class="flex items-center gap-3 text-sm text-sage-200/90 transition-colors hover:text-warm-300">
               <span class="flex size-10 items-center justify-center rounded-xl bg-white/10">
                 <Phone class="size-4" />
               </span>
@@ -35,7 +35,7 @@ import { contactContent } from '~/data'
             </a>
 
             <a v-if="contactContent.contactInfo.email" :href="contactContent.contactInfo.emailHref"
-              class="flex items-center gap-3 text-sm text-sage-200/90 transition-colors hover:text-primary">
+              class="flex items-center gap-3 text-sm text-sage-200/90 transition-colors hover:text-warm-300">
               <span class="flex size-10 items-center justify-center rounded-xl bg-white/10">
                 <Mail class="size-4" />
               </span>

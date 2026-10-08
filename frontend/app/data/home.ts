@@ -46,24 +46,19 @@ export const homeData = {
     ariaLabel: 'ارزش‌های کلیدی کاژه',
     items: [
       {
-        icon: 'Sparkles',
-        title: 'مهارت انتخاب مشاور',
-        description: 'راهنمای انتخاب روان‌درمانگر مناسب',
+        icon: 'CheckCircle2',
+        title: 'تخصص علمی',
+        description: 'بر پایه‌ی شواهد و استانداردها',
       },
       {
-        icon: 'HelpCircle',
-        title: 'ارزیابی اولیه',
-        description: 'پاسخ به چند سوال و دریافت توصیه تخصصی',
+        icon: 'LockKeyhole',
+        title: 'محرمانگی',
+        description: 'حفظ کامل اطلاعات شما',
       },
       {
-        icon: 'Phone',
-        title: 'پیش‌مشاوره رایگان',
-        description: 'گفتگوی کوتاه با متخصص',
-      },
-      {
-        icon: 'MessageSquare',
-        title: 'مشاوره متنی رایگان',
-        description: 'پاسخ به سوالات شما',
+        icon: 'HeartHandshake',
+        title: 'انتخاب آگاهانه',
+        description: 'با اطلاعات دقیق و شفاف',
       },
     ],
   },

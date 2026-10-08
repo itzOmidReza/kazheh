@@ -59,11 +59,11 @@ const icons = [Brain, Heart, MessageCircle]
           <CardHeader class="relative">
             <div class="flex items-center justify-between">
               <span
-                class="flex size-12 items-center justify-center rounded-2xl bg-sage-100 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:bg-primary-950 dark:text-sage-300">
+                class="flex size-12 items-center justify-center rounded-2xl bg-sage-100 text-primary-700 transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:bg-primary-950 dark:text-sage-300">
                 <component :is="icons[index % icons.length]" class="size-5" />
               </span>
 
-              <span class="text-sm font-semibold text-primary/60 dark:text-muted-foreground/60">
+              <span class="text-sm font-semibold text-primary-500/50 dark:text-muted-foreground/60">
                 {{ concern.number }}
               </span>
             </div>
@@ -87,7 +87,7 @@ const icons = [Brain, Heart, MessageCircle]
 
       <!-- Closing message -->
       <div
-        class="mt-12 rounded-[1.375rem] border border-secondary bg-secondary/50 px-6 py-7 text-center sm:px-10 dark:border-border dark:bg-card">
+        class="mt-12 rounded-[1.375rem] border border-warm-300/40 bg-warm-300/15 px-6 py-7 text-center sm:px-10 dark:border-warm-700/30 dark:bg-warm-900/10">
         <p class="text-base font-medium leading-8 text-foreground">
           {{ concernsContent.closingMessage }}
         </p>

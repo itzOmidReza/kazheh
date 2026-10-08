@@ -31,25 +31,18 @@ const formatNumber = (value: number) =>
 <template>
   <section v-if="items.length" id="articles" aria-labelledby="articles-title" class="section-space bg-background">
     <div class="site-container">
-      <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-        <div class="max-w-2xl">
-          <p class="text-sm font-medium text-primary">
-            {{ articlesContent.badge }}
-          </p>
+      <div class="max-w-2xl">
+        <p class="text-sm font-medium text-primary">
+          {{ articlesContent.badge }}
+        </p>
 
-          <h2 id="articles-title" class="mt-4 text-heading-xl text-foreground">
-            {{ articlesContent.title }}
-          </h2>
+        <h2 id="articles-title" class="mt-4 text-heading-xl text-foreground">
+          {{ articlesContent.title }}
+        </h2>
 
-          <p class="mt-5 text-body-lg text-muted-foreground">
-            {{ articlesContent.description }}
-          </p>
-        </div>
-
-        <NuxtLink to="/articles"
-          class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-          <span>{{ articlesContent.viewAllLabel || 'مشاهده همه >' }}</span>
-        </NuxtLink>
+        <p class="mt-5 text-body-lg text-muted-foreground">
+          {{ articlesContent.description }}
+        </p>
       </div>
 
       <ul class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">

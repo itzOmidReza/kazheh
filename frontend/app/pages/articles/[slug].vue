@@ -5,7 +5,6 @@ import { Calendar, ArrowRight, UserCheck, Share2 } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useArticlesStore, type ArticleItem } from '~/stores/articles'
-import { siteConfig, articleDetailContent } from '~/data'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,7 +38,7 @@ onMounted(async () => {
       <Button variant="ghost" size="sm" class="text-xs h-9 rounded-xl gap-2 text-muted-foreground hover:text-foreground"
         @click="router.push('/articles')">
         <ArrowRight class="size-4" />
-        <span>{{ articleDetailContent.backButton }}</span>
+        <span>بازگشت به مقالات</span>
       </Button>
     </div>
 
@@ -50,7 +49,7 @@ onMounted(async () => {
     <article v-else-if="article" class="space-y-8 bg-card p-6 sm:p-10 rounded-3xl border border-border/60">
       <header class="space-y-4 border-b border-border/60 pb-6">
         <div class="flex items-center gap-3">
-          <Badge variant="outline" class="text-xs">{{ siteConfig.name }}</Badge>
+          <Badge variant="outline" class="text-xs">پایگاه دانش کلینیک کاژه</Badge>
           <span class="text-xs text-muted-foreground flex items-center gap-1.5 font-sans">
             <Calendar class="size-3.5" />
             {{ new Date(article.created_at).toLocaleDateString('fa-IR') }}
@@ -80,8 +79,8 @@ onMounted(async () => {
             <UserCheck class="size-5" />
           </div>
           <div>
-            <div class="text-xs font-bold text-foreground">{{ siteConfig.name }}</div>
-            <div class="text-[11px] text-muted-foreground">{{ siteConfig.tagline }}</div>
+            <div class="text-xs font-bold text-foreground">تیم تخصصی کلینیک کاژه</div>
+            <div class="text-[11px] text-muted-foreground">روان‌شناسی و مشاوره خانواده</div>
           </div>
         </div>
       </footer>

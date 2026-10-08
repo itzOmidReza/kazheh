@@ -41,7 +41,7 @@ export const siteConfig: SiteConfig = {
     title: 'به مسیر بهتر زندگی فکر کن...',
     description:
       'با کمک متخصصان کاژه، می‌توانید قدم‌های مطمئنتری در مسیر سلامت روان خود بردارید.',
-    buttonText: 'رزرو نوبت',
+    buttonText: 'پیش‌مشاوره رایگان',
     buttonHref: '/contact',
   },
   contact: {

@@ -2,11 +2,7 @@
 import {
   CheckCircle2,
   HeartHandshake,
-  HelpCircle,
   LockKeyhole,
-  MessageSquare,
-  Phone,
-  Sparkles,
   UsersRound,
 } from '@lucide/vue'
 import { trustBarContent } from '~/data'
@@ -16,10 +12,6 @@ const iconMap: Record<string, any> = {
   HeartHandshake,
   UsersRound,
   CheckCircle2,
-  Sparkles,
-  HelpCircle,
-  Phone,
-  MessageSquare,
 }
 </script>
 
@@ -30,8 +22,8 @@ const iconMap: Record<string, any> = {
         <div v-for="item in trustBarContent.items" :key="item.title"
           class="flex items-start gap-4 px-0 py-7 sm:px-6 lg:px-7">
           <span
-            class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-sage-100 text-primary dark:bg-primary-950 dark:text-sage-300">
-            <component :is="iconMap[item.icon] || CheckCircle2" class="size-5" />
+            class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-sage-100 text-primary-700 dark:bg-primary-950 dark:text-sage-300">
+            <component :is="iconMap[item.icon]" class="size-5" />
           </span>
 
           <div>

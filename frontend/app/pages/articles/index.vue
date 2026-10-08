@@ -4,7 +4,6 @@ import { Calendar, ArrowLeft, BookOpen, Clock } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useArticlesStore } from '~/stores/articles'
-import { articlesPageContent, articleDetailContent } from '~/data'
 
 const articlesStore = useArticlesStore()
 
@@ -19,13 +18,13 @@ onMounted(async () => {
     <div class="text-center max-w-2xl mx-auto space-y-3">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
         <BookOpen class="size-3.5" />
-        <span>{{ articlesPageContent.badge }}</span>
+        <span>پایگاه دانش و مقالات تخصصی</span>
       </div>
       <h1 class="text-3xl font-extrabold text-foreground tracking-tight sm:text-4xl">
-        {{ articlesPageContent.heroTitle }}
+        مطالب و یافته‌های علمی کلینیک کاژه
       </h1>
       <p class="text-sm text-muted-foreground leading-relaxed">
-        {{ articlesPageContent.heroSubtitle }}
+        تازه‌ترین یادداشت‌ها، مقالات روان‌شناسی و راهنماهای کاربردی برای سلامت روان و سبک زندگی
       </p>
     </div>
 
@@ -38,9 +37,9 @@ onMounted(async () => {
     <div v-else-if="articlesStore.items.length === 0"
       class="text-center py-20 border border-dashed rounded-3xl bg-card/50 space-y-3">
       <BookOpen class="size-10 mx-auto text-muted-foreground/50" />
-      <h3 class="text-base font-semibold text-foreground">{{ articlesPageContent.emptyTitle }}</h3>
+      <h3 class="text-base font-semibold text-foreground">هنوز مقاله‌ای منتشر نشده است</h3>
       <p class="text-xs text-muted-foreground max-w-sm mx-auto">
-        {{ articlesPageContent.emptyDescription }}
+        به‌زودی مقالات جدید تیم متخصصان کلینیک کاژه در این قسمت در دسترس قرار خواهد گرفت.
       </p>
     </div>
 
@@ -71,7 +70,7 @@ onMounted(async () => {
           <NuxtLink :to="`/articles/${article.slug}`" class="w-full">
             <Button variant="ghost" size="sm"
               class="w-full justify-between text-xs h-9 rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-              <span>{{ articleDetailContent.cardReadButton }}</span>
+              <span>مطالعه کامل مطلب</span>
               <ArrowLeft class="size-3.5 transition-transform group-hover:-translate-x-1" />
             </Button>
           </NuxtLink>

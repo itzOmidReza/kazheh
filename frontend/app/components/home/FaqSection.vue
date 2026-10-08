@@ -30,7 +30,7 @@ import { faqContent } from '~/data'
             {{ faqContent.description }}
           </p>
 
-          <div class="mt-8 border-s-2 border-primary ps-5">
+          <div class="mt-8 border-s-2 border-warm-500 ps-5">
             <p class="text-sm leading-7 text-muted-foreground">
               {{ faqContent.notFoundText }}
             </p>

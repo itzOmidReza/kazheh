@@ -2,7 +2,6 @@
 import {
   ArrowLeft,
   Check,
-  Headphones,
   LockKeyhole,
   MessageCircle,
   Sparkles,
@@ -46,21 +45,20 @@ const icons = [Check, LockKeyhole, MessageCircle]
           </h1>
 
           <p class="mt-7 max-w-xl text-body-lg text-muted-foreground">
-            <span class="hidden sm:inline">{{ heroContent.descriptionDesktop || heroContent.description }}</span>
-            <span class="sm:hidden">{{ heroContent.descriptionMobile || heroContent.description }}</span>
+            {{ heroContent.description }}
           </p>
 
           <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button as-child size="lg"
               class="h-13 rounded-pill bg-cta px-7 text-base font-bold text-cta-foreground shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-cta-hover hover:shadow-card">
               <NuxtLink :to="heroContent.primaryCta.href">
-                <Headphones class="size-5" />
-                <span>{{ heroContent.primaryCta.label }}</span>
+                {{ heroContent.primaryCta.label }}
+                <ArrowLeft class="size-5" />
               </NuxtLink>
             </Button>
 
             <Button as-child variant="outline" size="lg"
-              class="h-13 rounded-pill border-border bg-card px-7 text-base text-foreground shadow-xs transition-colors hover:bg-secondary hover:text-primary dark:border-border dark:text-foreground">
+              class="h-13 rounded-pill border-primary/20 bg-background/70 px-7 text-base text-primary hover:bg-secondary dark:border-border dark:text-foreground">
               <NuxtLink :to="heroContent.secondaryCta.href">
                 {{ heroContent.secondaryCta.label }}
               </NuxtLink>
@@ -125,7 +123,7 @@ const icons = [Check, LockKeyhole, MessageCircle]
                   </p>
                 </div>
 
-                <div class="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <div class="flex size-11 items-center justify-center rounded-full bg-warm-300 text-primary-900">
                   <ArrowLeft class="size-5" />
                 </div>
               </div>
