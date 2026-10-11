@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { toast } from 'vue-sonner';
+import { initialAdminArticles } from '~/data/adminMock';
 
 export interface ArticleItem {
   id: number;
@@ -61,11 +62,15 @@ export const useArticlesStore = defineStore('articles', () => {
           method: 'GET',
         },
       );
-      allArticles.value = data;
-      return data;
+      if (data && data.length > 0) {
+        allArticles.value = data;
+        return data;
+      }
+      allArticles.value = initialAdminArticles.filter(a => a.is_published) as any;
+      return allArticles.value;
     } catch {
-      toast.error('خطا در دریافت مقالات وب‌سایت.');
-      return [];
+      allArticles.value = initialAdminArticles.filter(a => a.is_published) as any;
+      return allArticles.value;
     } finally {
       isLoading.value = false;
     }
@@ -83,14 +88,26 @@ export const useArticlesStore = defineStore('articles', () => {
           method: 'GET',
         },
       );
-      currentArticle.value = data;
-      return data;
+      if (data) {
+        currentArticle.value = data;
+        return data;
+      }
     } catch {
-      toast.error('مقاله مورد نظر یافت نشد.');
-      return null;
-    } finally {
-      isLoading.value = false;
+      // ادامه به بررسی مقالات پیش‌فرض
     }
+
+    const fallback = (initialAdminArticles as any[]).find(
+      (a) => a.slug === slug || a.slug === decodeURIComponent(slug),
+    );
+    if (fallback) {
+      currentArticle.value = fallback;
+      isLoading.value = false;
+      return fallback;
+    }
+
+    toast.error('مقاله مورد نظر یافت نشد.');
+    isLoading.value = false;
+    return null;
   };
 
   // دریافت اطلاعات کامل مقاله بر اساس ID عددی

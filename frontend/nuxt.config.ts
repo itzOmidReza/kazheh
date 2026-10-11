@@ -21,9 +21,13 @@ export default defineNuxtConfig({
 
   nitro: {
     routeRules: {
+      '/login': { redirect: '/admin/login' },
+      '/api/v1/**': {
+        proxy: `${process.env.BACKEND_URL || 'http://127.0.0.1:8000'}/api/v1/**`,
+      },
       '/static/**': {
         proxy:
-          `${process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/static/**`.replace(
+          `${process.env.BACKEND_URL || process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/static/**`.replace(
             /\/api\/v1\/static\/\*\*/,
             '/static/**',
           ),
