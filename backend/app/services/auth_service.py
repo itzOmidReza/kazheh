@@ -25,7 +25,7 @@ class AuthService:
         Authenticates an admin by phone and password.
         Returns the AdminUser instance if valid, or None if invalid/inactive.
         """
-        user = AuthService.get_by_phone(db, phone)
+        user = AuthService.get_by_phone(db, phone) or AuthService.get_by_username(db, phone)
         if not user:
             return None
         if not verify_password(password, user.hashed_password):
